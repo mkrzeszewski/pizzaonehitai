@@ -8,3 +8,5 @@ def handleResponse(usrMessage) -> str:
     
     if message == 'roll':
         return str(random.randint(1,6))
+
+    return (usrMessage + " hahaha")

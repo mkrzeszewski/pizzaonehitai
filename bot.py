@@ -22,9 +22,13 @@ def runDiscordBot():
 
     @client.event
     async def on_message(message):
-        print("jakas wiadomosc")
         if message.author == client.user:
             return
-        print(message.content)
+
+        userMessage = str(message.content)
+        print(userMessage)
+        if userMessage[0] == '?':
+            userMessage = userMessage[1:]
+            await sendMessage(message, userMessage, is_private=False)
 
     client.run(TOKEN)
