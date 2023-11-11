@@ -26,6 +26,8 @@ def runDiscordBot():
         if message.author == client.user:
             return
         print (message.author)
+        print (message.content)
+        print (message)
 
         userMessage = str(message.content)
         print(userMessage)
