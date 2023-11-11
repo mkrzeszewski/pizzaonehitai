@@ -15,6 +15,7 @@ def runDiscordBot():
         TOKEN=inputToken.read()
     
     intents_temp = discord.Intents.default()
+    intents_temp.message_content = True
     client = discord.Client(intents = intents_temp)
 
     @client.event
