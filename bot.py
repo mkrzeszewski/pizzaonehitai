@@ -8,6 +8,12 @@ async def sendMessage(message, user_message, is_private):
     except Exception as e:
         print(e)
 
+async def sendWeather():
+    #1172911430601822238 - gruby-test channnel
+    #1032698616910983168 - league of debils
+    #test
+    pass
+
 def runDiscordBot():
     #to do: parse file location
     TOKEN = '#INSERT YOUR TOKEN HERE'
@@ -26,13 +32,9 @@ def runDiscordBot():
     async def on_message(message):
         if message.author == client.user:
             return
-        print (message.author)
-        print (message.content)
-        print (message)
 
         userMessage = str(message.content)
-        print(userMessage)
-        if userMessage[0] == '?':
+        if userMessage[0] == '!':
             userMessage = userMessage[1:]
             await sendMessage(message, userMessage, is_private=False)
 
