@@ -14,7 +14,7 @@ def runDiscordBot():
     with open('token.tkn') as inputToken:
         TOKEN=inputToken.read()
     
-    client = discord.Client(discord.Intents.default())
+    client = discord.Client(intents = discord.Intents.default())
 
     @client.event
     async def onReady():
