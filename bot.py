@@ -17,7 +17,13 @@ def runDiscordBot():
     client = discord.Client(intents = discord.Intents.default())
 
     @client.event
-    async def onReady():
+    async def on_ready():
         print(f'{client.user} is now running!')
+
+    @client.event
+    async def on_message(message):
+        if message.author = client.user:
+            return
+    print(message.content)
 
     client.run(TOKEN)
