@@ -9,8 +9,12 @@ async def sendMessage(message, user_message, is_private):
         print(e)
 
 def runDiscordBot():
+    #to do: parse file location
     TOKEN = '#INSERT YOUR TOKEN HERE'
-    client = discord.Client()
+    with open('token.tkn') as inputToken:
+        TOKEN=inputToken.read()
+    
+    client = discord.Client(discord.Intents.default())
 
     @client.event
     async def onReady():
