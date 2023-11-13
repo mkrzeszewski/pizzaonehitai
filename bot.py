@@ -53,7 +53,10 @@ def runDiscordBot():
         API_KEY = "1f4b8c61bd3abc5071c8b2e823e465cb"
         # upadting the URL
         URL = BASE_URL + "q=" + CITY + "&appid=" + API_KEY
+        FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast?"
+        FORECAST_FINAL_URL = FORECAST_URL + "q=" + CITY + "&appid=" + API_KEY + "&cnt = 60"
         # HTTP request
+        print(URL)
         response = requests.get(URL)
         if response.status_code == 200:
             # getting data in the json format
@@ -74,11 +77,11 @@ def runDiscordBot():
             print(f"Pressure: {pressure}")
             print(f"Weather Report: {report[0]['description']}")
             if temperature >= 273.0 and temperature <= 283.0:
-                await channel.send("temperaturka w lodzi: "+ str(round(temperature - 273.0, 1)) +"°c. L4D2 juz blisko!")
+                await channel.send("Temperaturka w Łodzi wynosi: "+ str(round(temperature - 273.0, 1)) +"°c. L4D2 już blisko!")
             else:
-                await channel.send("@everyone O NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
-                await channel.send("@everyone O NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
-                await channel.send("@everyone O NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
+                await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
+                await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
+                await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
         else:
             print(response.status_code)
 
