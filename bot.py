@@ -56,32 +56,30 @@ def runDiscordBot():
         FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast?"
         FORECAST_FINAL_URL = FORECAST_URL + "q=" + CITY + "&appid=" + API_KEY + "&cnt = 60"
         # HTTP request
-        print(URL)
         response = requests.get(URL)
         if response.status_code == 200:
-            # getting data in the json format
+            # # getting data in the json format
             data = response.json()
-            # getting the main dict block
+            # # getting the main dict block
             main = data['main']
-            # getting temperature
+            # # getting temperature
             temperature = main['temp']
-            # getting the humidity
-            humidity = main['humidity']
-            # getting the pressure
-            pressure = main['pressure']
-            # weather report
-            report = data['weather']
-            print(f"{CITY:-^30}")
-            print(f"Temperature: {temperature}")
-            print(f"Humidity: {humidity}")
-            print(f"Pressure: {pressure}")
-            print(f"Weather Report: {report[0]['description']}")
+            # # getting the humidity
+            # humidity = main['humidity']
+            # # getting the pressure
+            # pressure = main['pressure']
+            # # weather report
+            # report = data['weather']
+            # print(f"{CITY:-^30}")
+            # print(f"Temperature: {temperature}")
+            # print(f"Humidity: {humidity}")
+            # print(f"Pressure: {pressure}")
+            # print(f"Weather Report: {report[0]['description']}")
             if temperature >= 273.0 and temperature <= 283.0:
                 await channel.send("Temperaturka w Łodzi wynosi: "+ str(round(temperature - 273.0, 1)) +"°c. L4D2 już blisko!")
             else:
                 await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
-                await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
-                await channel.send("@everyone TO NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
+
         else:
             print(response.status_code)
 
