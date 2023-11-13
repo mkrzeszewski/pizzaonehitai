@@ -49,7 +49,7 @@ def runDiscordBot():
         #await channel.send('test')
         
         BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
-        CITY = "lodz"
+        CITY = "lodz,pl"
         API_KEY = "1f4b8c61bd3abc5071c8b2e823e465cb"
         # upadting the URL
         URL = BASE_URL + "q=" + CITY + "&appid=" + API_KEY
@@ -73,7 +73,7 @@ def runDiscordBot():
             print(f"Humidity: {humidity}")
             print(f"Pressure: {pressure}")
             print(f"Weather Report: {report[0]['description']}")
-            await channel.send("temperaturka w lodzi: "+temperature+". L4D2 juz blisko!")
+            await channel.send("temperaturka w lodzi: "+ str(temperature - 273.0) +". L4D2 juz blisko!")
         else:
             print(response.status_code)
 
