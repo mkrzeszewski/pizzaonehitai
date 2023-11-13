@@ -73,8 +73,8 @@ def runDiscordBot():
             print(f"Humidity: {humidity}")
             print(f"Pressure: {pressure}")
             print(f"Weather Report: {report[0]['description']}")
-            if temperature >= 273.0:
-                await channel.send("@roLab temperaturka w lodzi: "+ str(round(temperature - 273.0, 1)) +"°c. L4D2 juz blisko!")
+            if temperature >= 273.0 and temperature <= 283.0:
+                await channel.send("temperaturka w lodzi: "+ str(round(temperature - 273.0, 1)) +"°c. L4D2 juz blisko!")
             else:
                 await channel.send("@everyone O NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
                 await channel.send("@everyone O NIE SA CWICZENIA, CZAS NA LEFT 4 DEAD 2 - TEMPERATURA W LODZI TO : "+ str(round(temperature - 273.0, 1)) + "°c.")
