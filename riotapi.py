@@ -79,7 +79,8 @@ def getUserMatchHistory(user):
     matches_ids = getMatchIDs(player_puuid)
     for match in matches_ids:
         if match in matches or match in oldMatches:
-            pass
+            parsedFile.write(str(match) + "\n")
+            oldMatches.append(match)
         else:
             tempMatches.append(match)
             matches.append(match)
