@@ -80,7 +80,7 @@ def runDiscordBot():
                         embed.set_thumbnail(url="https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png")
                         for result in results[:-2]:
                             embed.add_field(name = result, value = "", inline = False)
-                        #await channel.send(embed=embed)
+                        await channel.send(embed=embed)
                     else:
                         print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
         print("koniec")
