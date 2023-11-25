@@ -61,6 +61,8 @@ def analyzeMatch(match):
         ciekawostki.append("lose") 
     ciekawostki.append("Gierka trwała : " + gameDuration + ".")
     #ciekawostki.insert(0,"W tym meczu graly takie byczki z Pizza One Hit : " + playersInMatch[:-2] + "!")
+    parsedFile.write(str(match['metadata']['matchId']) + "\n")
+    oldMatches.append(match['metadata']['matchId'])
     return ciekawostki, ourPlayers
 
     
@@ -79,8 +81,7 @@ def getUserMatchHistory(user):
     matches_ids = getMatchIDs(player_puuid)
     for match in matches_ids:
         if match in matches or match in oldMatches:
-            parsedFile.write(str(match) + "\n")
-            oldMatches.append(match)
+            pass
         else:
             tempMatches.append(match)
             matches.append(match)
