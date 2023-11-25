@@ -7,7 +7,7 @@ riotAPIfile = open ("./riotAPI.txt","r")
 parsedFile = open("./alreadyParsed.txt","r+")
 oldMatches = parsedFile.read().splitlines()
 parsedFile.close()
-parsedFile = open("./alreadyParsed.txt","a")
+
 
 API_KEY = riotAPIfile.read()
 API_SUFFIX = "?api_key=" + API_KEY
@@ -61,7 +61,11 @@ def analyzeMatch(match):
         ciekawostki.append("lose") 
     ciekawostki.append("Gierka trwała : " + gameDuration + ".")
     #ciekawostki.insert(0,"W tym meczu graly takie byczki z Pizza One Hit : " + playersInMatch[:-2] + "!")
+    
+    parsedFile = open("./alreadyParsed.txt","a")
     parsedFile.write(str(match['metadata']['matchId']) + "\n")
+    parsedFile.close()
+
     oldMatches.append(match['metadata']['matchId'])
     return ciekawostki, ourPlayers
 
