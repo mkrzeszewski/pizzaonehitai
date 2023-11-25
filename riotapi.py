@@ -61,7 +61,7 @@ def analyzeMatch(match):
         ciekawostki.append("lose") 
     ciekawostki.append("Gierka trwała : " + gameDuration + ".")
     #ciekawostki.insert(0,"W tym meczu graly takie byczki z Pizza One Hit : " + playersInMatch[:-2] + "!")
-    
+
     parsedFile = open("./alreadyParsed.txt","a")
     parsedFile.write(str(match['metadata']['matchId']) + "\n")
     parsedFile.close()
@@ -94,7 +94,6 @@ def getUserMatchHistory(user):
 def getMatchData(match):
     response_match = requests.get(MATCH_DATA_URL + match + API_SUFFIX)
     if response_match.status_code == 200: 
-        parsedFile.write(str(match) + "\n")
         return response_match.json()
     else:
         print("Podczas analizy meczu dostalismy status code: " + str(response_match.status_code) + ".")
@@ -108,7 +107,6 @@ def analyze():
     for match in matches:    
         response_match = requests.get(MATCH_DATA_URL + match + API_SUFFIX)
         if response_match.status_code == 200: 
-            parsedFile.write(str(match) + "\n")
             final_matches.append(response_match.json())
         else:
             print("Podczas analizy meczu dostalismy status code: " + str(response_match.status_code) + ".")
