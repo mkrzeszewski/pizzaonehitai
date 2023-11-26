@@ -42,14 +42,14 @@ def analyzeMatch(match, isAutomatic):
                     playersInMatch += player['summonerName'] + ", "
                     pizzaPlayerAmount = pizzaPlayerAmount + 1
                     if player['pentaKills'] > 0:
-                        ciekawostki.append(player['summonerName'] + " w tym meczu przykurwił pentę postacią: " + player['championName'] + ".")
+                        ciekawostki.append(player['summonerName'] + " w tym meczu wykręcił penta killa postacią: " + player['championName'] + ".")
 
                     if player['deaths'] >= impressiveDeaths:
                         ciekawostki.append(player['summonerName'] + " zaliczył w tym meczu " + str(player['deaths']) + " wywrotek.")
                     if player['kills'] == 0:
                         ciekawostki.append(player['summonerName'] + " nie zabił nikogo.")
                     if player['challenges']['teamDamagePercentage'] >= 0.60:
-                        ciekawostki.append("Ło cie baben - " + player['summonerName'] + " przykurwił " + str(round(player['challenges']['teamDamagePercentage'],2) * 100) + "%" + "dmg całego teamu.")
+                        ciekawostki.append("Ło cie baben - " + player['summonerName'] + " nabił " + str(round(player['challenges']['teamDamagePercentage'],2) * 100) + "%" + "dmg całego teamu.")
                     if player['challenges']['kda'] < smallestKda:
                         smallestKda = player['challenges']['kda']
                         smallestKdaName = player['summonerName']
@@ -79,7 +79,7 @@ def analyzeMatch(match, isAutomatic):
             
     
     #jakies ciekawostki po przeliczeniu
-    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze:" + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " : " + str(round(highestKda,2)) + " (najlepsze w całej grze:" + str(round(highestKdaGame,2)) + ").")           
+    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze: " + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " : " + str(round(highestKda,2)) + " (najlepsze w całej grze: " + str(round(highestKdaGame,2)) + ").")           
     if wasSurrender == True and weWon == True:
         ciekawostki.append("Przeciwnicy to cipy i się poddały.")
     if wasSurrender == True and weWon == False:

@@ -3,6 +3,7 @@ import responses
 from discord.ext import tasks
 import weather
 import riotapi
+import re
 
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
@@ -68,11 +69,14 @@ def runDiscordBot():
             commands = userMessage.split(" ")
             if len(commands) > 1:
                 if commands[0] == "analyze":
-                    results, players = riotapi.analyzeMatch(riotapi.getMatchData(str(commands[1])), False)
-                    if len(results) > 0 :
-                        await message.channel.send(embed=generateEmbedFromMatch(results,players,commands[1]))
+                    if re.search("EUW1_\d+|EUN1_\d+",commands[1]):
+                        results, players = riotapi.analyzeMatch(riotapi.getMatchData(str(commands[1])), False)
+                        if len(results) > 0 :
+                            await message.channel.send(embed=generateEmbedFromMatch(results,players,commands[1]))
+                        else:
+                            print(results)
                     else:
-                        print("something's wrong")
+                        await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
             else:
                 await sendMessage(message, userMessage, is_private=False)
 
