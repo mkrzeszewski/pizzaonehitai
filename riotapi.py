@@ -28,6 +28,7 @@ def analyzeMatch(match, isAutomatic):
     smallestKdaName = ""
     highestKdaName = ""
     weWon = True
+    wasSurrender = False
     impressiveDeaths = 18
     gameDuration = str(0)
     pizzaPlayerAmount = 0
@@ -55,10 +56,8 @@ def analyzeMatch(match, isAutomatic):
                     if player['challenges']['kda'] > highestKda:
                         highestKda = player['challenges']['kda']
                         highestKdaName = player['summonerName']
-                    if player['gameEndedInSurrender'] == True and player['win'] == True:
-                        ciekawostki.append("Przeciwnicy to cipy i się poddały.")
-                    if player['gameEndedInSurrender'] == True and player['win'] == False:
-                        ciekawostki.append("Chłopakom siadła psycha i zajebali surrendera.")
+
+                    wasSurrender = player['gameEndedInSurrender']
                     weWon = player['win']
 
                     #ciekowistki osobiste
@@ -78,9 +77,13 @@ def analyzeMatch(match, isAutomatic):
     except:
         print(match)
             
-
+    
     #jakies ciekawostki po przeliczeniu
     ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze:" + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " : " + str(round(highestKda,2)) + " (najlepsze w całej grze:" + str(round(highestKdaGame,2)) + ").")           
+    if wasSurrender == True and weWon == True:
+        ciekawostki.append("Przeciwnicy to cipy i się poddały.")
+    if wasSurrender == True and weWon == False:
+        ciekawostki.append("Chłopakom siadła psycha i zajebali surrendera.")
     if weWon == True:
         ciekawostki.append("win")
     else:
