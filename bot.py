@@ -101,7 +101,9 @@ def runDiscordBot():
                 if matchData == 0:
                     pass
                 else:
-                    channel = client.get_channel(1172911430601822238)
+                    #1032698616910983168 - league of debils
+                    #1172911430601822238 - gruby-test
+                    channel = client.get_channel(1032698616910983168)
                     results, players = riotapi.analyzeMatch(matchData, True)
                     if len(results) > 0 and len(players) > 1:
                         await channel.send(embed=generateEmbedFromMatch(results,players,matchData['metadata']['matchId']))
