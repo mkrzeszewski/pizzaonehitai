@@ -80,7 +80,7 @@ def analyzeMatch(match, isAutomatic):
             
 
     #jakies ciekawostki po przeliczeniu
-    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze:" + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " :" + str(round(highestKda,2)) + " (najlepsze w całej grze:" + str(round(highestKdaGame,2)) + ").")           
+    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze:" + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " : " + str(round(highestKda,2)) + " (najlepsze w całej grze:" + str(round(highestKdaGame,2)) + ").")           
     if weWon == True:
         ciekawostki.append("win")
     else:
