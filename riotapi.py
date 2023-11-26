@@ -18,11 +18,15 @@ URLS = []
 USERLIST = {"P1H Rolab","AlphaKubek","Jeezie666","SMIRTFONEK","TipJoker","Wklej","CLG Pablo","Deαn","FatherInLaw","Kamil100CM","Minzzzy"}
 
 
-def analyzeMatch(match):
+def analyzeMatch(match, isAutomatic):
     playersInMatch = ""
     ciekawostki = []
     smallestKda = 10000.0
+    highestKda = -1.0
+    smallestKdaGame = 10000.0
+    highestKdaGame = -1.0
     smallestKdaName = ""
+    highestKdaName = ""
     weWon = True
     impressiveDeaths = 18
     gameDuration = str(0)
@@ -44,27 +48,49 @@ def analyzeMatch(match):
                     if player['kills'] == 0:
                         ciekawostki.append(player['summonerName'] + " nie zabił nikogo.")
                     if player['challenges']['teamDamagePercentage'] >= 0.60:
-                        ciekawostki.append("Ło cie baben - " + player['summonerName'] + " przykurwił " + str(round(player['challenges']['teamDamagePercentage'],2)) + "%dmg całego teamu.")
+                        ciekawostki.append("Ło cie baben - " + player['summonerName'] + " przykurwił " + str(round(player['challenges']['teamDamagePercentage'],2) * 100) + "%" + "dmg całego teamu.")
                     if player['challenges']['kda'] < smallestKda:
                         smallestKda = player['challenges']['kda']
                         smallestKdaName = player['summonerName']
+                    if player['challenges']['kda'] > highestKda:
+                        highestKda = player['challenges']['kda']
+                        highestKdaName = player['summonerName']
+                    if player['gameEndedInSurrender'] == True and player['win'] == True:
+                        ciekawostki.append("Przeciwnicy to cipy i się poddały.")
+                    if player['gameEndedInSurrender'] == True and player['win'] == False:
+                        ciekawostki.append("Chłopakom siadła psycha i zajebali surrendera.")
                     weWon = player['win']
+
+                    #ciekowistki osobiste
+                    if player['summonerName'] == "P1H Rolab" and player['championName'] == "Kennen":
+                        ciekawostki.append("Mati grał kennenem i rzucał małym małym shurikenem")
+                    if player['summonerName'] == "AlphaKubek" and player['championName'] == "Heimerdinger":
+                        ciekawostki.append("Maliniaka znowu atakowały brokuły.")
+                    if player['summonerName'] == "AlphaKubek" and player['championName'] == "Vladimir":
+                        ciekawostki.append("Maliniak z wodogłowiem odwiedził salony.")
+                    if player['summonerName'] == "Tip Joker" and player['championName'] == "Caitlyn" and player['challenges']['mythicItemUsed'] == 6691:
+                        ciekawostki.append("Tomek znowu trolluje kolegom mecz Caitlyn z Duskbladem. Klasyka.")
+
+                if player['challenges']['kda'] < smallestKdaGame:
+                    smallestKdaGame = player['challenges']['kda']
+                if player['challenges']['kda'] > highestKdaGame:
+                    highestKdaGame = player['challenges']['kda']
     except:
         print(match)
             
 
     #jakies ciekawostki po przeliczeniu
-    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda : " + str(round(smallestKda,2)) + ".")           
+    ciekawostki.append(smallestKdaName + " przykurwił najsłabsze kda: " + str(round(smallestKda,2)) + " (najgorsze w całej grze:" + str(round(smallestKdaGame,2)) + ").\nNajlepsze KDA zajebał: " +highestKdaName+ " :" + str(round(highestKda,2)) + " (najlepsze w całej grze:" + str(round(highestKdaGame,2)) + ").")           
     if weWon == True:
         ciekawostki.append("win")
     else:
         ciekawostki.append("lose") 
     ciekawostki.append("Gierka trwała : " + gameDuration + ".")
-    #ciekawostki.insert(0,"W tym meczu graly takie byczki z Pizza One Hit : " + playersInMatch[:-2] + "!")
 
-    parsedFile = open("./alreadyParsed.txt","a")
-    parsedFile.write(str(match['metadata']['matchId']) + "\n")
-    parsedFile.close()
+    if isAutomatic == True:
+        parsedFile = open("./alreadyParsed.txt","a")
+        parsedFile.write(str(match['metadata']['matchId']) + "\n")
+        parsedFile.close()
 
     oldMatches.append(match['metadata']['matchId'])
     return ciekawostki, ourPlayers

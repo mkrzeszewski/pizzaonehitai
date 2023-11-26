@@ -4,9 +4,10 @@ from discord.ext import tasks
 import weather
 import riotapi
 
-WIN_ICON_URL = "https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
-LOSE_ICON_URL = "https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
+WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
+LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
+FOOTER_ICON = "https://cdn3.emoji.gg/emojis/3149-jinx-evil.png"
 
 async def sendMessage(message, user_message, is_private):
     try:
@@ -15,6 +16,31 @@ async def sendMessage(message, user_message, is_private):
     except Exception as e:
         print(e)
 
+def generateEmbedFromMatch(results,players,matchID):
+        playerList = ""
+        for player in players:
+            playerList = playerList + player + ", "
+        playerList = playerList[:-2]
+        print (str("Chłopaki: " + playerList + " zagrali sobie ARAMka!"))
+        print(results[:-1])
+        
+        endGameStatus = "Kolejna przegrana.."
+        endGameIcon = LOSE_ICON_URL
+        endColour = discord.Colour.red()
+
+        if(results[-2] == "win"):
+            endGameStatus = "EZ WIN"
+            endGameIcon = WIN_ICON_URL
+            endColour = discord.Colour.green()
+            
+        embed = discord.Embed(title = str(playerList + " zagrali sobie ARAMka!"), description = str(results[-1]), colour = endColour )
+        embed.set_author(name = endGameStatus, icon_url = endGameIcon)
+        embed.set_thumbnail(url = LOL_ICON)
+        for result in results[:-2]:
+            embed.add_field(name = "", value = result, inline = False)
+
+        embed.set_footer(text = str(matchID), icon_url = FOOTER_ICON)
+        return embed
 def runDiscordBot():
     #to do: parse file location
     TOKEN = '#INSERT YOUR TOKEN HERE'
@@ -40,8 +66,13 @@ def runDiscordBot():
         if userMessage[0] == '!':
             userMessage = userMessage[1:]
             commands = userMessage.split(" ")
-            if len(commands) > 0:
-                pass
+            if len(commands) > 1:
+                if commands[0] == "analyze":
+                    results, players = riotapi.analyzeMatch(riotapi.getMatchData(str(commands[1])), False)
+                    if len(results) > 0 :
+                        await message.channel.send(embed=generateEmbedFromMatch(results,players,commands[1]))
+                    else:
+                        print("something's wrong")
             else:
                 await sendMessage(message, userMessage, is_private=False)
 
@@ -50,34 +81,8 @@ def runDiscordBot():
         #channel = client.get_channel(1172911430601822238)
         print (weather.getLodzWeather())
 
-
-
-    async def analyzeAndSendOnChannel(matchData):
-        channel = client.get_channel(1172911430601822238)
-        results, players = riotapi.analyzeMatch(matchData)
-        if len(results) > 0 and len(players) > 1:
-            playerList = ""
-            for player in players:
-                playerList = playerList + player + ", "
-            playerList = playerList[:-2]
-            print (str("Chłopaki: " + playerList + " zagrali sobie ARAMka!"))
-            print(results[:-1])
-            
-            embed = discord.Embed(title = str(playerList + " zagrali sobie ARAMka!"), description = str(results[-1]))
-            if(results[-2] == "win"):
-                embed.set_author(name="EZ WIN", icon_url = WIN_ICON_URL)
-            else:
-                embed.set_author(name="Kolejna przegrana..", icon_url = LOSE_ICON_URL)
-            embed.set_thumbnail(url = LOL_ICON)
-            for result in results[:-2]:
-                embed.add_field(name = result, value = "", inline = False)
-            await channel.send(embed=embed)
-        else:
-            print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
-
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistory():
-        
         playerList = []
         playersFile = open("lol-players.txt","r")
         playerList = playersFile.read().splitlines()
@@ -96,7 +101,12 @@ def runDiscordBot():
                 if matchData == 0:
                     pass
                 else:
-                    analyzeAndSendOnChannel(matchData)
+                    channel = client.get_channel(1172911430601822238)
+                    results, players = riotapi.analyzeMatch(matchData, True)
+                    if len(results) > 0 and len(players) > 1:
+                        await channel.send(embed=generateEmbedFromMatch(results,players,matchData['metadata']['matchId']))
+                    else:
+                        print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
         print("koniec")
         riotapi.matches = []
     client.run(TOKEN)
