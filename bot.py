@@ -7,7 +7,7 @@ import riotapi
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
-FOOTER_ICON = "https://cdn3.emoji.gg/emojis/3149-jinx-evil.png"
+FOOTER_ICON = "https://cdn3.emoji.gg/emojis/8003-jinxdealwithit.png"
 
 async def sendMessage(message, user_message, is_private):
     try:
