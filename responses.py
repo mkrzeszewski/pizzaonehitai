@@ -12,4 +12,5 @@ def handleResponse(usrMessage) -> str:
         return "embed_test"
     if message == "pogoda":
         return weather.getLodzWeather()
+    
     return (usrMessage + " hahaha (nie rozumiem o chuj Ci chodzi)")
