@@ -7,6 +7,7 @@ import riot.riottftapi as tftapi
 import re
 import json
 import random
+import time
 
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
@@ -79,7 +80,8 @@ def generateEmbedFromTFTMatch(results,players,matchID, date):
         embed.add_field(name = "", value = result, inline = False)
 
     #footer with match ID + date
-    embed.set_footer(text = str(matchID) + "                                                                            " + str(date), icon_url = FOOTER_TFT_ICON)
+    formatted_time = time.strftime('%Y-%m-%d %H:%M', time.gmtime(int(date)))
+    embed.set_footer(text = str(matchID) + "                                                                            " + str(formatted_time), icon_url = FOOTER_TFT_ICON)
 
     #print(datetime.datetime.fromtimestamp(date))
     return embed
@@ -138,10 +140,19 @@ def runDiscordBot():
             commands = userMessage.split(" ")
             if len(commands) > 1:
                 if commands[0] == "analyze":
-                    if re.search("EUW1_\d+|EUN1_\d+",commands[1]):
+                    if re.search(r'EUW1_\d+|EUN1_\d+',commands[1]):
                         results, players = leagueapi.analyzeMatch(leagueapi.getMatchData(str(commands[1])), False)
                         if len(results) > 0 :
                             await message.channel.send(embed=generateEmbedFromLeagueMatch(results,players,commands[1]))
+                        else:
+                            print(results)
+                    else:
+                        await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
+                elif commands[0] == "analyzetft":
+                    if re.search(r'EUW1_\d+|EUN1_\d+',commands[1]):
+                        date, results, players = tftapi.analyzeMatch(tftapi.getMatchData(str(commands[1])), False)
+                        if len(results) > 0 :
+                            await message.channel.send(embed=generateEmbedFromTFTMatch(results,players,commands[1], date))
                         else:
                             print(results)
                     else:
@@ -175,7 +186,6 @@ def runDiscordBot():
             print ("Nie ma obecnie meczy TFT do analizy.")
         else:
             for match in matchesToAnalyze:
-                print ("Analiza meczu: " + str(match))
                 matchData = tftapi.getMatchData(match)
 
                 if matchData == 0:

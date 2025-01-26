@@ -112,6 +112,12 @@ def getRankByString(tier, division):
     
     return number
 
+def getProperCharacterName(originalName):
+    name = originalName.removeprefix("TFT13_")
+    if name == "Beardy":
+        name = "Loris"
+    return name
+
 #returns last 20 IDs of matches in json format, one match ID example: EUN1_3732796685
 def getUserMatchHistory(player_puuid):
     currentMatches = []
@@ -125,11 +131,12 @@ def getUserMatchHistory(player_puuid):
                 currentMatches.append(match)
         return currentMatches
     else:
-        print("cos poszlo nie tak:")
+        print("Something went wrong: ")
         print(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX)
         print(RESPONSE_MATCH_IDS.status_code)
 
 def getMatchData(match):
+    print ("Analysing: " + str(match))
     RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX)
     if RESPONSE_MATCH.status_code == 200: 
         return RESPONSE_MATCH.json()
@@ -145,13 +152,26 @@ def analyzeMatch(match, isAutomatic):
     #for avg rank - later on
     summoner_ids = []
 
-    for participant in match['info']['participants']:
+    maxDamage = 0
+    currMaxDamageUser = ""
+    currEliminationRecord = 0
+
+    for participant in match['info']['participants']:  
         playerName = participant['riotIdGameName']
         placement = participant['placement']
         tempPlayers.append([playerName, placement])
         SUMMONER_ID = requests.get(SUMMONER_API_URL + participant['puuid'] + API_SUFFIX)
         if SUMMONER_ID.status_code == 200:
             summoner_ids.append(SUMMONER_ID.json()['id'])
+
+        if int(participant['total_damage_to_players']) >= maxDamage:
+            maxDamage = int(participant['total_damage_to_players'])
+            currMaxDamageUser = playerName
+
+        #if someone had lvl4/5 3 star - add info in trivia!
+        for unit in participant['units']:
+            if int(unit['rarity']) >= 4 & int(unit['tier']) >= 3:
+                results.append(playerName + " had 3 star " + getProperCharacterName(unit['character_id']) + "!")
     tempPlayers = sorted(tempPlayers, key=itemgetter(1)) 
 
     for player in tempPlayers:
@@ -196,17 +216,26 @@ def analyzeMatch(match, isAutomatic):
                     avg = avg + currRank
                     howManyRanks = howManyRanks + 1
 
+
+    #TRIVIA
+
+    #avg ranks
     if(howManyRanks > 0):
         results.append("AVG rank: " + getRankByNumber(math.ceil(avg / howManyRanks)) )
-    results.append("Gierka trwala : " + str(gameDuration) + " w minutach.")
+
+    #how long the game took
+    results.append("Timeframe: " + str(gameDuration) + "m.")
     
+    #max damage
+    results.append(currMaxDamageUser + " did most damage to other players: " + str(maxDamage) + ".")
+
+    #ensure this match is not analysed again by bot
     if isAutomatic == True:
         parsedFile = open("./riot/alreadyParsedTFT.txt","a")
         parsedFile.write(str(match['metadata']['match_id']) + "\n")
         parsedFile.close()
 
-
     #date = time.strftime('%d-%m-%Y %H:%M:%S', time.gmtime()
     #print(formatted_time)
-    date = int(match['info']['game_datetime'])
+    date = int(int(match['info']['game_datetime']) / 1000) + 3600
     return date, results, matchedPlayers
