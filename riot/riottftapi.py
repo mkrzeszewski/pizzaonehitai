@@ -3,6 +3,7 @@ import time
 import json
 from operator import itemgetter
 import math
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 matches = []
 oldMatches = []
@@ -121,7 +122,7 @@ def getProperCharacterName(originalName):
 #returns last 20 IDs of matches in json format, one match ID example: EUN1_3732796685
 def getUserMatchHistory(player_puuid):
     currentMatches = []
-    RESPONSE_MATCH_IDS = requests.get(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX)
+    RESPONSE_MATCH_IDS = requests.get(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX, headers=headers)
     if RESPONSE_MATCH_IDS.status_code == 200: 
         for match in RESPONSE_MATCH_IDS.json():
             if match in matches or match in oldMatches:
@@ -138,7 +139,7 @@ def getUserMatchHistory(player_puuid):
 
 def getMatchData(match):
     print ("Analysing: " + str(match))
-    RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX)
+    RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX, headers=headers)
     if RESPONSE_MATCH.status_code == 200: 
         return RESPONSE_MATCH.json()
     else:
@@ -164,7 +165,7 @@ def analyzeMatch(match, isAutomatic):
         playerName = participant['riotIdGameName']
         placement = participant['placement']
         tempPlayers.append([playerName, placement])
-        SUMMONER_ID = requests.get(SUMMONER_API_URL + participant['puuid'] + API_SUFFIX)
+        SUMMONER_ID = requests.get(SUMMONER_API_URL + participant['puuid'] + API_SUFFIX, headers=headers)
         if SUMMONER_ID.status_code == 200:
             summoner_ids.append(SUMMONER_ID.json()['id'])
 
@@ -210,7 +211,7 @@ def analyzeMatch(match, isAutomatic):
     avg = 0
     howManyRanks = 0
     for id in summoner_ids:
-        rankBody = requests.get(SUMMONER_RANK_URL + id + API_SUFFIX)
+        rankBody = requests.get(SUMMONER_RANK_URL + id + API_SUFFIX, headers=headers)
         if rankBody.status_code == 200:
             for object in rankBody.json():
                 if object['queueType'] == "RANKED_TFT":
