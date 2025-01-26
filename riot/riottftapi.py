@@ -74,7 +74,7 @@ def getRankByNumber(number):
     #print("Numer na wejsciu to : " + str(number) + ", reszta z modulo 4 to : " + str(rest) + ", main ranga to " + str(main) + ", wiec ranga to : " + rank)
 
     return rank
-        
+
 def getRankByString(tier, division):
     div = 0
     mult = 0
@@ -136,14 +136,13 @@ def getMatchData(match):
     else:
         print("Podczas analizy meczu dostalismy status code: " + str(RESPONSE_MATCH.status_code) + ".")
         return 0
-    return
 
 def analyzeMatch(match, isAutomatic):
     results = []
     tempPlayers = []
     matchedPlayers = []
 
-    #for avg rank
+    #for avg rank - later on
     summoner_ids = []
 
     for participant in match['info']['participants']:
@@ -211,7 +210,3 @@ def analyzeMatch(match, isAutomatic):
     #print(formatted_time)
     date = int(match['info']['game_datetime'])
     return date, results, matchedPlayers
-
-#print(getUserMatchHistory("IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"))
-
-#print(getMatchData("EUN1_3732796685"))

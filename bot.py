@@ -13,12 +13,15 @@ LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngke
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
 TFT_ICON = "https://images.seeklogo.com/logo-png/48/2/teamfight-tactics-logo-png_seeklogo-487286.png"
 FOOTER_ICON = "https://cdn3.emoji.gg/emojis/8003-jinxdealwithit.png"
+FOOTER_TFT_ICON = "https://emoji.discadia.com/emojis/86126f3e-361e-4306-9c3f-c359ed8c50c0.png"
 
 ENFORCER_ICON ="https://cdn.metatft.com/file/metatft/traits/squad.png"
 REBEL_ICON = "https://cdn.metatft.com/file/metatft/traits/rebel.png"
-PITFIGHTER_ICON = "./assets/img/pitfighter.jpg"
 
-ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png" , "https://cdn.metatft.com/file/metatft/traits/warband.png" , "https://cdn.metatft.com/file/metatft/traits/squad.png " , "https://cdn.metatft.com/file/metatft/traits/crime.png"]
+ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png", 
+              "https://cdn.metatft.com/file/metatft/traits/warband.png", 
+              "https://cdn.metatft.com/file/metatft/traits/squad.png", 
+              "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 
 playersFile = open("./riot/riot-players.txt","r")
 USERLIST = playersFile.read().splitlines()
@@ -40,38 +43,43 @@ async def sendMessage(message, user_message, is_private):
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
 
-    endGameStatus = results[0] + " - " + results[1]
-    endGameIcon = random.choice(ICON_ARRAY) #REBEL_ICON
+    #title of embed - ranked/normal - set
+    topTitle = results[0] + " - " + results[1]
+
+    #we random icons for now (left - up corner)
+    embedIcon = random.choice(ICON_ARRAY)
     endColour = discord.Colour.blue()
 
+    #main title and embed data 
     embed = discord.Embed(title = str("Nowa partia z P1H w TFT!"), description = None, colour = endColour )
+    embed.set_author(name = topTitle, icon_url = embedIcon)
+    embed.set_thumbnail(url = TFT_ICON)
 
     playerList = ""
     iterator = 0
     for player in players:
-        
+        #if its one of our players - we want to underline and bold him
         if player in importantPeople:
             player = "__**" + player + "**__"
         iterator += 1
         playerList = playerList + str (iterator) + ". " + player + "\n"
 
-    
+    #list players (strin playerList consist newlines)
     embed.add_field(name = "__Gracze w lobby:__", value = (playerList), inline = False)
     
-
-
-
-    embed.set_author(name = endGameStatus, icon_url = endGameIcon)
-    embed.set_thumbnail(url = TFT_ICON)
-
+    #we delete info of ranked/normal and set - no longer needed in later part
     del results[0]
     del results[0]
 
+    # CAN BE DONE BETTER - this field is to split player section and trivia section
     embed.add_field(name = "Interesting stuff: ", value = "=======================================", inline = False)
+
+    #trivia print (given form analyze match method)
     for result in results:
         embed.add_field(name = "", value = result, inline = False)
 
-    embed.set_footer(text = str(matchID) + "                                                                            " + str(date), icon_url = FOOTER_ICON)
+    #footer with match ID + date
+    embed.set_footer(text = str(matchID) + "                                                                            " + str(date), icon_url = FOOTER_TFT_ICON)
 
     #print(datetime.datetime.fromtimestamp(date))
     return embed
@@ -152,18 +160,24 @@ def runDiscordBot():
         with open('./riot/puuid-list.json','r') as playerFile:
             playersData = json.load(playerFile)
         matchesToAnalyze = []
-
+        parsedFile = open("./riot/alreadyParsedTFT.txt","r+")
+        oldMatches = parsedFile.read().splitlines()
+        parsedFile.close()
         for player in playersData['players']:
             tempMatches = tftapi.getUserMatchHistory(player['puuid'])
             for match in tempMatches:
-                matchesToAnalyze.append(match)   
+                if match in oldMatches:
+                    pass
+                else:
+                    matchesToAnalyze.append(match)   
 
         if len(matchesToAnalyze) == 0:
-            print ("Proba analizy meczow w TFT - nic nowego.")
+            print ("Nie ma obecnie meczy TFT do analizy.")
         else:
             for match in matchesToAnalyze:
                 print ("Analiza meczu: " + str(match))
                 matchData = tftapi.getMatchData(match)
+
                 if matchData == 0:
                     pass
                 else:
@@ -171,6 +185,7 @@ def runDiscordBot():
                     #1172911430601822238 - gruby-test
                     channel = client.get_channel(1172911430601822238)
                     date, results, players = tftapi.analyzeMatch(matchData, True)
+
                     if len(results) > 0 and len(players) > 1:
                         await channel.send(embed=generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
                     else:
@@ -186,7 +201,9 @@ def runDiscordBot():
         matchesToAnalyze = []
         for player in playerList:
             tempMatches = leagueapi.getUserMatchHistory(player)
+            
             for match in tempMatches:
+                
                 matchesToAnalyze.append(match)
         if len(matchesToAnalyze) == 0:
             print ("Nie ma czego analizowac..")
