@@ -4,13 +4,7 @@ import json
 from operator import itemgetter
 import math
 
-headers = {
-    "authority": "www.google.com",
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "accept-language": "en-US,en;q=0.9",
-    "cache-control": "max-age=0",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-}
+
 
 matches = []
 oldMatches = []
@@ -30,6 +24,14 @@ importantPeople = []
 for user in USERLIST:
     importantPeople.append(user.split('#')[0])
 
+headers = {
+    "authority": "www.google.com",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "accept-language": "en-US,en;q=0.9",
+    "cache-control": "max-age=0",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    "X-Riot-Token": API_KEY
+}
 API_SUFFIX = "?api_key=" + API_KEY
 SUMMONER_RANK_URL = "https://eun1.api.riotgames.com/tft/league/v1/entries/by-summoner/"
 SUMMONER_API_URL = "https://eun1.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/"
