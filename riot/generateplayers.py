@@ -7,7 +7,7 @@ json.dump(defaultContent, puuidFile, indent = 4)
 puuidFile.close()
 
 riotAPIfile = open ("./riot/riot-api-key","r")
-API_KEY = riotAPIfile.read()
+API_KEY = riotAPIfile.read().replace('\n','')
 API_SUFFIX = "?api_key=" + API_KEY
 
 playersFile = open("./riot/riot-players.txt","r")

@@ -10,7 +10,7 @@ matches = []
 oldMatches = []
 
 riotAPIfile = open ("./riot/riot-api-key","r")
-API_KEY = riotAPIfile.read()
+API_KEY = riotAPIfile.read().replace('\n','')
 riotAPIfile.close()
 
 parsedFile = open("./riot/alreadyParsedTFT.txt","r+")

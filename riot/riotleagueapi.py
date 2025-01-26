@@ -9,7 +9,8 @@ oldMatches = parsedFile.read().splitlines()
 parsedFile.close()
 
 
-API_KEY = riotAPIfile.read()
+API_KEY = riotAPIfile.read().replace('\n','')
+riotAPIfile.close()
 API_SUFFIX = "?api_key=" + API_KEY
 SUMMONERS_DATA_URL = "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/"
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" #IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"
