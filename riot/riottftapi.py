@@ -146,6 +146,9 @@ def getMatchData(match):
         return 0
 
 def analyzeMatch(match, isAutomatic):
+    if match == 0:
+        print("this is bad")
+        return 
     results = []
     tempPlayers = []
     matchedPlayers = []
