@@ -198,7 +198,7 @@ def runDiscordBot():
                 else:
                     #1032698616910983168 - league of debils
                     #1172911430601822238 - gruby-test
-                    channel = client.get_channel(1172911430601822238)
+                    channel = client.get_channel(1032698616910983168)
                     date, results, players = tftapi.analyzeMatch(matchData, True)
 
                     if len(results) > 0 and len(players) > 1:
