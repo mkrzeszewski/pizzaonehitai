@@ -1,0 +1,22 @@
+{
+    "players": [
+        {
+            "puuid": "IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g",
+            "summoner_id": "Gvx7KYeHgzurYjR676mX6eTnhyrJHg4VIqPJyShYSbSjbak",
+            "tag": "p1h",
+            "riotid": "roLab"
+        },
+        {
+            "puuid": "nk6eonzDgXQjxbf8_D0exfzjm1jYkJ3o7XSYfBBEv3lYjfJhvLPa4-Pkrulh298IUwZBD6zwgxNkWA",
+            "summoner_id": "euPeu9B07NB7YuO-qijQMLpLK0DiqGDwPMNYVCXRYGItVqw",
+            "tag": "2137",
+            "riotid": "Wklej"
+        },
+        {
+            "puuid": "xMM30sFcIEfTJ6VO4-JJ_s8iekYMoOr-3mxbWabdWptA-peWqPo6ei_X74elFxSwjgV8JfyUuPKdSg",
+            "summoner_id": "sIWjCr3OBvKAM-Ic7spYFmZASOMHc6Q4fiGSgvbLSEbJVO4",
+            "tag": "2137",
+            "riotid": "CLG Pablo"
+        }
+    ]
+}

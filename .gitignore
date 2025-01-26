@@ -153,4 +153,6 @@ cython_debug/
 token.tkn
 alreadyParsed
 riotAPI.txt
-*.txt
+riot-api-key
+debug-stuff
+*.png

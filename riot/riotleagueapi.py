@@ -3,8 +3,8 @@ import datetime
 
 matches = []
 oldMatches = []
-riotAPIfile = open ("./riotAPI.txt","r")
-parsedFile = open("./alreadyParsed.txt","r+")
+riotAPIfile = open ("./riot/riot-api-key","r")
+parsedFile = open("./riot/alreadyParsed.txt","r+")
 oldMatches = parsedFile.read().splitlines()
 parsedFile.close()
 
@@ -15,7 +15,7 @@ SUMMONERS_DATA_URL = "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/b
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" #IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"
 MATCH_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/"
 URLS = []
-playersFile = open("lol-players.txt","r")
+playersFile = open("./riot/riot-players.txt","r")
 #playerList = playersFile.read().splitlines()
 
 #USERLIST = {"P1H Rolab","AlphaKubek","Jeezie666","SMIRTFONEK","TipJoker","Wklej","CLG Pablo","Deαn","FatherInLaw","Kamil100CM","Minzzzy"}
@@ -101,9 +101,6 @@ def analyzeMatch(match, isAutomatic):
 
     oldMatches.append(match['metadata']['matchId'])
     return ciekawostki, ourPlayers
-
-    
-
 
 def getMatchIDs(player_puuid):
     response_matches = requests.get(MATCHESID_DATA_URL + player_puuid + "/ids" + API_SUFFIX)
