@@ -134,6 +134,7 @@ def getUserMatchHistory(player_puuid):
         print("Something went wrong: ")
         print(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX)
         print(RESPONSE_MATCH_IDS.status_code)
+    return 0
 
 def getMatchData(match):
     print ("Analysing: " + str(match))

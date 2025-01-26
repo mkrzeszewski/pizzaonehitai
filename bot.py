@@ -176,6 +176,11 @@ def runDiscordBot():
         parsedFile.close()
         for player in playersData['players']:
             tempMatches = tftapi.getUserMatchHistory(player['puuid'])
+
+            #this is quick-fix for an exception and should be handled properly later on
+            if tempMatches == 0:
+                return
+            
             for match in tempMatches:
                 if match in oldMatches:
                     pass
