@@ -199,7 +199,7 @@ def analyzeMatch(match, isAutomatic):
 
     if(howManyRanks > 0):
         results.append("AVG rank: " + getRankByNumber(math.ceil(avg / howManyRanks)) )
-    results.append("Gierka trwala : " + gameDuration + " minuty.")
+    results.append("Gierka trwala : " + str(gameDuration) + " w minutach.")
     
     if isAutomatic == True:
         parsedFile = open("./riot/alreadyParsedTFT.txt","a")
