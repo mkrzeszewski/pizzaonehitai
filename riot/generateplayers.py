@@ -41,10 +41,10 @@ def generatePUUIDfile():
             puuidFile.seek(0)
             json.dump(currentJsonBody,puuidFile, indent = 4)
             puuidFile.close()
-            print("done!")
+            print("[INFO]" + "Successfuly retrived PUUID and SUMMONER ID for user - " + USERNAME + "#" + TAG)
         else:
-            print("error - " + str(PLAYER_DATA.status_code) + ".")
-            print("request URL:")
+            print("[ERROR]" + "while getting user data from API we received status code: " + str(PLAYER_DATA.status_code) + ".")
+            print("URL that has been requested: ")
             print(ACCOUNT_API_URL)
     return
 

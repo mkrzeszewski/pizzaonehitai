@@ -32,7 +32,7 @@ importantPeople = []
 for user in USERLIST:
     importantPeople.append(user.split('#')[0])
 
-print("People that will have their stats shown:")
+print("[INFO]" + "People that will have their stats shown:")
 print(importantPeople)
 
 async def sendMessage(message, user_message, is_private):
@@ -124,7 +124,7 @@ def runDiscordBot():
 
     @client.event
     async def on_ready():
-        print(f'{client.user} is now running!')
+        print("[INFO]" + f'{client.user} is now running!')
         #sendWeather.start()
         #analyzeMatchHistoryLeague.start()
         analyzeMatchHistoryTFT.start()
@@ -153,8 +153,6 @@ def runDiscordBot():
                         date, results, players = tftapi.analyzeMatch(tftapi.getMatchData(str(commands[1])), False)
                         if len(results) > 0 :
                             await message.channel.send(embed=generateEmbedFromTFTMatch(results,players,commands[1], date))
-                        else:
-                            print(results)
                     else:
                         await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
             else:
@@ -167,6 +165,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
+        currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         playersData = []
         with open('./riot/puuid-list.json','r') as playerFile:
             playersData = json.load(playerFile)
@@ -188,7 +187,7 @@ def runDiscordBot():
                     matchesToAnalyze.append(match)   
 
         if len(matchesToAnalyze) == 0:
-            print ("Nie ma obecnie meczy TFT do analizy.")
+            print ("[INFO]" + currData + " - Nie ma obecnie meczy TFT do analizy.")
         else:
             for match in matchesToAnalyze:
                 matchData = tftapi.getMatchData(match)
@@ -200,15 +199,13 @@ def runDiscordBot():
                     #1172911430601822238 - gruby-test
                     channel = client.get_channel(1032698616910983168)
                     date, results, players = tftapi.analyzeMatch(matchData, True)
+                    await channel.send(embed=generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
 
-                    if len(results) > 0 and len(players) > 1:
-                        await channel.send(embed=generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
-                    else:
-                        print ("ktos gral solo - match : " + str(matchData['metadata']['match_id'])) 
         tftapi.matches = []
 
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryLeague():
+        currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         playerList = []
         playersFile = open("lol-players.txt","r")
         playerList = playersFile.read().splitlines()
@@ -221,10 +218,10 @@ def runDiscordBot():
                 
                 matchesToAnalyze.append(match)
         if len(matchesToAnalyze) == 0:
-            print ("Nie ma czego analizowac..")
+            print ("[INFO]" + currData + " - Nie ma czego analizowac..")
         else:
             for match in matchesToAnalyze:
-                print ("Analiza meczu: " + str(match))
+                print (currData + " - Analiza meczu: " + str(match))
                 matchData = leagueapi.getMatchData(match)
                 if matchData == 0:
                     pass
@@ -237,7 +234,6 @@ def runDiscordBot():
                         await channel.send(embed=generateEmbedFromLeagueMatch(results,players,matchData['metadata']['matchId']))
                     else:
                         print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
-        print("koniec")
         leagueapi.matches = []
 
     client.run(TOKEN)

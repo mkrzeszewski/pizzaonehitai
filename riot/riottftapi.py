@@ -141,23 +141,23 @@ def getUserMatchHistory(player_puuid):
                 currentMatches.append(match)
         return currentMatches
     else:
-        print("Something went wrong: ")
+        print("[ERROR]" + "Something went wrong: ")
         print(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX)
         print(RESPONSE_MATCH_IDS.status_code)
     return 0
 
 def getMatchData(match):
-    print ("Analysing: " + str(match))
+    print ("[INFO]" + "Analysing: " + str(match))
     RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX, headers=headers)
     if RESPONSE_MATCH.status_code == 200: 
         return RESPONSE_MATCH.json()
     else:
-        print("Podczas analizy meczu dostalismy status code: " + str(RESPONSE_MATCH.status_code) + ".")
+        print("[ERROR]" + "Podczas analizy meczu dostalismy status code: " + str(RESPONSE_MATCH.status_code) + ".")
         return 0
 
 def analyzeMatch(match, isAutomatic):
     if match == 0:
-        print("this is bad")
+        print("[ERROR]" + "Empty match data has been parsed to analyzeMatch - aborting.")
         return 
     results = []
     tempPlayers = []
