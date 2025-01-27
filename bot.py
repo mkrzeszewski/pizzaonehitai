@@ -1,13 +1,14 @@
 import discord
 import responses
 from discord.ext import tasks
-import weather
+import plugins.weather as weather
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import re
 import json
 import random
 import time
+import os
 
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
@@ -24,7 +25,7 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 
-playersFile = open("./riot/riot-players.txt","r")
+playersFile = open("./sharedpath/riot-players.txt","r")
 USERLIST = playersFile.read().splitlines()
 playersFile.close()
 
@@ -114,10 +115,11 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
 
 def runDiscordBot():
     #to do: parse file location
-    TOKEN = '#INSERT YOUR TOKEN HERE'
-    with open('token.tkn') as inputToken:
-        TOKEN=inputToken.read()
     
+    TOKEN = '#INSERT YOUR TOKEN HERE'
+    with open('./sharedpath/token.tkn') as inputToken:
+        TOKEN=inputToken.read()
+    #TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
     client = discord.Client(intents = intents_temp)
@@ -167,10 +169,10 @@ def runDiscordBot():
     async def analyzeMatchHistoryTFT():
         currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         playersData = []
-        with open('./riot/puuid-list.json','r') as playerFile:
+        with open('./sharedpath/puuid-list.json','r') as playerFile:
             playersData = json.load(playerFile)
         matchesToAnalyze = []
-        parsedFile = open("./riot/alreadyParsedTFT.txt","r+")
+        parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
         oldMatches = parsedFile.read().splitlines()
         parsedFile.close()
         for player in playersData['players']:
@@ -207,7 +209,7 @@ def runDiscordBot():
     async def analyzeMatchHistoryLeague():
         currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         playerList = []
-        playersFile = open("lol-players.txt","r")
+        playersFile = open("./sharedpath/riot-players.txt","r")
         playerList = playersFile.read().splitlines()
         playersFile.close()
         matchesToAnalyze = []

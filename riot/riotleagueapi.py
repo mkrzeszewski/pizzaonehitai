@@ -3,8 +3,8 @@ import datetime
 
 matches = []
 oldMatches = []
-riotAPIfile = open ("./riot/riot-api-key","r")
-parsedFile = open("./riot/alreadyParsed.txt","r+")
+riotAPIfile = open ("./sharedpath/riot-api-key","r")
+parsedFile = open("./sharedpath/alreadyParsed.txt","r+")
 oldMatches = parsedFile.read().splitlines()
 parsedFile.close()
 
@@ -16,7 +16,7 @@ SUMMONERS_DATA_URL = "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/b
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" #IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"
 MATCH_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/"
 URLS = []
-playersFile = open("./riot/riot-players.txt","r")
+playersFile = open("./sharedpath/riot-players.txt","r")
 #playerList = playersFile.read().splitlines()
 
 #USERLIST = {"P1H Rolab","AlphaKubek","Jeezie666","SMIRTFONEK","TipJoker","Wklej","CLG Pablo","Deαn","FatherInLaw","Kamil100CM","Minzzzy"}
@@ -96,7 +96,7 @@ def analyzeMatch(match, isAutomatic):
     ciekawostki.append("Gierka trwała : " + gameDuration + ".")
 
     if isAutomatic == True:
-        parsedFile = open("./alreadyParsed.txt","a")
+        parsedFile = open("./sharedpath/alreadyParsed.txt","a")
         parsedFile.write(str(match['metadata']['matchId']) + "\n")
         parsedFile.close()
 

@@ -1,11 +1,11 @@
 import random
-import weather
+import plugins.weather as weather
 
 def handleResponse(usrMessage) -> str:
     message = usrMessage.lower()
 
     if message == 'bingo':
-        return 'chuj ci na ryj!!!'
+        return 'bingo'
     if message == 'roll':
         return str(random.randint(1,6))
     if message == 'embed':

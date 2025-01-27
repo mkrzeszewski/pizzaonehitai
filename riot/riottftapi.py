@@ -9,15 +9,15 @@ import math
 matches = []
 oldMatches = []
 
-riotAPIfile = open ("./riot/riot-api-key","r")
+riotAPIfile = open ("./sharedpath/riot-api-key","r")
 API_KEY = riotAPIfile.read().replace('\n','')
 riotAPIfile.close()
 
-parsedFile = open("./riot/alreadyParsedTFT.txt","r+")
+parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
 oldMatches = parsedFile.read().splitlines()
 parsedFile.close()
 
-playersFile = open("./riot/riot-players.txt","r")
+playersFile = open("./sharedpath/riot-players.txt","r")
 USERLIST = playersFile.read().splitlines()
 playersFile.close()
 importantPeople = []
@@ -41,7 +41,7 @@ MATCH_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/"
 URLS = []
 playersData = {}
 
-with open('./riot/puuid-list.json','r') as playerFile:
+with open('./sharedpath/puuid-list.json','r') as playerFile:
     playersData = json.load(playerFile)
 
 def getRankByNumber(number):
@@ -245,7 +245,7 @@ def analyzeMatch(match, isAutomatic):
 
     #ensure this match is not analysed again by bot
     if isAutomatic == True:
-        parsedFile = open("./riot/alreadyParsedTFT.txt","a")
+        parsedFile = open("./sharedpath/alreadyParsedTFT.txt","a")
         parsedFile.write(str(match['metadata']['match_id']) + "\n")
         parsedFile.close()
 
