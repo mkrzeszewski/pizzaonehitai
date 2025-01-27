@@ -3,15 +3,14 @@ import time
 import json
 from operator import itemgetter
 import math
+import os
 
 
 
 matches = []
 oldMatches = []
 
-riotAPIfile = open ("./sharedpath/riot-api-key","r")
-API_KEY = riotAPIfile.read().replace('\n','')
-riotAPIfile.close()
+API_KEY = os.environ["RIOT_API_TOKEN"]
 
 parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
 oldMatches = parsedFile.read().splitlines()
