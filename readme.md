@@ -5,7 +5,7 @@ docker run -d --mount src="/opt/pizzaonehitai/sharedpath",target=/pizzaonehitai/
 -e DC_TOKEN=$(cat /opt/pizzaonehitai/sharedpath/token.tkn) \
 -e RIOT_API_TOKEN=$(cat /opt/pizzaonehitai/sharedpath/riot-api-key) \
 --name p1h-discord-bot \
-mkrzeszewski/pizzaonehit-discord-bot:multiarch-env-tokens
+mkrzeszewski/pizzaonehit-discord-bot:latest
 ```
 ### clearing old containers:
 ```
@@ -18,7 +18,7 @@ version: '3'
 services:
   p1h-discord-bot:
     container_name: p1h-dc-bot
-    image: mkrzeszewski/pizzaonehit-discord-bot:multiarch-env-tokens
+    image: mkrzeszewski/pizzaonehit-discord-bot:latest
     restart: unless-stopped
     volumes:
       - /opt/pizzaonehitai/sharedpath:/pizzaonehitai/sharedpath
