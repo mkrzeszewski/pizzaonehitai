@@ -11,3 +11,18 @@ mkrzeszewski/pizzaonehit-discord-bot:multiarch-env-tokens
 ```
 for container in $(docker ps -a | awk '{print $1}'); do docker rm $container; done;
 ```
+### for docker compose
+```
+version: '3'
+
+services:
+  p1h-discord-bot:
+    container_name: p1h-dc-bot
+    image: mkrzeszewski/pizzaonehit-discord-bot:multiarch-env-tokens
+    restart: unless-stopped
+    volumes:
+      - /opt/pizzaonehitai/sharedpath:/pizzaonehitai/sharedpath
+    environment:
+        RIOT_API_TOKEN: <YOUR RIOT TOKEN>
+        DC_TOKEN: <YOUR DC TOKEN>
+```
