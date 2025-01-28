@@ -1,13 +1,15 @@
 import requests
 import json
+import os
+
 defaultContent = {"players": []}
+
 puuidFile = open("./riot/puuid-list.json","r+")
 puuidFile.truncate(0)
 json.dump(defaultContent, puuidFile, indent = 4)
 puuidFile.close()
 
-riotAPIfile = open ("./riot/riot-api-key","r")
-API_KEY = riotAPIfile.read().replace('\n','')
+API_KEY = os.environ["RIOT_API_TOKEN"]
 API_SUFFIX = "?api_key=" + API_KEY
 
 playersFile = open("./riot/riot-players.txt","r")

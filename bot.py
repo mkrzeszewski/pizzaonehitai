@@ -114,12 +114,7 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
     return embed
 
 def runDiscordBot():
-    #to do: parse file location
-    
-    TOKEN = '#INSERT YOUR TOKEN HERE'
-    with open('./sharedpath/token.tkn') as inputToken:
-        TOKEN=inputToken.read()
-    #TOKEN = os.environ["DC_TOKEN"]
+    TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
     client = discord.Client(intents = intents_temp)
