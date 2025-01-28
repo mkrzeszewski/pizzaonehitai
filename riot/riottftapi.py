@@ -162,6 +162,24 @@ def analyzeMatch(match, isAutomatic):
     tempPlayers = []
     matchedPlayers = []
 
+    queueType = str(match['info']['queue_id'])
+    if queueType == "6100":
+        queueType = "NORMAL"
+    elif queueType == "1090":
+        queueType = "NORMAL"
+    elif queueType == "1100":
+        queueType = "RANKED"
+    elif queueType == "1130":
+        queueType = "HYPER ROLL"
+
+    gameType = queueType 
+    setCoreName =  str(match['info']['tft_set_core_name'])
+    match setCoreName:
+        case "TFTSet13":
+            setCoreName = "TFT SET 13 - Arcane"
+        case "TFTSet4_Act2":
+            setCoreName = "TFT SET 4.5 - Fates"
+
     #for avg rank - later on
     summoner_ids = []
 
@@ -183,31 +201,13 @@ def analyzeMatch(match, isAutomatic):
 
         #if someone had lvl4/5 3 star - add info in trivia!
         for unit in participant['units']:
-            if int(unit['rarity']) >= 4 & int(unit['tier']) >= 3:
-                results.append(playerName + " had 3 star " + getProperCharacterName(unit['character_id']) + "!")
+            properName = str(getProperCharacterName(unit['character_id']))
+            if (int(unit['rarity']) >= 4) & (int(unit['tier']) >= 3) & (properName != "Sion") :
+                results.append(playerName + " had 3 star " + properName + "!")
     tempPlayers = sorted(tempPlayers, key=itemgetter(1)) 
 
     for player in tempPlayers:
         matchedPlayers.append(player[0])
-
-    queueType = str(match['info']['queue_id'])
-    if queueType == "6100":
-        queueType = "NORMAL"
-    elif queueType == "1090":
-        queueType = "NORMAL"
-    elif queueType == "1100":
-        queueType = "RANKED"
-    elif queueType == "1130":
-        queueType = "HYPER ROLL"
-
-    gameType = queueType 
-    setCoreName =  str(match['info']['tft_set_core_name'])
-    match setCoreName:
-        case "TFTSet13":
-            setCoreName = "TFT SET 13 - Arcane"
-        case "TFTSet4_Act2":
-            setCoreName = "TFT SET 4.5 - Fates"
-
 
     gameDuration = match['info']['game_length']
     gameDuration = math.ceil(gameDuration / 60)
