@@ -1,4 +1,4 @@
-from random import random
+import random
 from discord import Embed, Colour
 import time
 

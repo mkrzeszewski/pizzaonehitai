@@ -1,6 +1,9 @@
 import random
 import plugins.weather as weather
 
+def getWeather():
+    return weather.getLodzWeather()
+
 def handleResponse(usrMessage) -> str:
     message = usrMessage.lower()
 

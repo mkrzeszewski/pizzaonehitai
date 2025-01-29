@@ -31,18 +31,27 @@ headers = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     "X-Riot-Token": API_KEY
 }
+
 API_SUFFIX = "?api_key=" + API_KEY
 SUMMONER_RANK_URL = "https://eun1.api.riotgames.com/tft/league/v1/entries/by-summoner/"
 SUMMONER_API_URL = "https://eun1.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/"
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/"
 MATCHESID_SUFFIX = "/ids?start=0&count=20&api_key=" + API_KEY
 MATCH_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/"
+PLATFORM_STATUS_URL = "https://eun1.api.riotgames.com/tft/status/v1/platform-data"
 URLS = []
 playersData = {}
 
 with open('./sharedpath/puuid-list.json','r') as playerFile:
     playersData = json.load(playerFile)
 
+def isAPIDown():
+    API_RESPONSE = requests.get(PLATFORM_STATUS_URL + API_SUFFIX, headers=headers)
+    if API_RESPONSE.status_code == 200:
+        return False
+    return API_RESPONSE.status_code
+
+#this function is to exchange numeric rank (obtained by getRankByString) to its proper correspondet rank name (i.e 17 = Platinum IV)
 def getRankByNumber(number):
 
     rest = number % 4
@@ -84,6 +93,7 @@ def getRankByNumber(number):
 
     return rank
 
+#this function is to change literal rank name (I.E - Platinum IV) to numeric rank (in case of P4 - 17). It's counterpart is getRankByNumber
 def getRankByString(tier, division):
     div = 0
     mult = 0
@@ -121,11 +131,39 @@ def getRankByString(tier, division):
     
     return number
 
+#modify names from TFT Api to what we know as playing
 def getProperCharacterName(originalName):
     name = originalName.removeprefix("TFT13_")
     if name == "Beardy":
         name = "Loris"
     return name
+
+#this is called every 5 minutes by bot
+def getMatchesToAnalyze():
+    playersData = []
+    with open('./sharedpath/puuid-list.json','r') as playerFile:
+        playersData = json.load(playerFile)
+    matchesToAnalyze = []
+    parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
+    oldMatches = parsedFile.read().splitlines()
+    parsedFile.close()
+    for player in playersData['players']:
+        tempMatches = getUserMatchHistory(player['puuid'])
+        #this is quick-fix for an exception and should be handled properly later on
+        if tempMatches == 0:
+            return 
+        for match in tempMatches:
+            if match in oldMatches:
+                pass
+            else:
+                matchesToAnalyze.append(match)   
+    if len(matchesToAnalyze) == 0:
+        print ("[INFO]" + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " - Nie ma obecnie meczy TFT do analizy.")
+        return None
+    else:
+        matches = []
+        return matchesToAnalyze
+    
 
 #returns last 20 IDs of matches in json format, one match ID example: EUN1_3732796685
 def getUserMatchHistory(player_puuid):
@@ -145,6 +183,7 @@ def getUserMatchHistory(player_puuid):
         print(RESPONSE_MATCH_IDS.status_code)
     return 0
 
+#get data from one match (match = MATCHID, example EUN1_3732796685)
 def getMatchData(match):
     print ("[INFO]" + "Analysing: " + str(match))
     RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX, headers=headers)
@@ -154,6 +193,7 @@ def getMatchData(match):
         print("[ERROR]" + "Podczas analizy meczu dostalismy status code: " + str(RESPONSE_MATCH.status_code) + ".")
         return 0
 
+#get interesting data from match, returns:date when match took place, results array, players that played.
 def analyzeMatch(match, isAutomatic):
     if match == 0:
         print("[ERROR]" + "Empty match data has been parsed to analyzeMatch - aborting.")

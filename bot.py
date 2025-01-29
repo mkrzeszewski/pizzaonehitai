@@ -1,12 +1,10 @@
 import discord
 import responses
 from discord.ext import tasks
-import plugins.weather as weather
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import re
 import json
-import random
 import time
 import os
 import embedgen
@@ -33,18 +31,19 @@ def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
-    client = discord.Client(intents = intents_temp)
+    bot = discord.Client(intents = intents_temp)
 
-    @client.event
+    @bot.event
     async def on_ready():
-        print("[INFO]" + f'{client.user} is now running!')
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
+        print("[INFO]" + f'{bot.user} is now running!')
         #sendWeather.start()
         #analyzeMatchHistoryLeague.start()
         analyzeMatchHistoryTFT.start()
         
-    @client.event
+    @bot.event
     async def on_message(message):
-        if message.author == client.user:
+        if message.author == bot.user:
             return
         
         userMessage = str(message.content)
@@ -73,11 +72,27 @@ def runDiscordBot():
 
     @tasks.loop(hours = 1.0)
     async def sendWeather():
-        #channel = client.get_channel(1172911430601822238)
-        print (weather.getLodzWeather())
-
+        print (responses.getWeather())
+        
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
+        channel = bot.get_channel(1172911430601822238)
+        status_code = tftapi.isAPIDown()
+        if status_code:
+            print("[ERROR] API is unreachable - status code " + status_code)
+        else:
+            matchesToAnalyze = tftapi.getMatchesToAnalyze()
+            if matchesToAnalyze != None:
+                for match in matchesToAnalyze:
+                    matchData = tftapi.getMatchData(match)
+                    if matchData == 0:
+                        pass
+                    else:
+                        date, results, players = tftapi.analyzeMatch(matchData, True)
+                        await channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
+        return 0
+        
+
         currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         playersData = []
         with open('./sharedpath/puuid-list.json','r') as playerFile:
@@ -110,9 +125,9 @@ def runDiscordBot():
                 else:
                     #1032698616910983168 - league of debils
                     #1172911430601822238 - gruby-test
-                    channel = client.get_channel(1172911430601822238)
+                    channel = bot.get_channel(1172911430601822238)
                     date, results, players = tftapi.analyzeMatch(matchData, True)
-                    await channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
+                    
 
         tftapi.matches = []
 
@@ -142,7 +157,7 @@ def runDiscordBot():
 
                     #1032698616910983168 - league of debils
                     #1172911430601822238 - gruby-test
-                    channel = client.get_channel(os.environ["DISCORD_CHANNEL_TFT"])
+                    channel = bot.get_channel(os.environ["DISCORD_CHANNEL_TFT"])
                     results, players = leagueapi.analyzeMatch(matchData, True)
                     if len(results) > 0 and len(players) > 1:
                         await channel.send(embed=embedgen.generateEmbedFromLeagueMatch(results,players,matchData['metadata']['matchId']))
@@ -150,4 +165,4 @@ def runDiscordBot():
                         print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
         leagueapi.matches = []
 
-    client.run(TOKEN)
+    bot.run(TOKEN)
