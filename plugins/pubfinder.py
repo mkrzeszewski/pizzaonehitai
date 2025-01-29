@@ -10,7 +10,10 @@ GOOGLE_API_KEY = environ["GOOGLE_MAPS_API_KEY"]
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
 dbclient = MongoClient(CONN_URL)
 db = dbclient['discord']
+user_collection = db['users']
 
+
+#geographic midpoint between users - at the moment - all users in database
 def calculateGeographicMidpoint(coords):
     latitudes = np.radians([c[0] for c in coords])
     longitudes = np.radians([c[1] for c in coords])
@@ -29,8 +32,8 @@ def calculateGeographicMidpoint(coords):
     
     return np.degrees(central_latitude), np.degrees(central_longitude)
 
-def find_restaurant(api_key, location, radius=1000):
-    gmaps = googlemaps.Client(key=api_key)
+def find_restaurant(location, radius=1000):
+    gmaps = googlemaps.Client(key = GOOGLE_API_KEY)
     places = gmaps.places_nearby(
         location=location,
         radius=radius,
@@ -40,29 +43,35 @@ def find_restaurant(api_key, location, radius=1000):
     if places.get("results"):
         best_place = sorted(places["results"], key=lambda x: x.get("rating", 0), reverse=True)[0]
         return best_place
-    return None
+    else:
+        return find_restaurant(location, radius = radius + 1000)
+    #return None
 
-def main():
-    parser = argparse.ArgumentParser(description="Find a central restaurant for given locations.")
-    parser.add_argument("coords", nargs='+', help="List of latitude,longitude pairs", type=str)
-    args = parser.parse_args()
-    
-    coords = [tuple(map(float, coord.split(','))) for coord in args.coords]
-    midpoint = calculateGeographicMidpoint(coords)
-    
-    
+def chooseRestaurant():
+    reply = ""
     if not GOOGLE_API_KEY:
-        print("Google Maps API key not found. Set GOOGLE_MAPS_API_KEY as an environment variable.")
+        print("[ERROR]Google Maps API key not found. Set GOOGLE_MAPS_API_KEY as an environment variable.")
         return
-    
-    restaurant = find_restaurant(GOOGLE_API_KEY, midpoint)
+    coords = []
+    users = user_collection.find({})
+    if users != None:
+        for user in users:
+            if user['riotid'] == 'roLab' or user['riotid'] == 'SMIRNOFF' or user['riotid'] == 'Wklej' or user['riotid'] == 'FatherInLaw':
+                coords.append(user['coordinates'])
+    if len(coords) > 1:
+        midpoint = calculateGeographicMidpoint(coords)
+        restaurant = find_restaurant(midpoint)
+    else:
+        return None
     
     if restaurant:
-        print(f"Best Restaurant: {restaurant['name']}")
-        print(f"Address: {restaurant['vicinity']}")
-        print(f"Rating: {restaurant.get('rating', 'N/A')}")
-    else:
-        print("No restaurants found near the midpoint.")
+        return restaurant
+        #reply = reply + f"Best Restaurant: {restaurant['name']}\n"
+        #reply = reply + f"Address: {restaurant['vicinity']}\n"
+        #reply = reply + f"Rating: {restaurant.get('rating', 'N/A')}\n"
+    #else:
+        #reply = reply + "No restaurants found near the midpoint."
+
+    return None
     
-if __name__ == "__main__":
-    main()
+   
