@@ -44,7 +44,7 @@ API_SUFFIX = ""# "?api_key=" + API_KEY
 SUMMONER_RANK_URL = "https://eun1.api.riotgames.com/tft/league/v1/entries/by-summoner/"
 SUMMONER_API_URL = "https://eun1.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/"
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/"
-MATCHESID_SUFFIX = "/ids?start=0&count=20&api_key=" + API_KEY
+MATCHESID_SUFFIX = "/ids?start=0&count=20" #&api_key=" + API_KEY
 MATCH_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/"
 PLATFORM_STATUS_URL = "https://eun1.api.riotgames.com/tft/status/v1/platform-data"
 
