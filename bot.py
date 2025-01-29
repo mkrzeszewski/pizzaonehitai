@@ -11,17 +11,6 @@ import asyncio
 import datetime
 import plugins.birthday as birthday
 
-playersFile = open("./sharedpath/riot-players.txt","r")
-USERLIST = playersFile.read().splitlines()
-playersFile.close()
-
-importantPeople = []
-for user in USERLIST:
-    importantPeople.append(user.split('#')[0])
-
-print("[INFO]" + "People that will have their stats shown:")
-print(importantPeople)
-
 async def sendMessage(message, user_message, is_private):
     try:
         response = responses.handleResponse(user_message)
@@ -109,7 +98,7 @@ def runDiscordBot():
         channel = bot.get_channel(1172911430601822238)
         status_code = tftapi.isAPIDown()
         if status_code:
-            print("[ERROR] API is unreachable - status code " + status_code)
+            print("[ERROR] API is unreachable - status code " + str(status_code))
         else:
             matchesToAnalyze = tftapi.getMatchesToAnalyze()
             if matchesToAnalyze != None:
