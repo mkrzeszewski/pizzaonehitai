@@ -1,28 +1,35 @@
 import requests
 import time
-import json
 from operator import itemgetter
 import math
-import os
+from os import environ
+from pymongo import MongoClient
 
+#token for RIOT - defined in ENV file
+API_KEY = environ["RIOT_API_TOKEN"]
 
+#connect to mongodb database and get proper database
+CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
+client = MongoClient(CONN_URL)
+db = client['discord']
 
-matches = []
+#collection for tft matches (add already parsed)
+matches_collection = db['parsed_tft_matches']
+
+#users collection
+user_collection = db['users']
+
+users = user_collection.find({})
+importantPeople = []
+players = []
 oldMatches = []
 
-API_KEY = os.environ["RIOT_API_TOKEN"]
+if users != None:
+    for user in users:
+        players.append(user)
+        importantPeople.append(user['riotid'])
 
-parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
-oldMatches = parsedFile.read().splitlines()
-parsedFile.close()
-
-playersFile = open("./sharedpath/riot-players.txt","r")
-USERLIST = playersFile.read().splitlines()
-playersFile.close()
-importantPeople = []
-for user in USERLIST:
-    importantPeople.append(user.split('#')[0])
-
+#imitate real browser
 headers = {
     "authority": "www.google.com",
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -32,18 +39,14 @@ headers = {
     "X-Riot-Token": API_KEY
 }
 
-API_SUFFIX = "?api_key=" + API_KEY
+#API & URL FOR API
+API_SUFFIX = ""# "?api_key=" + API_KEY
 SUMMONER_RANK_URL = "https://eun1.api.riotgames.com/tft/league/v1/entries/by-summoner/"
 SUMMONER_API_URL = "https://eun1.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/"
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/by-puuid/"
 MATCHESID_SUFFIX = "/ids?start=0&count=20&api_key=" + API_KEY
 MATCH_DATA_URL = "https://europe.api.riotgames.com/tft/match/v1/matches/"
 PLATFORM_STATUS_URL = "https://eun1.api.riotgames.com/tft/status/v1/platform-data"
-URLS = []
-playersData = {}
-
-with open('./sharedpath/puuid-list.json','r') as playerFile:
-    playersData = json.load(playerFile)
 
 def isAPIDown():
     API_RESPONSE = requests.get(PLATFORM_STATUS_URL + API_SUFFIX, headers=headers)
@@ -140,18 +143,20 @@ def getProperCharacterName(originalName):
 
 #this is called every 5 minutes by bot
 def getMatchesToAnalyze():
-    playersData = []
-    with open('./sharedpath/puuid-list.json','r') as playerFile:
-        playersData = json.load(playerFile)
     matchesToAnalyze = []
-    parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
-    oldMatches = parsedFile.read().splitlines()
-    parsedFile.close()
-    for player in playersData['players']:
+    matches_collection = db['parsed_tft_matches']
+    analyzed_matches = matches_collection.find({})
+    
+    if analyzed_matches != None:
+        for analyzed_match in analyzed_matches:
+            oldMatches.append(analyzed_match['riotid'])
+    for player in players:
         tempMatches = getUserMatchHistory(player['puuid'])
+
         #this is quick-fix for an exception and should be handled properly later on
-        if tempMatches == 0:
+        if tempMatches == None:
             return 
+        
         for match in tempMatches:
             if match in oldMatches:
                 pass
@@ -161,27 +166,25 @@ def getMatchesToAnalyze():
         print ("[INFO]" + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " - Nie ma obecnie meczy TFT do analizy.")
         return None
     else:
-        matches = []
         return matchesToAnalyze
     
-
 #returns last 20 IDs of matches in json format, one match ID example: EUN1_3732796685
 def getUserMatchHistory(player_puuid):
     currentMatches = []
     RESPONSE_MATCH_IDS = requests.get(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX, headers=headers)
     if RESPONSE_MATCH_IDS.status_code == 200: 
         for match in RESPONSE_MATCH_IDS.json():
-            if match in matches or match in oldMatches:
+            if match in oldMatches:
                 pass
             else:
-                matches.append(match)
                 currentMatches.append(match)
         return currentMatches
     else:
         print("[ERROR]" + "Something went wrong: ")
         print(MATCHESID_DATA_URL + player_puuid + MATCHESID_SUFFIX)
         print(RESPONSE_MATCH_IDS.status_code)
-    return 0
+
+    return None
 
 #get data from one match (match = MATCHID, example EUN1_3732796685)
 def getMatchData(match):
@@ -246,8 +249,12 @@ def analyzeMatch(match, isAutomatic):
                 results.append(playerName + " had 3 star " + properName + "!")
     tempPlayers = sorted(tempPlayers, key=itemgetter(1)) 
 
+    #add all players to list, bold + underline for important people 
     for player in tempPlayers:
-        matchedPlayers.append(player[0])
+        finalPlayer = player[0]
+        if finalPlayer in importantPeople:
+            finalPlayer = "__**" + finalPlayer + "**__"
+        matchedPlayers.append(finalPlayer)
 
     gameDuration = match['info']['game_length']
     gameDuration = math.ceil(gameDuration / 60)
@@ -280,15 +287,15 @@ def analyzeMatch(match, isAutomatic):
     results.append("Timeframe: " + str(gameDuration) + "m.")
     
     #max damage
-    results.append(currMaxDamageUser + " did most damage to other players: " + str(maxDamage) + ".")
+    results.append("Most damage to players: " + str(maxDamage) + " by - " + currMaxDamageUser + ".")
 
     #ensure this match is not analysed again by bot
     if isAutomatic == True:
-        parsedFile = open("./sharedpath/alreadyParsedTFT.txt","a")
-        parsedFile.write(str(match['metadata']['match_id']) + "\n")
-        parsedFile.close()
+        matches_collection.insert_one({"riotid": match['metadata']['match_id'] })
 
     #date = time.strftime('%d-%m-%Y %H:%M:%S', time.gmtime()
     #print(formatted_time)
     date = int(int(match['info']['game_datetime']) / 1000) + 3600
+
+
     return date, results, matchedPlayers
