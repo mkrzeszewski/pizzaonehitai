@@ -10,6 +10,7 @@ import embedgen
 import asyncio
 import datetime
 import plugins.birthday as birthday
+import plugins.pubfinder as pubfinder
 
 async def sendMessage(message, user_message, is_private):
     try:
