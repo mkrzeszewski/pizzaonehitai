@@ -4,11 +4,16 @@ from discord.ext import tasks
 import plugins.weather as weather
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+import plugins.birthday as birthday
 import re
 import json
 import random
 import time
+import datetime
 import os
+import asyncio
+
+
 
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless" #"https://elocentral.com/wp-content/uploads/2021/03/105050041_626416314631979_3504539849394714483_o-2.png"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png" #"https://www.pngkey.com/png/full/713-7131234_image-rights-to-riot-games.png"
@@ -16,10 +21,8 @@ LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216
 TFT_ICON = "https://images.seeklogo.com/logo-png/48/2/teamfight-tactics-logo-png_seeklogo-487286.png"
 FOOTER_ICON = "https://cdn3.emoji.gg/emojis/8003-jinxdealwithit.png"
 FOOTER_TFT_ICON = "https://emoji.discadia.com/emojis/86126f3e-361e-4306-9c3f-c359ed8c50c0.png"
-
 ENFORCER_ICON ="https://cdn.metatft.com/file/metatft/traits/squad.png"
 REBEL_ICON = "https://cdn.metatft.com/file/metatft/traits/rebel.png"
-
 ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png", 
               "https://cdn.metatft.com/file/metatft/traits/warband.png", 
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
@@ -32,9 +35,6 @@ playersFile.close()
 importantPeople = []
 for user in USERLIST:
     importantPeople.append(user.split('#')[0])
-
-print("[INFO]" + "People that will have their stats shown:")
-print(importantPeople)
 
 async def sendMessage(message, user_message, is_private):
     try:
@@ -117,18 +117,26 @@ def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
-    client = discord.Client(intents = intents_temp)
+    bot = discord.Client(intents = intents_temp)
 
-    @client.event
+
+    # ON READY FUNCTION - this is where we start all looping things.
+    @bot.event
     async def on_ready():
-        print("[INFO]" + f'{client.user} is now running!')
-        #sendWeather.start()
-        #analyzeMatchHistoryLeague.start()
-        analyzeMatchHistoryTFT.start()
+        print("[INFO]" + f'{bot.user} is now running!')
+
+        #analyze TFT matches - every 5 minutes
+        if not analyzeMatchHistoryTFT.is_running():
+            analyzeMatchHistoryTFT.start() 
         
-    @client.event
+        if not sendBirthdayInfo.is_running():
+            sendBirthdayInfo.start() 
+            
+
+        
+    @bot.event
     async def on_message(message):
-        if message.author == client.user:
+        if message.author == bot.user:
             return
         
         userMessage = str(message.content)
@@ -157,8 +165,33 @@ def runDiscordBot():
 
     @tasks.loop(hours = 1.0)
     async def sendWeather():
-        #channel = client.get_channel(1172911430601822238)
+        #channel = bot.get_channel(1172911430601822238)
         print (weather.getLodzWeather())
+
+    async def waitUntil(target_time):
+        #wait until specified time to start loop for DC bot
+        now = datetime.datetime.now()
+        target_datetime = datetime.datetime.combine(now.date(), target_time)
+
+        # If the time has already passed today, schedule for tomorrow
+        if now > target_datetime:
+            target_datetime += datetime.timedelta(days=1)
+
+        await asyncio.sleep((target_datetime - now).total_seconds())
+
+    @tasks.loop(hours = 24.0)
+    async def sendBirthdayInfo():
+        birthdayBoys = birthday.getBirthdayPeople()
+        if birthdayBoys != None:
+            for boy in birthdayBoys:
+                print (boy['username'])
+        else:
+            print ("[INFO]Noone has birthday today..")
+
+    @sendBirthdayInfo.before_loop
+    async def beforeBirthdayTask():
+        #ensure its 8AM - the bot will send messages ONCE every 24H - this task should only happen ONCE.
+        await waitUntil(datetime.time(8, 0))
 
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
@@ -194,7 +227,7 @@ def runDiscordBot():
                 else:
                     #1032698616910983168 - league of debils
                     #1172911430601822238 - gruby-test
-                    channel = client.get_channel(1032698616910983168)
+                    channel = bot.get_channel(1032698616910983168)
                     date, results, players = tftapi.analyzeMatch(matchData, True)
                     await channel.send(embed=generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
 
@@ -225,7 +258,7 @@ def runDiscordBot():
                 else:
                     #1032698616910983168 - league of debils
                     #1172911430601822238 - gruby-test
-                    channel = client.get_channel(1032698616910983168)
+                    channel = bot.get_channel(1032698616910983168)
                     results, players = leagueapi.analyzeMatch(matchData, True)
                     if len(results) > 0 and len(players) > 1:
                         await channel.send(embed=generateEmbedFromLeagueMatch(results,players,matchData['metadata']['matchId']))
@@ -233,4 +266,4 @@ def runDiscordBot():
                         print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
         leagueapi.matches = []
 
-    client.run(TOKEN)
+    bot.run(TOKEN)
