@@ -4,10 +4,12 @@ from discord.ext import tasks
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import re
-import json
 import time
 import os
 import embedgen
+import asyncio
+import datetime
+import plugins.birthday as birthday
 
 playersFile = open("./sharedpath/riot-players.txt","r")
 USERLIST = playersFile.read().splitlines()
@@ -37,9 +39,12 @@ def runDiscordBot():
     async def on_ready():
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO]" + f'{bot.user} is now running!')
-        #sendWeather.start()
-        #analyzeMatchHistoryLeague.start()
-        analyzeMatchHistoryTFT.start()
+
+        if not analyzeMatchHistoryTFT.is_running():
+            analyzeMatchHistoryTFT.start() 
+        
+        if not sendBirthdayInfo.is_running():
+            sendBirthdayInfo.start() 
         
     @bot.event
     async def on_message(message):
@@ -73,6 +78,31 @@ def runDiscordBot():
     @tasks.loop(hours = 1.0)
     async def sendWeather():
         print (responses.getWeather())
+
+    async def waitUntil(target_time):
+        #wait until specified time to start loop for DC bot
+        now = datetime.datetime.now()
+        target_datetime = datetime.datetime.combine(now.date(), target_time)
+
+        # If the time has already passed today, schedule for tomorrow
+        if now > target_datetime:
+            target_datetime += datetime.timedelta(days = 1)
+
+        await asyncio.sleep((target_datetime - now).total_seconds())
+
+    @tasks.loop(hours = 24.0)
+    async def sendBirthdayInfo():
+        birthdayBoys = birthday.getBirthdayPeople()
+        if birthdayBoys != None:
+            for boy in birthdayBoys:
+                print (boy['username'])
+        else:
+            print ("[INFO] Noone has birthday today..")
+
+    @sendBirthdayInfo.before_loop
+    async def beforeBirthdayTask():
+        #ensure its 8AM - the bot will send messages ONCE every 24H - this task should only happen ONCE.
+        await waitUntil(datetime.time(8, 0))
         
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
@@ -91,45 +121,6 @@ def runDiscordBot():
                         date, results, players = tftapi.analyzeMatch(matchData, True)
                         await channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
         return 0
-        
-
-        currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        playersData = []
-        with open('./sharedpath/puuid-list.json','r') as playerFile:
-            playersData = json.load(playerFile)
-        matchesToAnalyze = []
-        parsedFile = open("./sharedpath/alreadyParsedTFT.txt","r+")
-        oldMatches = parsedFile.read().splitlines()
-        parsedFile.close()
-        for player in playersData['players']:
-            tempMatches = tftapi.getUserMatchHistory(player['puuid'])
-
-            #this is quick-fix for an exception and should be handled properly later on
-            if tempMatches == 0:
-                return
-            
-            for match in tempMatches:
-                if match in oldMatches:
-                    pass
-                else:
-                    matchesToAnalyze.append(match)   
-
-        if len(matchesToAnalyze) == 0:
-            print ("[INFO]" + currData + " - Nie ma obecnie meczy TFT do analizy.")
-        else:
-            for match in matchesToAnalyze:
-                matchData = tftapi.getMatchData(match)
-
-                if matchData == 0:
-                    pass
-                else:
-                    #1032698616910983168 - league of debils
-                    #1172911430601822238 - gruby-test
-                    channel = bot.get_channel(1172911430601822238)
-                    date, results, players = tftapi.analyzeMatch(matchData, True)
-                    
-
-        tftapi.matches = []
 
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryLeague():
