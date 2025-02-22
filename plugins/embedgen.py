@@ -4,6 +4,8 @@ import time
 import requests
 from os import environ
 
+POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
+GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
@@ -127,4 +129,31 @@ def generateEmbedFromHoroscope(text, sign, name):
     embed.set_author(name = "Horoskop na dzis - dla Ciebie, " + str(name) + "!", icon_url = SIGN_ICON_ARRAY[sign])
     embed.add_field(name = str(sign).capitalize(), value = text)
     embed.set_footer(text = "source : https://horoskop.wp.pl/horoskop/horoskop-dzienny/")
+    return embed
+
+def generateHelpEmbed():
+    embed = Embed(colour = Colour.yellow())
+    embed.set_author(name = "Tutorial uzywania bota:", icon_url = "https://cdn.7tv.app/emote/01GR7R0H9G000FEKDNHQTECH62/2x.avif")
+    embed.set_thumbnail(url = "https://cdn.7tv.app/emote/01G4ZTECKR0002P97QQ94BDSP4/4x.avif")
+    listOfCommands = "!help - to okno.\n"
+    listOfCommands += "!analyzetft <match_id> - analiza meczu TFT.\n"
+    listOfCommands += "!analyzelol <match_id> - analiza meczu LOL'a.\n"
+    listOfCommands += "!points - wyswietla aktualna liczbe punktow.\n"
+    listOfCommands += "!top X - wyswietla top X posiadaczy punktow.\n"
+    listOfCommands += "!horoskop - zwraca horoskop na dzis!\n"
+    embed.add_field(name = "Komendy:", value = listOfCommands)
+    embed.set_footer(text = "w razie pytan - uderzaj do roLab")
+    return embed
+
+def generateTopPointsEmbed(users, amount):
+    stringList = ""
+    increment = 0
+    for user in users:
+        increment = increment + 1
+        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
+
+    embed = Embed(colour = Colour.og_blurple())
+    embed.set_author(name = "pizzopunkty na DC Pizza One Hit!")
+    embed.set_thumbnail(url = POINTS_ICON_URL)
+    embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed

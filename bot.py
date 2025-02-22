@@ -9,6 +9,15 @@ import plugins.embedgen as embedgen
 import asyncio
 import datetime
 import plugins.birthday as birthday
+import plugins.points as points
+
+CHANNEL_IDS = [
+    1166761619351687258, #TFT ENJOYERS
+    837732320017645582, #HOBBISTYCZNI HAZARDZISCI
+    995377960431394969, #ANDROIDOWCY
+    1154849700021796955, #JABLKARZE
+    1342821212023160842, #HOROSKOP
+]
 
 async def sendMessage(message, user_message, is_private):
     try:
