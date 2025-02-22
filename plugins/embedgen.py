@@ -4,6 +4,8 @@ import time
 import requests
 from os import environ
 
+POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
+GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
@@ -127,4 +129,17 @@ def generateEmbedFromHoroscope(text, sign, name):
     embed.set_author(name = "Horoskop na dzis - dla Ciebie, " + str(name) + "!", icon_url = SIGN_ICON_ARRAY[sign])
     embed.add_field(name = str(sign).capitalize(), value = text)
     embed.set_footer(text = "source : https://horoskop.wp.pl/horoskop/horoskop-dzienny/")
+    return embed
+
+def generateTopPointsEmbed(users, amount):
+    stringList = ""
+    increment = 0
+    for user in users:
+        increment = increment + 1
+        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + "pkt.\n"
+
+    embed = Embed(colour = Colour.og_blurple())
+    embed.set_author(name = "Pizzopunkty na DC Pizza One Hit!")
+    embed.set_thumbnail(url = POINTS_ICON_URL)
+    embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
