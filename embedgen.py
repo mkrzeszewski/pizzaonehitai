@@ -1,6 +1,8 @@
 import random
 from discord import Embed, Colour
 import time
+import requests
+from os import environ
 
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
@@ -14,6 +16,9 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/warband.png", 
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
+
+PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
+API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -59,6 +64,7 @@ def generateEmbedFromTFTMatch(results,players,matchID, date):
     return embed
 
 def generateEmbedFromLeagueMatch(results,players,matchID):
+
     playerList = ""
     for player in players:
         playerList = playerList + player + ", "
@@ -82,4 +88,18 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
         embed.add_field(name = "", value = result, inline = False)
 
     embed.set_footer(text = str(matchID), icon_url = FOOTER_ICON)
+    return embed
+
+def generateEmbedFromRestaurant(restaurant, userlist):
+    embedIcon = random.choice(ICON_ARRAY)
+    endColour = Colour.blue()
+    
+    #print(restaurant['photos']['photo_reference'])
+    #print(PHOTO_REFERENCE_URL + str(restaurant['photos'][0]['photo_reference']) + API_KEY)
+    #print(restaurant['photos'][0]['photo_reference'])
+    #main title and embed data 
+    embed = Embed(title = restaurant['name'], description = restaurant['vicinity'], colour = endColour )
+    embed.set_author(name = "Restauracja wybrana!", icon_url = restaurant['icon'])
+    #if restaurant['photos']:
+    #embed.set_thumbnail(url = requests.get(PHOTO_REFERENCE_URL + str(restaurant['photos'][0]['photo_reference']) + API_KEY, allow_redirects = False).headers['location'])
     return embed

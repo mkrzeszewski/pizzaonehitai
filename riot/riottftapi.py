@@ -10,8 +10,8 @@ API_KEY = environ["RIOT_API_TOKEN"]
 
 #connect to mongodb database and get proper database
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
-client = MongoClient(CONN_URL)
-db = client['discord']
+dbclient = MongoClient(CONN_URL)
+db = dbclient['discord']
 
 #collection for tft matches (add already parsed)
 matches_collection = db['parsed_tft_matches']

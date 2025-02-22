@@ -3,3 +3,4 @@ responses==0.25.6
 discord.py==2.4.0
 audioop-lts; python_version>='3.13'
 pymongo==4.11
+googlemaps==4.10.0

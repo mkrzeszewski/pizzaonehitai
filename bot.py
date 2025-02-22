@@ -10,6 +10,7 @@ import embedgen
 import asyncio
 import datetime
 import plugins.birthday as birthday
+import plugins.pubfinder as pubfinder
 
 async def sendMessage(message, user_message, is_private):
     try:
@@ -61,6 +62,8 @@ def runDiscordBot():
                             await message.channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,commands[1], date))
                     else:
                         await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
+                elif commands[0] == "znajdzbar":
+                    await message.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"]))
             else:
                 await sendMessage(message, userMessage, is_private=False)
 
