@@ -13,3 +13,20 @@ def getTop(howMany = 5):
             increment = increment + 1
         return returnUsers
     return None
+
+def addPoints(discord_id, amount):
+    user = db.retrieveUser('discord_id', discord_id)
+    if user:
+        db.updateUser(str(discord_id), 'points', int(user['points']) + amount)
+        print("[INFO] Adding " + str(amount) + " points to: " +  user['name'] + ".")
+    return None
+
+def removePoints(discord_id, amount):
+    user = db.retrieveUser('discord_id', discord_id)
+    if user:
+        newPoints = 0
+        if (int(user['points']) - int(amount)) > 0:
+            newPoints = int(user['points']) - int(amount)
+        db.updateUser(str(discord_id), 'points', int(user['points']) + amount)
+        print("[INFO] Removing " + str(amount) + " points from: " +  user['name'] + ".")
+    return None

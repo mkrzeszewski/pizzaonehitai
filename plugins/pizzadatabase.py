@@ -43,7 +43,7 @@ def updateUser(discord_id, key, value):
     )
     text = ""
 
-    print("[INFO] - DB MODIFY - " + str(discord_id) + " - " + str(result))
+    print("[INFO] DB MODIFY: {" + str(discord_id) + " - " + str(key) + " = " + str(value) + "} - result: " + str(result))
     if result.matched_count > 0:
         text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
     else:

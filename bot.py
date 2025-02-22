@@ -17,6 +17,7 @@ CHANNEL_IDS = [
     995377960431394969, #ANDROIDOWCY
     1154849700021796955, #JABLKARZE
     1342821212023160842, #HOROSKOP
+    1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
 ]
 
 async def sendMessage(message, user_message, is_private):
@@ -47,6 +48,9 @@ def runDiscordBot():
         
         if not sendBirthdayInfo.is_running():
             sendBirthdayInfo.start() 
+
+        if not checkChannelActivityAndAwardPoints.is_running():
+            checkChannelActivityAndAwardPoints.start() 
         
     @bot.event
     async def on_message(message):
@@ -138,4 +142,13 @@ def runDiscordBot():
                         print ("ktos gral solo - match : " + str(matchData['metadata']['matchId']))
         leagueapi.matches = []
 
+    @tasks.loop(minutes = 10.0)
+    async def checkChannelActivityAndAwardPoints():
+        amount = 5
+        for id in CHANNEL_IDS:
+            channel = bot.get_channel(id)
+            members = channel.members
+            for member in members:
+                points.addPoints(str(member.id), amount)
+        return None
     bot.run(TOKEN)
