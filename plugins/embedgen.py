@@ -131,15 +131,29 @@ def generateEmbedFromHoroscope(text, sign, name):
     embed.set_footer(text = "source : https://horoskop.wp.pl/horoskop/horoskop-dzienny/")
     return embed
 
+def generateHelpEmbed():
+    embed = Embed(colour = Colour.yellow())
+    embed.set_author(name = "Tutorial uzywania bota:", icon_url = "https://cdn.7tv.app/emote/01GR7R0H9G000FEKDNHQTECH62/2x.avif")
+    embed.set_thumbnail(url = "https://cdn.7tv.app/emote/01G4ZTECKR0002P97QQ94BDSP4/4x.avif")
+    listOfCommands = "!help - to okno.\n"
+    listOfCommands += "!analyzetft <match_id> - analiza meczu TFT.\n"
+    listOfCommands += "!analyzelol <match_id> - analiza meczu LOL'a.\n"
+    listOfCommands += "!points - wyswietla aktualna liczbe punktow.\n"
+    listOfCommands += "!top X - wyswietla top X posiadaczy punktow.\n"
+    listOfCommands += "!horoskop - zwraca horoskop na dzis!\n"
+    embed.add_field(name = "Komendy:", value = listOfCommands)
+    embed.set_footer(text = "w razie pytan - uderzaj do roLab")
+    return embed
+
 def generateTopPointsEmbed(users, amount):
     stringList = ""
     increment = 0
     for user in users:
         increment = increment + 1
-        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + "pkt.\n"
+        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
 
     embed = Embed(colour = Colour.og_blurple())
-    embed.set_author(name = "Pizzopunkty na DC Pizza One Hit!")
+    embed.set_author(name = "pizzopunkty na DC Pizza One Hit!")
     embed.set_thumbnail(url = POINTS_ICON_URL)
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed

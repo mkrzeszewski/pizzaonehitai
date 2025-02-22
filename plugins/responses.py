@@ -83,6 +83,15 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = "Nie masz prawa do uzywania tej komendy. Ten incydent zostanie zgloszony."
 
+
+        elif commands[0] == "top":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    amount = int(str(commands[1]))
+                    users = points.getTop(amount)
+                    if users:
+                        returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
+
         elif commands[0] == "roll":
             if len(commands) == 2:
                 returnText = "Rolling between 1 - " + commands[1] + " -> " + str(random.randint(1,int(commands[1])))
@@ -95,7 +104,7 @@ def handleResponse(userMessage, author) -> str:
         if message == "points":
             user = db.retrieveUser('discord_id', str(author))
             if user:
-                returnText = user['name'] + " - You have : " + str(user['points']) + " points."
+                returnText = user['name'] + " - masz: " + str(user['points']) + " pizzapoints."
 
         if message == 'roll':
             returnText =  str(random.randint(1,6))
@@ -106,7 +115,7 @@ def handleResponse(userMessage, author) -> str:
         if message == "pogoda":
             returnText =  weather.getLodzWeather()
 
-        if message == "top5":
+        if message == "top5" or message == "top":
             amount = 5
             users = points.getTop(amount)
             if users:
@@ -116,5 +125,12 @@ def handleResponse(userMessage, author) -> str:
             name = db.retrieveUser('discord_id', str(author))['name']
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
+
+
+
+
+
+        if message == "help" or message == "?" or message == "??" or message == "pomoc" or message == "tutorial":
+            returnEmbed = embedgen.generateHelpEmbed()
 
     return returnEmbed, returnText
