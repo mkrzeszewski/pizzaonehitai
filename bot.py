@@ -1,21 +1,27 @@
 import discord
-import responses
+import plugins.responses as responses
 from discord.ext import tasks
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import re
 import time
 import os
-import embedgen
+import plugins.embedgen as embedgen
 import asyncio
 import datetime
 import plugins.birthday as birthday
 import plugins.pubfinder as pubfinder
+import plugins.horoscope as horoskop
 
 async def sendMessage(message, user_message, is_private):
     try:
-        response = responses.handleResponse(user_message)
-        await message.author.send(response) if is_private else await message.channel.send(response)
+        embed = None
+        response = ""
+        embed, response = responses.handleResponse(user_message, message.author.id)
+        if embed == None:
+            await message.author.send(response) if is_private else await message.channel.send(response)
+        else:
+            await message.author.send(embed = embed) if is_private else await message.channel.send(embed = embed)
     except Exception as e:
         print(e)
 

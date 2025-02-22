@@ -17,6 +17,24 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 
+SIGN_ICON_ARRAY = {
+    "baran": "https://cdn3.emoji.gg/emojis/42434-aries.png",
+    "byk": "https://cdn3.emoji.gg/emojis/44512-taurus.png",
+    "bliznieta": "https://cdn3.emoji.gg/emojis/42244-gemini.png",
+    "rak": "https://cdn3.emoji.gg/emojis/87993-cancer.png",
+    "lew": "https://cdn3.emoji.gg/emojis/85770-leo.png",
+    "panna": "https://cdn3.emoji.gg/emojis/47057-virgo.png",
+    "waga": "https://cdn3.emoji.gg/emojis/12487-libra.png",
+    "skorpion": "https://cdn3.emoji.gg/emojis/6245-scorpio.png",
+    "strzelec": "https://cdn3.emoji.gg/emojis/68830-sagittarius.png",
+    "koziorozec": "https://cdn3.emoji.gg/emojis/27440-capricorn.png",
+    "wodnik": "https://cdn3.emoji.gg/emojis/53835-aquarius.png",
+    "ryby": "https://cdn3.emoji.gg/emojis/9982-pisces.png"
+}
+
+
+
+
 PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
 API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
 
@@ -102,4 +120,11 @@ def generateEmbedFromRestaurant(restaurant, userlist):
     embed.set_author(name = "Restauracja wybrana!", icon_url = restaurant['icon'])
     #if restaurant['photos']:
     #embed.set_thumbnail(url = requests.get(PHOTO_REFERENCE_URL + str(restaurant['photos'][0]['photo_reference']) + API_KEY, allow_redirects = False).headers['location'])
+    return embed
+
+def generateEmbedFromHoroscope(text, sign, name):
+    embed = Embed(colour = Colour.purple())
+    embed.set_author(name = "Horoskop na dzis - dla Ciebie, " + str(name) + "!", icon_url = SIGN_ICON_ARRAY[sign])
+    embed.add_field(name = str(sign).capitalize(), value = text)
+    embed.set_footer(text = "source : https://horoskop.wp.pl/horoskop/horoskop-dzienny/")
     return embed
