@@ -192,9 +192,11 @@ def getMatchData(match):
     RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX, headers=headers)
     if RESPONSE_MATCH.status_code == 200: 
         return RESPONSE_MATCH.json()
+    elif RESPONSE_MATCH.status_code == 429:
+        print("[ERROR]" + "Too many requests! Try again later.")
     else:
         print("[ERROR]" + "Podczas analizy meczu dostalismy status code: " + str(RESPONSE_MATCH.status_code) + ".")
-        return 0
+    return 0
 
 #get interesting data from match, returns:date when match took place, results array, players that played.
 def analyzeMatch(match, isAutomatic):

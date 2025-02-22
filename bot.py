@@ -3,15 +3,12 @@ import plugins.responses as responses
 from discord.ext import tasks
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
-import re
 import time
 import os
 import plugins.embedgen as embedgen
 import asyncio
 import datetime
 import plugins.birthday as birthday
-import plugins.pubfinder as pubfinder
-import plugins.horoscope as horoskop
 
 async def sendMessage(message, user_message, is_private):
     try:
@@ -46,32 +43,10 @@ def runDiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-        
+
         userMessage = str(message.content)
         if userMessage[0] == '!':
-            userMessage = userMessage[1:]
-            commands = userMessage.split(" ")
-            if len(commands) > 1:
-                if commands[0] == "analyze":
-                    if re.search(r'EUW1_\d+|EUN1_\d+',commands[1]):
-                        results, players = leagueapi.analyzeMatch(leagueapi.getMatchData(str(commands[1])), False)
-                        if len(results) > 0 :
-                            await message.channel.send(embed=embedgen.generateEmbedFromLeagueMatch(results,players,commands[1]))
-                        else:
-                            print(results)
-                    else:
-                        await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
-                elif commands[0] == "analyzetft":
-                    if re.search(r'EUW1_\d+|EUN1_\d+',commands[1]):
-                        date, results, players = tftapi.analyzeMatch(tftapi.getMatchData(str(commands[1])), False)
-                        if len(results) > 0 :
-                            await message.channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,commands[1], date))
-                    else:
-                        await message.channel.send("kolego, podaj poprawny ID, np: EUN1_3498132354")
-                elif commands[0] == "znajdzbar":
-                    await message.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"]))
-            else:
-                await sendMessage(message, userMessage, is_private=False)
+            await sendMessage(message, userMessage, is_private=False)
 
     @tasks.loop(hours = 1.0)
     async def sendWeather():
