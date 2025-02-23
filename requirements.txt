@@ -5,3 +5,4 @@ audioop-lts; python_version>='3.13'
 pymongo==4.11
 googlemaps==4.10.0
 beautifulsoup4==4.13.3
+pillow==11.1.0

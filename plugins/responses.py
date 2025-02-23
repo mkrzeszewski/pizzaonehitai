@@ -5,8 +5,10 @@ import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
+import plugins.gifgenerator as gif
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
@@ -80,6 +82,7 @@ def handleResponse(userMessage, author) -> str:
     message = userMessage.lower()
     returnEmbed = None
     returnView = None
+    returnFile = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
     message = message[1:]
     commands = message.split(" ")
@@ -196,8 +199,9 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
         if message == "ruleta":
-            returnEmbed = embedgen.generateRuleta()
-            returnView = ruletaView()
+            winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
+            returnEmbed, returnFile = embedgen.generateRuleta(winner)
+            #returnView = ruletaView()
 
         if message in restaurantKeywords:
             embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
@@ -207,4 +211,4 @@ def handleResponse(userMessage, author) -> str:
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
 
-    return returnEmbed, returnText, returnView
+    return returnEmbed, returnText, returnView, returnFile

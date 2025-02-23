@@ -1,5 +1,5 @@
 import random
-from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
+from discord import Embed, Colour, File
 import time
 from os import environ
 
@@ -158,8 +158,17 @@ def generateTopPointsEmbed(users, amount):
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
 
-def generateRuleta():
-    embed = Embed(colour = Colour.darker_grey(), description="Click a button below:")
+def generateRuleta(winner):
+    # Path to the locally stored GIF
+    gif_path = 'assets/gif/ruleta.gif'
+    # Create the embed
+    embed = Embed(title="Ruleta test!", description="The winner is... " + str(winner) + "!", color=Colour.darker_grey())
+    
+    # Attach the GIF from local storage
+    file = File(gif_path, filename="ruleta.gif")
+    
+    # Reference the file inside the embed
+    embed.set_image(url="attachment://ruleta.gif")
     embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
-    return embed
+    return embed, file
 

@@ -37,14 +37,11 @@ async def sendEmbedToChannel(interaction, embed, is_private=False):
 async def sendMessage(message, user_message, is_private):
     try:
         response = ""
-        embed, response, view = responses.handleResponse(user_message, message.author.id)
+        embed, response, view, file = responses.handleResponse(user_message, message.author.id)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
-            if view:
-                await message.author.send(embed = embed, view = view) if is_private else await message.channel.send(embed = embed, view = view)   
-            else:
-                await message.author.send(embed = embed) if is_private else await message.channel.send(embed = embed)
+            await message.author.send(embed = embed, view = view, file = file) if is_private else await message.channel.send(embed = embed, view = view, file = file)   
     except Exception as e:
         print(e)
 
