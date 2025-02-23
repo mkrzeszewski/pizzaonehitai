@@ -11,7 +11,7 @@ import datetime
 import plugins.birthday as birthday
 import plugins.points as points
 
-CHANNEL_IDS = [
+VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
     837732320017645582, #HOBBISTYCZNI HAZARDZISCI
     995377960431394969, #ANDROIDOWCY
@@ -20,11 +20,13 @@ CHANNEL_IDS = [
     1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
 ]
 
+
+
 async def sendMessage(message, user_message, is_private):
     try:
         embed = None
         response = ""
-        embed, response = responses.handleResponse(user_message, message.author.id)
+        embed, response, view = responses.handleResponse(user_message, message.author.id)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
@@ -145,10 +147,11 @@ def runDiscordBot():
     @tasks.loop(minutes = 10.0)
     async def checkChannelActivityAndAwardPoints():
         amount = 5
-        for id in CHANNEL_IDS:
+        for id in VOICE_CHANNEL_IDS:
             channel = bot.get_channel(id)
             members = channel.members
             for member in members:
                 points.addPoints(str(member.id), amount)
         return None
+    
     bot.run(TOKEN)
