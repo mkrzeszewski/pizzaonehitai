@@ -15,6 +15,7 @@ def getWeather():
 def handleResponse(userMessage, author) -> str:
     message = userMessage.lower()
     returnEmbed = None
+    returnView = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
     message = message[1:]
     commands = message.split(" ")
@@ -126,11 +127,12 @@ def handleResponse(userMessage, author) -> str:
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
-
+        if message == "ruleta":
+            returnEmbed = embedgen.generateRuleta()
 
 
 
         if message == "help" or message == "?" or message == "??" or message == "pomoc" or message == "tutorial":
             returnEmbed = embedgen.generateHelpEmbed()
 
-    return returnEmbed, returnText
+    return returnEmbed, returnText, returnView

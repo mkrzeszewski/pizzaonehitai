@@ -1,10 +1,11 @@
 import random
-from discord import Embed, Colour
+from discord import Embed, Colour, ui, ButtonStyle, Interaction
 import time
 import requests
 from os import environ
 
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
+CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
@@ -39,6 +40,19 @@ SIGN_ICON_ARRAY = {
 
 PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
 API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
+
+class ruletaView(ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @ui.button(label="Option 1", style=ButtonStyle.primary)
+    async def option1(self, interaction: Interaction, button: ui.Button):
+        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
+
+    @ui.button(label="Option 2", style=ButtonStyle.success)
+    async def option2(self, interaction: Interaction, button: ui.Button):
+        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
+
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -157,3 +171,9 @@ def generateTopPointsEmbed(users, amount):
     embed.set_thumbnail(url = POINTS_ICON_URL)
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
+
+def generateRuleta():
+    embed = Embed(colour = Colour.darker_grey())
+    embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
+    return embed
+
