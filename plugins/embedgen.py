@@ -196,12 +196,15 @@ def generateRuletaResults(players, winner):
             sign = "+"
         listOfPlayers = str(player[0]) + ": "+ str(sign) + str(player[2]) + "ppkt.\n"
     embed.add_field(name = "Bilans: ", value = listOfPlayers)
+    formatted_time = time.strftime('%Y-%m-%d %H:%M', time.gmtime())
+    embed.set_footer(text = str(formatted_time), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed
 
 
 def generateRuletaChoices():
     embed = Embed(title="Prosimy o wybor!", description="Pick wisely!", color=Colour.darker_grey())
     # Reference the file inside the embed
-    embed.set_author(name = "Wybierz na co stawiasz!", icon_url = CASINO_ICON_URL)
+    embed.set_author(name = "Wybierz na co stawiasz!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
     embed.add_field(name = "Koszt: 50 ppkt", value = "niebieski/czerwony = x2 \n zielony = x20")
+    embed.set_footer(text = "ruleta odpala sie co 10 minut, try your luck", icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed
