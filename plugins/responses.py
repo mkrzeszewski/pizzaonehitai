@@ -8,6 +8,7 @@ import plugins.points as points
 import plugins.gifgenerator as gif
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+import asyncio
 
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
@@ -16,15 +17,59 @@ restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 class ruletaView(ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=5)
+        self.playingUsers = []
+        self.sent_messages = []
+        self.message = None
 
-    @ui.button(label="Option 1", style=ButtonStyle.primary)
+    @ui.button(label="Blue", style=ButtonStyle.primary)
     async def option1(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
+        author_id = interaction.user.id
+        choice = "Blue"
+        
+        message = await interaction.response.send_message("Postawiles pizzopunkty na niebieskie!", ephemeral=True)
+        self.sent_messages.append(message)
+        self.playingUsers.append([author_id, choice])
 
-    @ui.button(label="Option 2", style=ButtonStyle.success)
+    @ui.button(label="Red", style=ButtonStyle.danger)
     async def option2(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
+        author_id = interaction.user.id
+        choice = "Red"
+        message = await interaction.response.send_message("Postawiles pizzopunkty na czerwone!", ephemeral=True)
+        self.sent_messages.append(message)
+        self.playingUsers.append([author_id, choice])
+
+    @ui.button(label="Green", style=ButtonStyle.success)
+    async def option3(self, interaction: Interaction, button: ui.Button):
+        author_id = interaction.user.id
+        choice = "Green"
+        message = await interaction.response.send_message("Postawiles pizzopunkty na zielone!", ephemeral=True)
+        self.sent_messages.append(message)
+        self.playingUsers.append([author_id, choice])
+
+    async def on_timeout(self):
+        if self.sent_messages:
+                for message in self.sent_messages:
+                    if message:
+                        try:
+                            await message.delete() 
+                        except NotFound:
+                            pass
+        if self.message:
+            channel = self.message.channel
+            try:
+                await channel.send("The interactive view has expired!")
+                await self.message.delete()
+                  # Send a follow-up message
+            except NotFound:
+                print("Message already deleted.")
+        if self.playingUsers:
+            await channel.send("Oto gracze tej rulety:")
+        else:
+            await channel.send("Nikt nie skusil sie na partyjke ruletki")    
+        
+
+
 
 class usersChooseView:
     def __init__(self, users, radius):
@@ -199,9 +244,11 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
         if message == "ruleta":
-            winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
-            returnEmbed, returnFile = embedgen.generateRuleta(winner)
+            #winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
+            #returnEmbed, returnFile = embedgen.generateRuleta(winner)
             #returnView = ruletaView()
+            returnView = ruletaView()
+            returnEmbed = embedgen.generateRuletaChoices()
 
         if message in restaurantKeywords:
             embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
