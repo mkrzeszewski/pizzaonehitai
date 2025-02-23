@@ -57,20 +57,20 @@ def runDiscordBot():
         print (responses.getWeather())
 
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=15)
     async def rouletteTask():
         channel = bot.get_channel(1343278156265685092)
         if channel:
             view = responses.ruletaView()
             await view.send(channel, embed = embedgen.generateRuletaChoices())
 
-    @rouletteTask.before_loop
-    async def beforeRouletteTask():
-        """ Waits until the next 10-minute-aligned mark before starting the loop """
-        now = datetime.datetime.now()
-        minutes_until_next_run = 10 - (now.minute % 10)  # Time left until the next aligned minute (X:00, X:10, X:20, etc.)
-        seconds_until_start = minutes_until_next_run * 60 - now.second
-        print(f"Waiting {seconds_until_start} seconds until the next aligned interval...")
+    #@rouletteTask.before_loop
+    #async def beforeRouletteTask():
+    #    """ Waits until the next 10-minute-aligned mark before starting the loop """
+    #    now = datetime.datetime.now()
+    #    minutes_until_next_run = 10 - (now.minute % 10)  # Time left until the next aligned minute (X:00, X:10, X:20, etc.)
+    #    seconds_until_start = minutes_until_next_run * 60 - now.second
+    #    print(f"Waiting {seconds_until_start} seconds until the next aligned interval...")
 
     async def waitUntil(target_time):
         #wait until specified time to start loop for DC bot
@@ -124,8 +124,6 @@ def runDiscordBot():
         if userMessage[0] == '!':
             await sendMessage(message, userMessage, is_private=False)
 
-    
-        
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
         channel = bot.get_channel(DEFAULT_TFT_CHANNEL)
