@@ -17,7 +17,7 @@ blue = (1, 66, 99)
 red = (200, 66, 66)
 white = (255, 255, 255)
 yellow = (255, 190, 20)
-
+green = (20, 200, 20)
 
 # Function to draw the wheel
 def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
@@ -42,7 +42,7 @@ def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
         # Determine the color (alternating black and red)
         color = blue if i % 2 == 0 else red
         if i in [0]:
-            color = yellow
+            color = green
 
         # Create the points for the triangle (sector)
         points = [
@@ -76,6 +76,7 @@ def generate_spinning_wheel_with_pointer(filename="ruleta.gif"):
     initial_rotation = random.randint(1,360)
     angle_offset = (360) + initial_rotation
     pointer_angle = (360)  # Pointer moves along with the wheel
+    color = white
     for i in range(startFrames):
         dynamicOffset = int(frames - i*2)
         angle_offset = (360 * i) / dynamicOffset + initial_rotation
@@ -91,11 +92,11 @@ def generate_spinning_wheel_with_pointer(filename="ruleta.gif"):
     for i in range (endFrames):
         dynamicOffset = int(frames - (startFrames*2) + i*4)
         angle_offset = (360 * i) / dynamicOffset + initial_rotation
-        frame, previous_color = draw_wheel(angle_offset, pointer_angle, previous_color)
+        frame, color = draw_wheel(angle_offset, pointer_angle, previous_color)
         images.append(frame)
 
     for i in range(80):
-        frame, color = draw_wheel(angle_offset, pointer_angle, previous_color)
+        frame, previous_color = draw_wheel(angle_offset, pointer_angle, previous_color)
         images.append(frame)
         
     images[0].save(filename, save_all=True, append_images=images[1:], duration=40, loop=1)
@@ -104,8 +105,8 @@ def generate_spinning_wheel_with_pointer(filename="ruleta.gif"):
     else:
         if color == blue:
             return "Blue"
-        elif color == yellow:
-            return "Yellow"
+        elif color == green:
+            return "Green"
         elif color == red:
             return "Red"
     
