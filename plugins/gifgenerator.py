@@ -94,7 +94,7 @@ def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
         images.append(frame)
 
     for i in range (endFrames):
-        dynamicOffset = int(frames - (startFrames*2) + i*4)
+        dynamicOffset = int(frames - (startFrames*2) + (i * random.randint(1, 6)))
         angle_offset = (360 * i) / dynamicOffset + initial_rotation
         frame, color = draw_wheel(angle_offset, pointer_angle, previous_color)
         images.append(frame)
