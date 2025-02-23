@@ -10,7 +10,7 @@ import riot.riottftapi as tftapi
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
-restKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
+restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 class ruletaView(ui.View):
     def __init__(self):
@@ -24,7 +24,7 @@ class ruletaView(ui.View):
     async def option2(self, interaction: Interaction, button: ui.Button):
         await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
 
-class usersView:
+class usersChooseView:
     def __init__(self, users, radius):
         self.users = users
         self.selectedUsers = []
@@ -108,10 +108,10 @@ def handleResponse(userMessage, author) -> str:
                 returnText = "kolego, podaj poprawny ID, np: EUN1_3742603881"
 
         #find proper pub to meet together (NEEDS WORK)
-        elif commands[0] in restKeywords:
+        elif commands[0] in restaurantKeywords:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
-                    embed_buttons = usersView(db.retrieveAllusers(), int(str(commands[1])))
+                    embed_buttons = usersChooseView(db.retrieveAllusers(), int(str(commands[1])))
                     returnView = embed_buttons.generate_view()
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
@@ -134,7 +134,7 @@ def handleResponse(userMessage, author) -> str:
                             else:
                                 curr = curr - amount
                                 returnText = "You've Lost!"
-                            db.updateUser(str(author), 'points', curr)
+                            db.updateUser('discord_id', str(author), 'points', curr)
                         else:
                             returnText = "You can't bet more than You have; your current points: " + str(user['points']) + "!"
                 else:
@@ -199,8 +199,8 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateRuleta()
             returnView = ruletaView()
 
-        if message in restKeywords:
-            embed_buttons = usersView(db.retrieveAllusers(), 500)
+        if message in restaurantKeywords:
+            embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
             returnView = embed_buttons.generate_view()
             returnEmbed = embed_buttons.generate_embed()
 

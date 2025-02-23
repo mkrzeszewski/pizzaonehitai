@@ -3,23 +3,14 @@ import time
 from operator import itemgetter
 import math
 from os import environ
-from pymongo import MongoClient
+import plugins.pizzadatabase as db
+import plugins.points as points
 
 #token for RIOT - defined in ENV file
 API_KEY = environ["RIOT_API_TOKEN"]
 
-#connect to mongodb database and get proper database
-CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
-dbclient = MongoClient(CONN_URL)
-db = dbclient['discord']
-
-#collection for tft matches (add already parsed)
-matches_collection = db['parsed_tft_matches']
-
-#users collection
-user_collection = db['users']
-
-users = user_collection.find({})
+#get all users from mongodb database
+users = db.retrieveAllusers()
 importantPeople = []
 players = []
 oldMatches = []
@@ -144,12 +135,6 @@ def getProperCharacterName(originalName):
 #this is called every 5 minutes by bot
 def getMatchesToAnalyze():
     matchesToAnalyze = []
-    matches_collection = db['parsed_tft_matches']
-    analyzed_matches = matches_collection.find({})
-    
-    if analyzed_matches != None:
-        for analyzed_match in analyzed_matches:
-            oldMatches.append(analyzed_match['riotid'])
     for player in players:
         tempMatches = getUserMatchHistory(player['puuid'])
 
@@ -157,16 +142,19 @@ def getMatchesToAnalyze():
         if tempMatches == None:
             return 
         
+        #check if match is already in DB or if is already in list during this for instruction
         for match in tempMatches:
-            if match in oldMatches:
+            if db.retrieveTFTMatch(match) or match in matchesToAnalyze:
                 pass
             else:
-                matchesToAnalyze.append(match)   
-    if len(matchesToAnalyze) == 0:
-        print ("[INFO]" + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " - Nie ma obecnie meczy TFT do analizy.")
-        return None
-    else:
+                matchesToAnalyze.append(match)
+
+    if matchesToAnalyze:
+        print(matchesToAnalyze)
         return matchesToAnalyze
+    else:
+        print ("[INFO] " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " - Nie ma obecnie meczy TFT do analizy.")
+        return None
     
 #returns last 20 IDs of matches in json format, one match ID example: EUN1_3732796685
 def getUserMatchHistory(player_puuid):
@@ -188,7 +176,7 @@ def getUserMatchHistory(player_puuid):
 
 #get data from one match (match = MATCHID, example EUN1_3732796685)
 def getMatchData(match):
-    print ("[INFO]" + "Analysing: " + str(match))
+    print ("[INFO] " + "Analysing: " + str(match))
     RESPONSE_MATCH = requests.get(MATCH_DATA_URL + match + API_SUFFIX, headers=headers)
     if RESPONSE_MATCH.status_code == 200: 
         return RESPONSE_MATCH.json()
@@ -254,7 +242,15 @@ def analyzeMatch(match, isAutomatic):
     #add all players to list, bold + underline for important people 
     for player in tempPlayers:
         finalPlayer = player[0]
+        placement = player[1]
         if finalPlayer in importantPeople:
+
+            #append points if its automatic match
+            if isAutomatic == True:
+                modifyPoints = 40 - (10 * placement)
+                if placement in [1, 8]:
+                    modifyPoints *= 2
+                points.modifyPoints('riotid',finalPlayer, modifyPoints)
             finalPlayer = "__**" + finalPlayer + "**__"
         matchedPlayers.append(finalPlayer)
 
@@ -293,7 +289,7 @@ def analyzeMatch(match, isAutomatic):
 
     #ensure this match is not analysed again by bot
     if isAutomatic == True:
-        matches_collection.insert_one({"riotid": match['metadata']['match_id'] })
+        db.insertTFTMatch(match['metadata']['match_id'])
 
     #date = time.strftime('%d-%m-%Y %H:%M:%S', time.gmtime()
     #print(formatted_time)

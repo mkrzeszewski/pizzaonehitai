@@ -20,6 +20,12 @@ VOICE_CHANNEL_IDS = [
     1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
 ]
 
+#1032698616910983168 - league of debils
+#1172911430601822238 - gruby-test
+
+DEFAULT_CHANNEL = 1172911430601822238 #GRUBY-TEST
+if os.environ["PROD_STATUS"] == "PRODUCTION":
+    DEFAULT_CHANNEL = 1032698616910983168 #GRUBY-TEST
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -53,7 +59,7 @@ def runDiscordBot():
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
-        print("[INFO]" + f'{bot.user} is now running!')
+        print("[INFO] " + f'{bot.user} is now running!')
 
         if not analyzeMatchHistoryTFT.is_running():
             analyzeMatchHistoryTFT.start() 
@@ -110,7 +116,7 @@ def runDiscordBot():
             print("[ERROR] API is unreachable - status code " + str(status_code))
         else:
             matchesToAnalyze = tftapi.getMatchesToAnalyze()
-            if matchesToAnalyze != None:
+            if matchesToAnalyze:
                 for match in matchesToAnalyze:
                     matchData = tftapi.getMatchData(match)
                     if matchData == 0:
@@ -130,12 +136,10 @@ def runDiscordBot():
         matchesToAnalyze = []
         for player in playerList:
             tempMatches = leagueapi.getUserMatchHistory(player)
-            
             for match in tempMatches:
-                
                 matchesToAnalyze.append(match)
         if len(matchesToAnalyze) == 0:
-            print ("[INFO]" + currData + " - Nie ma czego analizowac..")
+            print ("[INFO] " + currData + " - Nie ma czego analizowac..")
         else:
             for match in matchesToAnalyze:
                 print (currData + " - Analiza meczu: " + str(match))
@@ -144,8 +148,7 @@ def runDiscordBot():
                     pass
                 else:
 
-                    #1032698616910983168 - league of debils
-                    #1172911430601822238 - gruby-test
+                    
                     channel = bot.get_channel(os.environ["DISCORD_CHANNEL_TFT"])
                     results, players = leagueapi.analyzeMatch(matchData, True)
                     if len(results) > 0 and len(players) > 1:
