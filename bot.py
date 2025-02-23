@@ -23,9 +23,10 @@ VOICE_CHANNEL_IDS = [
 #1032698616910983168 - league of debils
 #1172911430601822238 - gruby-test
 
-DEFAULT_CHANNEL = 1172911430601822238 #GRUBY-TEST
+GAMBA_CHANNEL_ID = 1343278156265685092
+DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
 if os.environ["PROD_STATUS"] == "PRODUCTION":
-    DEFAULT_CHANNEL = 1032698616910983168 #GRUBY-TEST
+    DEFAULT_TFT_CHANNEL = 1032698616910983168 #GRUBY-TEST
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -37,51 +38,39 @@ async def sendEmbedToChannel(interaction, embed, is_private=False):
 async def sendMessage(message, user_message, is_private):
     try:
         response = ""
-        embed, response, view = responses.handleResponse(user_message, message.author.id)
+        embed, response, view, file = responses.handleResponse(user_message, message.author.id)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
-            if view:
-                await message.author.send(embed = embed, view = view) if is_private else await message.channel.send(embed = embed, view = view)   
-            else:
-                await message.author.send(embed = embed) if is_private else await message.channel.send(embed = embed)
+            await message.author.send(embed = embed, view = view, file = file) if is_private else await message.channel.send(embed = embed, view = view, file = file)   
     except Exception as e:
         print(e)
 
 def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
-
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
     bot = discord.Client(intents = intents_temp)
 
-    @bot.event
-    async def on_ready():
-        #bot.add_view(embedgen.ruletaView())
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
-        print("[INFO] " + f'{bot.user} is now running!')
-
-        if not analyzeMatchHistoryTFT.is_running():
-            analyzeMatchHistoryTFT.start() 
-        
-        if not sendBirthdayInfo.is_running():
-            sendBirthdayInfo.start() 
-
-        if not checkChannelActivityAndAwardPoints.is_running():
-            checkChannelActivityAndAwardPoints.start() 
-        
-    @bot.event
-    async def on_message(message):
-        if message.author == bot.user:
-            return
-
-        userMessage = str(message.content)
-        if userMessage[0] == '!':
-            await sendMessage(message, userMessage, is_private=False)
-
     @tasks.loop(hours = 1.0)
     async def sendWeather():
         print (responses.getWeather())
+
+
+    @tasks.loop(minutes=10)
+    async def rouletteTask():
+        channel = bot.get_channel(1343278156265685092)
+        if channel:
+            view = responses.ruletaView()
+            await view.send(channel, embed = embedgen.generateRuletaChoices())
+
+    @rouletteTask.before_loop
+    async def beforeRouletteTask():
+        """ Waits until the next 10-minute-aligned mark before starting the loop """
+        now = datetime.datetime.now()
+        minutes_until_next_run = 10 - (now.minute % 10)  # Time left until the next aligned minute (X:00, X:10, X:20, etc.)
+        seconds_until_start = minutes_until_next_run * 60 - now.second
+        print(f"Waiting {seconds_until_start} seconds until the next aligned interval...")
 
     async def waitUntil(target_time):
         #wait until specified time to start loop for DC bot
@@ -107,10 +96,39 @@ def runDiscordBot():
     async def beforeBirthdayTask():
         #ensure its 8AM - the bot will send messages ONCE every 24H - this task should only happen ONCE.
         await waitUntil(datetime.time(8, 0))
+
+    @bot.event
+    async def on_ready():
+        #bot.add_view(embedgen.ruletaView())
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
+        print("[INFO] " + f'{bot.user} is now running!')
+
+        if not analyzeMatchHistoryTFT.is_running():
+            analyzeMatchHistoryTFT.start() 
+        
+        if not sendBirthdayInfo.is_running():
+            sendBirthdayInfo.start() 
+
+        if not rouletteTask.is_running():
+            rouletteTask.start() 
+
+        if not checkChannelActivityAndAwardPoints.is_running():
+            checkChannelActivityAndAwardPoints.start() 
+        
+    @bot.event
+    async def on_message(message):
+        if message.author == bot.user:
+            return
+
+        userMessage = str(message.content)
+        if userMessage[0] == '!':
+            await sendMessage(message, userMessage, is_private=False)
+
+    
         
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryTFT():
-        channel = bot.get_channel(1172911430601822238)
+        channel = bot.get_channel(DEFAULT_TFT_CHANNEL)
         status_code = tftapi.isAPIDown()
         if status_code:
             print("[ERROR] API is unreachable - status code " + str(status_code))
@@ -147,8 +165,6 @@ def runDiscordBot():
                 if matchData == 0:
                     pass
                 else:
-
-                    
                     channel = bot.get_channel(os.environ["DISCORD_CHANNEL_TFT"])
                     results, players = leagueapi.analyzeMatch(matchData, True)
                     if len(results) > 0 and len(players) > 1:

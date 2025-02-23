@@ -5,24 +5,143 @@ import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
+import plugins.gifgenerator as gif
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+import asyncio
+
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
+
 class ruletaView(ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout = 25)
+        self.playingUsers = []
+        self.sent_messages = []
+        self.message = None
+        self.amount = 50
 
-    @ui.button(label="Option 1", style=ButtonStyle.primary)
+    async def treatMessage(self, choice, text, interaction):
+        author_id = interaction.user.id
+        user = db.retrieveUser('discord_id',author_id)
+        if user:
+            if int(user['points']) < int(self.amount):
+                message = await interaction.response.send_message("Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!", ephemeral=True)
+        else:
+            message = await interaction.response.send_message(text, ephemeral=True)
+            self.sent_messages.append(message)
+            if self.playingUsers:
+                for user in self.playingUsers:
+                    if user[0] == author_id:
+                        user[1] = choice
+            else:
+                self.playingUsers.append([author_id, choice])
+
+
+    @ui.button(label="Blue", style=ButtonStyle.primary)
     async def option1(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
+        author_id = interaction.user.id
+        user = db.retrieveUser('discord_id',author_id)
+        if user:
+            if int(user['points']) < int(self.amount):
+                message = await interaction.response.send_message("Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!", ephemeral=True)
+        else:
+            choice = "Blue"
+            message = await interaction.response.send_message("Postawiles pizzopunkty na Niebieskie!", ephemeral=True)
+            self.sent_messages.append(message)
+            if self.playingUsers:
+                for user in self.playingUsers:
+                    if user[0] == author_id:
+                        user[1] = choice
+            else:
+                self.playingUsers.append([author_id, choice])
 
-    @ui.button(label="Option 2", style=ButtonStyle.success)
+    @ui.button(label="Red", style=ButtonStyle.danger)
     async def option2(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
+        author_id = interaction.user.id
+        user = db.retrieveUser('discord_id',author_id)
+        if user:
+            if int(user['points']) < int(self.amount):
+                message = await interaction.response.send_message("Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!", ephemeral=True)
+        else:
+            choice = "Red"
+            message = await interaction.response.send_message("Postawiles pizzopunkty na czerwone!", ephemeral=True)
+            self.sent_messages.append(message)
+            if self.playingUsers:
+                for user in self.playingUsers:
+                    if user[0] == author_id:
+                        user[1] = choice
+            else:
+                self.playingUsers.append([author_id, choice])
+
+    @ui.button(label="Green", style=ButtonStyle.success)
+    async def option3(self, interaction: Interaction, button: ui.Button):
+        author_id = interaction.user.id
+        user = db.retrieveUser('discord_id',author_id)
+        if user:
+            if int(user['points']) < int(self.amount):
+                message = await interaction.response.send_message("Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!", ephemeral=True)
+        else:
+            choice = "Green"
+            message = await interaction.response.send_message("Postawiles pizzopunkty na zielone!", ephemeral=True)
+            self.sent_messages.append(message)
+            if self.playingUsers:
+                for user in self.playingUsers:
+                    if user[0] == author_id:
+                        user[1] = choice
+            else:
+                self.playingUsers.append([author_id, choice])
+    
+    async def send(self, channel, embed = None):  
+        self.message = await channel.send(view=self, embed = embed)
+
+    async def on_timeout(self):
+        if self.sent_messages:
+                for message in self.sent_messages:
+                    if message:
+                        try:
+                            await message.delete() 
+                        except NotFound:
+                            pass
+
+        if self.message:
+            channel = self.message.channel
+            try:
+                await self.message.delete()
+            except NotFound:
+                print("[INFO] wiadomosc juz jest usunieta - ruletaview")
+
+        if self.playingUsers:
+            parsedPeople = []
+            winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
+            await channel.send("Oto gracze tej rulety:")
+            for pair in self.playingUsers:
+                user = db.retrieveUser('discord_id',str(pair[0]))
+                if user:
+                    earnings = 0
+                    if pair[1] == winner:
+                        if winner == "Green":
+                            earnings = self.amount * 20
+                        else:
+                            earnings = self.amount * 2
+                    else:
+                        earnings -= self.amount
+                    msg = str(user['name'] + " postawil na: " + str(pair[1]) + "!")
+                    points.addPoints(pair[0], earnings)
+                    parsedPeople.append([user['name'], pair[1], earnings])
+                    await channel.send(msg)
+
+            embed, file = embedgen.generateRuletaWheel()
+            message = await channel.send(embed = embed, file = file)
+            await asyncio.sleep(15)
+            #await message.delete()
+            await channel.send(embed = embedgen.generateRuletaResults(parsedPeople, winner)) 
+        else:
+            print("Nikt nie skusil sie na partyjke ruletki")    
+        
 
 class usersChooseView:
     def __init__(self, users, radius):
@@ -80,6 +199,7 @@ def handleResponse(userMessage, author) -> str:
     message = userMessage.lower()
     returnEmbed = None
     returnView = None
+    returnFile = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
     message = message[1:]
     commands = message.split(" ")
@@ -126,17 +246,17 @@ def handleResponse(userMessage, author) -> str:
                         curr = int(user['points'])
                         if str(commands[1]) == "all":
                             amount = curr
-                        if curr >= amount:
+                        if curr >= amount and amount > 0:
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
-                                returnText = "You've won!"
+                                returnText = "You've won " + str(amount) + " ponits! (now You have : " + str(curr) + ")"
                             else:
                                 curr = curr - amount
-                                returnText = "You've Lost!"
+                                returnText = "You've Lost " + str(amount) + " ponits! (now You have : " + str(curr) + ")"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
-                            returnText = "You can't bet more than You have; your current points: " + str(user['points']) + "!"
+                            returnText = "You can't bet that; your current points: " + str(user['points']) + "!"
                 else:
                     returnText = "You have to pass a positive number!"
 
@@ -144,7 +264,7 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
-                        returnText = db.updateUser(str(commands[1]), 'points', int(commands[2]))
+                        returnText = db.updateUser('discord_id', str(commands[1]), 'points', int(commands[2]))
                     else:
                         returnText = "ERROR: ostatnia wartosc to musi byc int!"
                 else:
@@ -195,9 +315,12 @@ def handleResponse(userMessage, author) -> str:
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
-        if message == "ruleta":
-            returnEmbed = embedgen.generateRuleta()
-            returnView = ruletaView()
+        #if message == "ruleta":
+            #winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
+            #returnEmbed, returnFile = embedgen.generateRuleta(winner)
+            #returnView = ruletaView()
+            #returnView = ruletaView()
+            #returnEmbed = embedgen.generateRuletaChoices()
 
         if message in restaurantKeywords:
             embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
@@ -207,4 +330,4 @@ def handleResponse(userMessage, author) -> str:
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
 
-    return returnEmbed, returnText, returnView
+    return returnEmbed, returnText, returnView, returnFile
