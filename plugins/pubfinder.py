@@ -3,15 +3,9 @@ import googlemaps
 import numpy as np
 from os import environ
 from pymongo import MongoClient
+import plugins.pizzadatabase as db
 
 GOOGLE_API_KEY = environ["GOOGLE_MAPS_API_KEY"]
-
-#connect to mongodb database and get proper database
-CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
-dbclient = MongoClient(CONN_URL)
-db = dbclient['discord']
-user_collection = db['users']
-
 
 #geographic midpoint between users - at the moment - all users in database
 def calculateGeographicMidpoint(coords):
@@ -44,23 +38,23 @@ def find_restaurant(location, radius=1000):
         best_place = sorted(places["results"], key=lambda x: x.get("rating", 0), reverse=True)[0]
         return best_place
     else:
-        return find_restaurant(location, radius = radius + 1000)
+        return find_restaurant(location, radius = (radius * 2))
     #return None
 
-def chooseRestaurant():
+def chooseRestaurant(selectedUsers, radius = 1000):
     reply = ""
     if not GOOGLE_API_KEY:
         print("[ERROR]Google Maps API key not found. Set GOOGLE_MAPS_API_KEY as an environment variable.")
         return
     coords = []
-    users = user_collection.find({})
-    if users != None:
+    users = db.retrieveAllusers()
+    if users:
         for user in users:
-            if user['riotid'] == 'roLab' or user['riotid'] == 'SMIRNOFF' or user['riotid'] == 'Wklej' or user['riotid'] == 'FatherInLaw':
+            if user in selectedUsers:
                 coords.append(user['coordinates'])
     if len(coords) > 1:
         midpoint = calculateGeographicMidpoint(coords)
-        restaurant = find_restaurant(midpoint)
+        restaurant = find_restaurant(midpoint, radius)
     else:
         return None
     

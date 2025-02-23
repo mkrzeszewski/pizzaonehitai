@@ -21,27 +21,37 @@ VOICE_CHANNEL_IDS = [
 ]
 
 
+async def sendEmbedToChannel(interaction, embed, is_private=False):
+    if is_private:
+        await interaction.author.send(embed=embed)
+    else:
+        await interaction.channel.send(embed=embed)
 
+        
 async def sendMessage(message, user_message, is_private):
     try:
-        embed = None
         response = ""
         embed, response, view = responses.handleResponse(user_message, message.author.id)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
-            await message.author.send(embed = embed) if is_private else await message.channel.send(embed = embed)
+            if view:
+                await message.author.send(embed = embed, view = view) if is_private else await message.channel.send(embed = embed, view = view)   
+            else:
+                await message.author.send(embed = embed) if is_private else await message.channel.send(embed = embed)
     except Exception as e:
         print(e)
 
 def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
+
     intents_temp = discord.Intents.default()
     intents_temp.message_content = True
     bot = discord.Client(intents = intents_temp)
 
     @bot.event
     async def on_ready():
+        #bot.add_view(embedgen.ruletaView())
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO]" + f'{bot.user} is now running!')
 

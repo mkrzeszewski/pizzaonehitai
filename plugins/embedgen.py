@@ -1,7 +1,6 @@
 import random
-from discord import Embed, Colour, ui, ButtonStyle, Interaction
+from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 import time
-import requests
 from os import environ
 
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
@@ -40,19 +39,6 @@ SIGN_ICON_ARRAY = {
 
 PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
 API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
-
-class ruletaView(ui.View):
-    def __init__(self):
-        super().__init__()
-
-    @ui.button(label="Option 1", style=ButtonStyle.primary)
-    async def option1(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
-
-    @ui.button(label="Option 2", style=ButtonStyle.success)
-    async def option2(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
-
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -124,7 +110,7 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
     embed.set_footer(text = str(matchID), icon_url = FOOTER_ICON)
     return embed
 
-def generateEmbedFromRestaurant(restaurant, userlist):
+def generateEmbedFromRestaurant(restaurant):
     embedIcon = random.choice(ICON_ARRAY)
     endColour = Colour.blue()
     
@@ -173,7 +159,7 @@ def generateTopPointsEmbed(users, amount):
     return embed
 
 def generateRuleta():
-    embed = Embed(colour = Colour.darker_grey())
+    embed = Embed(colour = Colour.darker_grey(), description="Click a button below:")
     embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
     return embed
 
