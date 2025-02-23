@@ -1,7 +1,6 @@
 import random
-from discord import Embed, Colour, ui, ButtonStyle, Interaction
+from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 import time
-import requests
 from os import environ
 
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
@@ -52,6 +51,53 @@ class ruletaView(ui.View):
     @ui.button(label="Option 2", style=ButtonStyle.success)
     async def option2(self, interaction: Interaction, button: ui.Button):
         await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
+
+class usersView:
+    def __init__(self, users):
+        self.users = users
+        self.selectedUsers = []
+        self.sent_messages = []
+
+    def generate_embed(self):
+        """Creates and returns an embed."""
+        embed = Embed(title="User Selection", description="Click on a user button below:", color=Colour.blue())
+        return embed
+
+    def generate_view(self):
+        """Dynamically creates a view with buttons based on users."""
+        view = ui.View()
+        for user in self.users:
+            button = ui.Button(label=user['name'], style=ButtonStyle.primary)
+            button.callback = self.create_callback(user)
+            view.add_item(button)
+
+        button = ui.Button(label="OK", style=ButtonStyle.success)
+        button.callback = self.create_finish_callback()
+        view.add_item(button)
+
+        return view
+
+    def create_callback(self, user):
+        async def callback(interaction: Interaction):
+            await interaction.response.defer()
+            message = await interaction.followup.send(f"You selected {user['name']}.")
+            self.sent_messages.append(message)
+            self.selectedUsers.append(user)
+        return callback
+    
+    def create_finish_callback(self):
+        async def callback(interaction: Interaction):
+            if self.sent_messages:
+                for message in self.sent_messages:
+                    if message:
+                        try:
+                            await message.delete() 
+                        except NotFound:
+                            pass
+            userListString = " ".join([user['name'] for user in self.selectedUsers])
+            await interaction.message.delete()
+            await interaction.channel.send(f"Wybrane osoby: {userListString}.")
+        return callback
 
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
@@ -173,7 +219,7 @@ def generateTopPointsEmbed(users, amount):
     return embed
 
 def generateRuleta():
-    embed = Embed(colour = Colour.darker_grey())
+    embed = Embed(colour = Colour.darker_grey(), description="Click a button below:")
     embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
     return embed
 

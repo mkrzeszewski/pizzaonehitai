@@ -44,8 +44,10 @@ def handleResponse(userMessage, author) -> str:
                 returnText = "kolego, podaj poprawny ID, np: EUN1_3742603881"
 
         #find proper pub to meet together (NEEDS WORK)
-        elif commands[0] == "znajdzbar":
-            returnEmbed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
+        elif commands[0] == "znajdzbar" or commands[0] == "knajpa" or commands[0] == "restauracja" or commands[0] == "gdziejemy":
+            embed_buttons = embedgen.usersView(db.retrieveAllusers())
+            returnView = embed_buttons.generate_view()
+            returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:
@@ -129,7 +131,7 @@ def handleResponse(userMessage, author) -> str:
 
         if message == "ruleta":
             returnEmbed = embedgen.generateRuleta()
-
+            returnView = embedgen.ruletaView()
 
 
         if message == "help" or message == "?" or message == "??" or message == "pomoc" or message == "tutorial":
