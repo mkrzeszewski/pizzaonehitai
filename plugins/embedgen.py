@@ -40,66 +40,6 @@ SIGN_ICON_ARRAY = {
 PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
 API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
 
-class ruletaView(ui.View):
-    def __init__(self):
-        super().__init__()
-
-    @ui.button(label="Option 1", style=ButtonStyle.primary)
-    async def option1(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
-
-    @ui.button(label="Option 2", style=ButtonStyle.success)
-    async def option2(self, interaction: Interaction, button: ui.Button):
-        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
-
-class usersView:
-    def __init__(self, users):
-        self.users = users
-        self.selectedUsers = []
-        self.sent_messages = []
-
-    def generate_embed(self):
-        """Creates and returns an embed."""
-        embed = Embed(title="User Selection", description="Click on a user button below:", color=Colour.blue())
-        return embed
-
-    def generate_view(self):
-        """Dynamically creates a view with buttons based on users."""
-        view = ui.View()
-        for user in self.users:
-            button = ui.Button(label=user['name'], style=ButtonStyle.primary)
-            button.callback = self.create_callback(user)
-            view.add_item(button)
-
-        button = ui.Button(label="OK", style=ButtonStyle.success)
-        button.callback = self.create_finish_callback()
-        view.add_item(button)
-
-        return view
-
-    def create_callback(self, user):
-        async def callback(interaction: Interaction):
-            await interaction.response.defer()
-            message = await interaction.followup.send(f"You selected {user['name']}.")
-            self.sent_messages.append(message)
-            self.selectedUsers.append(user)
-        return callback
-    
-    def create_finish_callback(self):
-        async def callback(interaction: Interaction):
-            if self.sent_messages:
-                for message in self.sent_messages:
-                    if message:
-                        try:
-                            await message.delete() 
-                        except NotFound:
-                            pass
-            userListString = " ".join([user['name'] for user in self.selectedUsers])
-            await interaction.message.delete()
-            await interaction.channel.send(f"Wybrane osoby: {userListString}.")
-        return callback
-
-
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
     topTitle = results[0] + " - " + results[1]
@@ -170,7 +110,7 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
     embed.set_footer(text = str(matchID), icon_url = FOOTER_ICON)
     return embed
 
-def generateEmbedFromRestaurant(restaurant, userlist):
+def generateEmbedFromRestaurant(restaurant):
     embedIcon = random.choice(ICON_ARRAY)
     endColour = Colour.blue()
     

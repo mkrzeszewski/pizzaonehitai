@@ -21,7 +21,13 @@ VOICE_CHANNEL_IDS = [
 ]
 
 
+async def sendEmbedToChannel(interaction, embed, is_private=False):
+    if is_private:
+        await interaction.author.send(embed=embed)
+    else:
+        await interaction.channel.send(embed=embed)
 
+        
 async def sendMessage(message, user_message, is_private):
     try:
         response = ""

@@ -8,6 +8,70 @@ import plugins.points as points
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import re
+from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
+
+restKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
+helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
+class ruletaView(ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @ui.button(label="Option 1", style=ButtonStyle.primary)
+    async def option1(self, interaction: Interaction, button: ui.Button):
+        await interaction.response.send_message("You clicked Option 1!", ephemeral=True)
+
+    @ui.button(label="Option 2", style=ButtonStyle.success)
+    async def option2(self, interaction: Interaction, button: ui.Button):
+        await interaction.response.send_message("You clicked Option 2!", ephemeral=True)
+
+class usersView:
+    def __init__(self, users, radius):
+        self.users = users
+        self.selectedUsers = []
+        self.sent_messages = []
+        self.radius = radius
+
+    def generate_embed(self):
+        """Creates and returns an embed."""
+        embed = Embed(title="User Selection", description="Click on a user button below:", color=Colour.blue())
+        return embed
+
+    def generate_view(self):
+        """Dynamically creates a view with buttons based on users."""
+        view = ui.View()
+        for user in self.users:
+            button = ui.Button(label=user['name'], style=ButtonStyle.primary)
+            button.callback = self.create_callback(user)
+            view.add_item(button)
+
+        button = ui.Button(label="OK", style=ButtonStyle.success)
+        button.callback = self.create_finish_callback()
+        view.add_item(button)
+
+        return view
+
+    def create_callback(self, user):
+        async def callback(interaction: Interaction):
+            await interaction.response.defer()
+            message = await interaction.followup.send(f"You selected {user['name']}.")
+            self.sent_messages.append(message)
+            self.selectedUsers.append(user)
+        return callback
+    
+    def create_finish_callback(self):
+        async def callback(interaction: Interaction):
+            if self.sent_messages:
+                for message in self.sent_messages:
+                    if message:
+                        try:
+                            await message.delete() 
+                        except NotFound:
+                            pass
+            userListString = " ".join([user['name'] for user in self.selectedUsers])
+            await interaction.message.delete()
+            await interaction.channel.send(f"Wybrane osoby: {userListString}.")
+            await interaction.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(self.selectedUsers, radius = self.radius)))
+        return callback
 
 def getWeather():
     return weather.getLodzWeather()
@@ -44,10 +108,12 @@ def handleResponse(userMessage, author) -> str:
                 returnText = "kolego, podaj poprawny ID, np: EUN1_3742603881"
 
         #find proper pub to meet together (NEEDS WORK)
-        elif commands[0] == "znajdzbar" or commands[0] == "knajpa" or commands[0] == "restauracja" or commands[0] == "gdziejemy":
-            embed_buttons = embedgen.usersView(db.retrieveAllusers())
-            returnView = embed_buttons.generate_view()
-            returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
+        elif commands[0] in restKeywords:
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    embed_buttons = usersView(db.retrieveAllusers(), int(str(commands[1])))
+                    returnView = embed_buttons.generate_view()
+                    returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:
@@ -131,10 +197,14 @@ def handleResponse(userMessage, author) -> str:
 
         if message == "ruleta":
             returnEmbed = embedgen.generateRuleta()
-            returnView = embedgen.ruletaView()
+            returnView = ruletaView()
 
+        if message in restKeywords:
+            embed_buttons = usersView(db.retrieveAllusers(), 500)
+            returnView = embed_buttons.generate_view()
+            returnEmbed = embed_buttons.generate_embed()
 
-        if message == "help" or message == "?" or message == "??" or message == "pomoc" or message == "tutorial":
+        if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
 
     return returnEmbed, returnText, returnView
