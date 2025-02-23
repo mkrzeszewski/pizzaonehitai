@@ -172,3 +172,8 @@ def generateRuleta(winner):
     embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
     return embed, file
 
+def generateRuletaChoices():
+    embed = Embed(title="Ruleta test!", description="Pick wisely!", color=Colour.darker_grey())
+    # Reference the file inside the embed
+    embed.set_author(name = "Wybierz na co stawiasz!", icon_url = CASINO_ICON_URL)
+    return embed
