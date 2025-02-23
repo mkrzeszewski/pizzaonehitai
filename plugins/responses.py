@@ -130,10 +130,10 @@ def handleResponse(userMessage, author) -> str:
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
-                                returnText = "You've won!"
+                                returnText = "You've won " + str(amount) + " ponits! (now You have : " + str(curr) + ")"
                             else:
                                 curr = curr - amount
-                                returnText = "You've Lost!"
+                                returnText = "You've Lost " + str(amount) + " ponits! (now You have : " + str(curr) + ")"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
                             returnText = "You can't bet more than You have; your current points: " + str(user['points']) + "!"
@@ -144,7 +144,7 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
-                        returnText = db.updateUser(str(commands[1]), 'points', int(commands[2]))
+                        returnText = db.updateUser('discord_id', str(commands[1]), 'points', int(commands[2]))
                     else:
                         returnText = "ERROR: ostatnia wartosc to musi byc int!"
                 else:
