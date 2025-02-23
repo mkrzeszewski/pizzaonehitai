@@ -1,6 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import random
+from datetime import datetime
+random.seed(datetime.now().timestamp())
 
 # Constants
 num_fields = 21  # Number of sectors
@@ -14,10 +16,10 @@ center = (width // 2, height // 2)  # Center of the wheel
 
 # Colors
 blue = (1, 66, 99)
-red = (200, 66, 66)
+red = (151, 42, 39)
 white = (255, 255, 255)
 yellow = (255, 190, 20)
-green = (20, 200, 20)
+green = (0, 99, 0)
 
 # Function to draw the wheel
 def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
@@ -39,11 +41,6 @@ def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
         angle_start = (i * 360 / num_fields + angle_offset) % 360
         angle_end = ((i + 1) * 360 / num_fields + angle_offset) % 360
 
-        # Determine the color (alternating black and red)
-        color = blue if i % 2 == 0 else red
-        if i in [0]:
-            color = green
-
         # Create the points for the triangle (sector)
         points = [
             center,  # The center of the wheel
@@ -52,9 +49,15 @@ def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
             (center[0] + radius * np.cos(np.radians(angle_end)),
              center[1] + radius * np.sin(np.radians(angle_end)))
         ]
-        if angle_start <= 0 < angle_end or (angle_end < angle_start and (0 >= angle_start or 0 < angle_end)):
+        # Determine the color (alternating black and red)
+        color = blue if i % 2 == 0 else red
+        if i in [0]:
+            color = green
+
+        #check if it goes through 0 angle
+        if (angle_start < angle_end and angle_start <= 0 < angle_end) or (angle_start > angle_end and (angle_start <= 0 or angle_end > 0)):
             top_color = color
-        # Draw the triangle (sector)
+
         draw.polygon(points, fill=color)
 
     pointer_jump = 0
@@ -67,10 +70,11 @@ def draw_wheel(angle_offset=0, pointer_angle=0, previous_color=None, debug=""):
     # Draw the pointer triangle (white)
     draw.polygon(pointer_points, fill=white)
 
+    pointer_position = (pointer_angle + angle_offset) % 360
     return img, top_color  # Return the color of the current field
 
 # Function to generate the GIF
-def generate_spinning_wheel_with_pointer(filename="ruleta.gif"):
+def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
     images = []
     previous_color = None  # Track the previous color for pointer jump
     initial_rotation = random.randint(1,360)

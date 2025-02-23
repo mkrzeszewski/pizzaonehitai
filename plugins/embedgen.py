@@ -6,6 +6,7 @@ from os import environ
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
+GAMBA_ANOTHER_GIF_URL = "https://cdn3.emoji.gg/emojis/3884-gamba.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
 LOL_ICON = "https://raw.githubusercontent.com/github/explore/b088bf18ff2af3f2216294ffb10f5a07eb55aa31/topics/league-of-legends/league-of-legends.png"
@@ -18,6 +19,10 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/warband.png", 
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
+
+GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
+                           "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
+                           "https://cdn3.emoji.gg/emojis/3955-gamba-addict.gif"]
 
 SIGN_ICON_ARRAY = {
     "baran": "https://cdn3.emoji.gg/emojis/42434-aries.png",
@@ -158,11 +163,11 @@ def generateTopPointsEmbed(users, amount):
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
 
-def generateRuleta(winner):
+def generateRuletaWheel():
     # Path to the locally stored GIF
     gif_path = 'assets/gif/ruleta.gif'
     # Create the embed
-    embed = Embed(title="Ruleta test!", description="The winner is... " + str(winner) + "!", color=Colour.darker_grey())
+    embed = Embed(title="Krecimy!", description="The winner is... ", color=Colour.darker_grey())
     
     # Attach the GIF from local storage
     file = File(gif_path, filename="ruleta.gif")
@@ -172,8 +177,31 @@ def generateRuleta(winner):
     embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
     return embed, file
 
+def generateRuletaResults(players, winner):
+    color = Colour.dark_blue()
+    text = "niebieski"
+    if winner == "Red":
+        color = Colour.dark_red()
+        text = "czerwony"
+    elif winner == "Green":
+        color = Colour.dark_green(0)
+        text = "zielony"
+        
+    embed = Embed(title="Oto wyniki:", description="Wygrywa... " + str(text) + "!", color=color)
+    embed.set_author(name = "Ruleta zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    listOfPlayers = ""
+    for player in players:
+        sign = ""
+        if int(player[2] > 0):
+            sign = "+"
+        listOfPlayers = str(player[0]) + ": "+ str(sign) + str(player[2]) + "ppkt.\n"
+    embed.add_field(name = "Bilans: ", value = listOfPlayers)
+    return embed
+
+
 def generateRuletaChoices():
-    embed = Embed(title="Ruleta test!", description="Pick wisely!", color=Colour.darker_grey())
+    embed = Embed(title="Prosimy o wybor!", description="Pick wisely!", color=Colour.darker_grey())
     # Reference the file inside the embed
     embed.set_author(name = "Wybierz na co stawiasz!", icon_url = CASINO_ICON_URL)
+    embed.add_field(name = "Koszt: 50 ppkt", value = "niebieski/czerwony = x2 \n zielony = x20")
     return embed
