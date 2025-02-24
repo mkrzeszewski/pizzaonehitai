@@ -170,10 +170,10 @@ def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
     embed = Embed(title="Krecimy!", description="The winner is... ", color=Colour.darker_grey())
     
     # Attach the GIF from local storage
-    file = File(gif_path, filename = gif_path)
+    file = File(gif_path, filename = gif_path.split("/")[-1])
     
     # Reference the file inside the embed
-    embed.set_image(url="attachment://"+ gif_path)
+    embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
     embed.set_author(name = "Ruleta P1H - animacja", icon_url = CASINO_ICON_URL)
     embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed, file
