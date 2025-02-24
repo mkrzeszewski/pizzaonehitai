@@ -20,9 +20,9 @@ if users != None:
         players.append(user)
         importantPeople.append(user['riotid'])
 
-def updateAPIKey(updatedApiKey):
+def setAPIKey(updatedApiKey):
     global API_KEY
-    API_KEY = updateAPIKey
+    API_KEY = updatedApiKey
 
 #imitate real browser
 headers = {

@@ -172,7 +172,6 @@ class ruletaView(ui.View):
         else:
             print("Nikt nie skusil sie na partyjke ruletki")    
         
-
 class usersChooseView:
     def __init__(self, users, radius):
         self.users = users
@@ -226,17 +225,16 @@ def getWeather():
     return weather.getLodzWeather()
 
 def handleResponse(userMessage, author) -> str:
-    message = userMessage.lower()
+    #message = userMessage.lower()
     returnEmbed = None
     returnView = None
     returnFile = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
-    message = message[1:]
+    message = userMessage[1:]
     commands = message.split(" ")
-
+    commands[0] = str(commands[0].lower())
     #komendy wielokomendowe
     if len(commands) > 1:
-
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
         if commands[0] == "analyzelol":
             if re.search(r'euw1_\d+|eun1_\d+',commands[1]):
@@ -302,6 +300,10 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = "Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 
+        elif commands[0] == "setriotkey":
+            if int(author) == 326259887007072257 and len(commands) == 2:
+                tftapi.setAPIKey(commands[1])
+                returnText = "API Key successfuly replaced"
 
         elif commands[0] == "top":
             if len(commands) == 2:
