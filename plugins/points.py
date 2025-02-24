@@ -18,7 +18,7 @@ def addPoints(discord_id, amount):
     user = db.retrieveUser('discord_id', discord_id)
     if user:
         db.updateUser('discord_id', str(discord_id), 'points', int(user['points']) + amount)
-        print("[INFO] Adding " + str(amount) + " points to: " +  user['name'] + ".")
+        #print("[INFO] Adding " + str(amount) + " points to: " +  user['name'] + ".")
     return None
 
 def modifyPoints(key, value, amount):
@@ -32,5 +32,5 @@ def modifyPoints(key, value, amount):
         if(int(amount) < 0):
             operation = "-"
         db.updateUser('discord_id', str(user['discord_id']), 'points', newPoints)
-        print("[INFO] Modifying: " + operation + str(amount) + " points for: " +  user['name'] + ".")
+        #print("[INFO] Modifying: " + operation + str(amount) + " points for: " +  user['name'] + ".")
     return None

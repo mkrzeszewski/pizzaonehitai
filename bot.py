@@ -57,12 +57,12 @@ def runDiscordBot():
         print (responses.getWeather())
 
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes = 5)
     async def rouletteTask():
         channel = bot.get_channel(1343278156265685092)
         if channel:
             view = responses.ruletaView()
-            await view.send(channel, embed = embedgen.generateRuletaChoices())
+            await view.start(channel)
 
     #@rouletteTask.before_loop
     #async def beforeRouletteTask():

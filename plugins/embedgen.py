@@ -2,6 +2,7 @@ import random
 from discord import Embed, Colour, File
 import time
 from os import environ
+from datetime import datetime, timedelta
 
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
@@ -163,7 +164,7 @@ def generateTopPointsEmbed(users, amount):
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
 
-def generateRuletaWheel():
+def generateRuletaWheel(id = 0):
     # Path to the locally stored GIF
     gif_path = 'assets/gif/ruleta.gif'
     # Create the embed
@@ -174,10 +175,11 @@ def generateRuletaWheel():
     
     # Reference the file inside the embed
     embed.set_image(url="attachment://ruleta.gif")
-    embed.set_author(name = "Ruleta - test", icon_url = CASINO_ICON_URL)
+    embed.set_author(name = "Ruleta P1H - animacja", icon_url = CASINO_ICON_URL)
+    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed, file
 
-def generateRuletaResults(players, winner):
+def generateRuletaResults(players, winner, id = 0):
     color = Colour.dark_blue()
     text = "niebieski"
     if winner == "Red":
@@ -188,23 +190,31 @@ def generateRuletaResults(players, winner):
         text = "zielony"
         
     embed = Embed(title="Oto wyniki:", description="Wygrywa... " + str(text) + "!", color=color)
-    embed.set_author(name = "Ruleta zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.set_author(name = "Ruleta P1H zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
     listOfPlayers = ""
     for player in players:
         sign = ""
-        if int(player[2] > 0):
+        if int(player[2]) > 0:
             sign = "+"
-        listOfPlayers = str(player[0]) + ": "+ str(sign) + str(player[2]) + "ppkt.\n"
+        listOfPlayers = listOfPlayers + str(player[0]) + ": "+ str(sign) + str(player[2]) + "ppkt.\n"
     embed.add_field(name = "Bilans: ", value = listOfPlayers)
-    formatted_time = time.strftime('%Y-%m-%d %H:%M', time.gmtime())
-    embed.set_footer(text = str(formatted_time), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
+    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed
 
 
-def generateRuletaChoices():
-    embed = Embed(title="Prosimy o wybor!", description="Pick wisely!", color=Colour.darker_grey())
+def generateRuletaChoices(id = 0):
+    formatted_time = (datetime.now() + timedelta(minutes=4)).strftime('%H:%M')
+    embed = Embed(title="50 ppkt", description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
     # Reference the file inside the embed
-    embed.set_author(name = "Wybierz na co stawiasz!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
-    embed.add_field(name = "Koszt: 50 ppkt", value = "niebieski/czerwony = x2 \n zielony = x20")
-    embed.set_footer(text = "ruleta odpala sie co 10 minut, try your luck", icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
+    embed.set_author(name = "Ruleta P1H - wybor", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.add_field(name = "", value = "!niebieski = x2!\n!czerwony = x2! \n !zielony = x25!")
+    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
+    return embed
+
+def generateRuletaPlayers(players, id = 0):
+    embed = Embed(title="Oto zawodnicy:", description="", color=Colour.darker_grey())
+    # Reference the file inside the embed
+    embed.set_author(name = "Ruleta P1H - gracze", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.add_field(name = "-----------", value = players)
+    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed

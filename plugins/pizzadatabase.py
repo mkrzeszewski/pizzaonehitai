@@ -1,10 +1,38 @@
 from pymongo import MongoClient
 from os import environ
+import time
 
 #connect to mongodb database and get proper database
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
 dbclient = MongoClient(CONN_URL)
 db = dbclient['discord']
+
+def addRouletteEntry():
+    ruletasCollection = db['ruletas']
+    count = ruletasCollection.estimated_document_count()
+    formatted_time = str(time.strftime('%Y-%m-%d %H:%M', time.gmtime()))
+    ruletasCollection.insert_one({'date': formatted_time,
+                                  'winner': "",
+                                  'players':[],
+                                  'ruleta_id': count})
+    return count
+
+def updateRouletteEntry(ruleta_id, winner):
+    ruletasCollection = db['ruletas']
+    ruletasCollection.update_one(
+    {"ruleta_id": ruleta_id},
+    {"$set": {'winner': winner}}
+    )
+    return None
+
+def addRoulettePlayer(ruleta_id, players):
+    if not isinstance(players, list):
+        players = [players]
+    ruletasCollection = db['ruletas']
+    ruletasCollection.update_one(
+    {"ruleta_id": ruleta_id},
+    {"$push": {'players': {"$each":players}}}
+    )
 
 def retrieveUser(key, value):
     userCollection = db['users']
@@ -36,34 +64,19 @@ def retrieveAllUsersRevSorted(key):
     return userCollection.find({}).sort({key: -1})
 
 def updateDiscordUser(discord_id, key, value):
-    userCollection = db['users']
-    user = userCollection.find_one({'discord_id': str(discord_id)})
-    result = userCollection.update_one(
-    {"discord_id": discord_id},  # Match the document where 'id' equals the specified user ID
-    {"$set": {key: value}}  # Set the new points value
-    )
-    text = ""
-
-    print("[DBINFO] DB MODIFY: {" + str(discord_id) + " - " + str(key) + " = " + str(value) + "} - result: " + str(result))
-    if result.matched_count > 0:
-        text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
-    else:
-        text = "User not found."
-
-    return text
+    return updateUser('discord_id', discord_id, key, value)
 
 def updateUser(querykey, queryvalue, key, value):
+    text = "User not found."
     userCollection = db['users']
     user = userCollection.find_one({querykey: queryvalue})
-    result = userCollection.update_one(
-    {querykey: queryvalue},
-    {"$set": {key: value}}
-    )
-    text = ""
-    print("[DBINFO] DB MODIFY: {" + str(user['name']) + " - " + str(key) + " = " + str(value) + "} - result: " + str(result))
-    if result.matched_count > 0:
-        text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
-    else:
-        text = "User not found."
-
+    if user:
+        oldValue = user[key]
+        result = userCollection.update_one(
+        {querykey: queryvalue},
+        {"$set": {key: value}}
+        )
+        print("[DBINFO] DB MODIFY: {" + str(user['name']) + " - " + str(key) + ": " + str(oldValue) + " -> " + str(value) + "} - result: " + str(result))
+        if result.matched_count > 0:
+            text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
     return text
