@@ -16,13 +16,20 @@ for container in $(docker ps -a | awk '{print $1}'); do docker rm $container; do
 version: '3'
 
 services:
-  p1h-discord-bot:
-    container_name: p1h-dc-bot
-    image: mkrzeszewski/pizzaonehit-discord-bot:latest
+   p1h-discord-bot:
+    container_name: discord-bot
+    image: mkrzeszewski/pizzaonehit-discord-bot:multiarch-env-tokens
     restart: unless-stopped
     volumes:
-      - /opt/pizzaonehitai/sharedpath:/pizzaonehitai/sharedpath
+      - /opt/pizzaonehitai/pizzaonehitai/plugins:/pizzaonehitai/plugins
     environment:
-        RIOT_API_TOKEN: <YOUR RIOT TOKEN>
-        DC_TOKEN: <YOUR DC TOKEN>
+        RIOT_API_TOKEN: <>
+        DC_TOKEN: <>
+        MONGO_USERNAME: <>
+        MONGO_PASSWORD: <>
+        MONGO_ENDPOINT: mongo:27017
+        DISCORD_CHANNEL_TFT: <>
+        PROD_STATUS: PRODUCTION / DEVELOPEMENT
+        DEBUG_MODE: True
+        GOOGLE_MAPS_API_KEY: <>
 ```
