@@ -119,8 +119,11 @@ def runDiscordBot():
     async def on_message(message):
         if message.author == bot.user:
             return
-
         userMessage = str(message.content)
+        
+        # If message is empty (e.g., image, embed, sticker)
+        if not userMessage:
+            return
         if userMessage[0] == '!':
             await sendMessage(message, userMessage, is_private=False)
 
