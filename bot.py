@@ -90,7 +90,7 @@ def runDiscordBot():
             for boy in birthdayBoys:
                 print (boy['username'])
         else:
-            print ("[INFO] Noone has birthday today..")
+            print ("[INFO] " + str(time.strftime('%Y-%m-%d %H:%M', time.gmtime())) + " - Noone has birthday today..")
 
     @sendBirthdayInfo.before_loop
     async def beforeBirthdayTask():
