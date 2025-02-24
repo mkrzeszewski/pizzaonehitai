@@ -1,13 +1,10 @@
 import requests
 import datetime
 import os
+import plugins.pizzadatabase as db
 
 matches = []
 oldMatches = []
-parsedFile = open("./sharedpath/alreadyParsed.txt","r+")
-oldMatches = parsedFile.read().splitlines()
-parsedFile.close()
-
 API_KEY = os.environ["RIOT_API_TOKEN"]
 
 API_SUFFIX = "?api_key=" + API_KEY
@@ -15,12 +12,7 @@ SUMMONERS_DATA_URL = "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/b
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" #IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"
 MATCH_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/"
 URLS = []
-playersFile = open("./sharedpath/riot-players.txt","r")
-#playerList = playersFile.read().splitlines()
-
-#USERLIST = {"P1H Rolab","AlphaKubek","Jeezie666","SMIRTFONEK","TipJoker","Wklej","CLG Pablo","Deαn","FatherInLaw","Kamil100CM","Minzzzy"}
-USERLIST = playersFile.read().splitlines()
-playersFile.close()
+USERLIST = db.retrieveAllusers()
 
 def analyzeMatch(match, isAutomatic):
     playersInMatch = ""
