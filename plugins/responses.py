@@ -15,6 +15,7 @@ from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
+begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "kurwodawajpunkty", "kierowniku", "beg"]
 
 class ruletaView(ui.View):
     def __init__(self):
@@ -126,6 +127,7 @@ class ruletaView(ui.View):
                         except NotFound:
                             pass
 
+        #delete original message with buttons
         if self.message:
             channel = self.message.channel
             try:
@@ -146,6 +148,8 @@ class ruletaView(ui.View):
             embed, file = embedgen.generateRuletaWheel(self.id)
             message = await channel.send(embed = embed, file = file)
             await asyncio.sleep(15)
+
+            #delete wheel? for now - no
             #await message.delete()
             
             userIds = []
@@ -169,8 +173,6 @@ class ruletaView(ui.View):
             db.updateRouletteEntry(self.id, winner)
             db.addRoulettePlayer(self.id, userIds)
             await channel.send(embed = embedgen.generateRuletaResults(parsedPeople, winner, self.id))               
-        else:
-            print("Nikt nie skusil sie na partyjke ruletki")    
         
 class usersChooseView:
     def __init__(self, users, radius):
@@ -335,6 +337,16 @@ def handleResponse(userMessage, author) -> str:
 
         if message == "pogoda":
             returnText =  weather.getLodzWeather()
+
+        if message in begKeyword:
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                curr = int(user['points'])
+                if curr < 100:
+                    db.updateUser('discord_id', str(author), 'points', 100)
+                    returnText = "Ustawiono 100 ppkt dla " + user['Name'] + ". Globalny cooldown - 15 min."
+                else:
+                    returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
         if message == "top5" or message == "top":
             amount = 5
