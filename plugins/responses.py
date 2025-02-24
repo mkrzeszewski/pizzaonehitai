@@ -344,7 +344,7 @@ def handleResponse(userMessage, author) -> str:
                 curr = int(user['points'])
                 if curr < 100:
                     db.updateUser('discord_id', str(author), 'points', 100)
-                    returnText = "Ustawiono 100 ppkt dla " + user['Name'] + ". Globalny cooldown - 15 min."
+                    returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
                 else:
                     returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
