@@ -164,17 +164,16 @@ def generateTopPointsEmbed(users, amount):
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
     return embed
 
-def generateRuletaWheel(id = 0):
+def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
     # Path to the locally stored GIF
-    gif_path = 'assets/gif/ruleta.gif'
     # Create the embed
     embed = Embed(title="Krecimy!", description="The winner is... ", color=Colour.darker_grey())
     
     # Attach the GIF from local storage
-    file = File(gif_path, filename="ruleta.gif")
+    file = File(gif_path, filename = gif_path)
     
     # Reference the file inside the embed
-    embed.set_image(url="attachment://ruleta.gif")
+    embed.set_image(url="attachment://"+ gif_path)
     embed.set_author(name = "Ruleta P1H - animacja", icon_url = CASINO_ICON_URL)
     embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed, file

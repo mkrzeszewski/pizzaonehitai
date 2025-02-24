@@ -137,7 +137,8 @@ class ruletaView(ui.View):
 
         if self.playingUsers:
             parsedPeople = []
-            winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
+            fileName = "assets/gif/ruleta" + str(self.id) + ".gif"
+            winner = gif.generate_spinning_wheel_with_pointer(fileName)
             msg = ""
             for pair in self.playingUsers:
                 user = db.retrieveUser('discord_id',str(pair[0]))
@@ -145,7 +146,7 @@ class ruletaView(ui.View):
                     msg = msg + str(user['name'] + " postawil na: " + str(pair[1]) + "!\n")
 
             await channel.send(embed = embedgen.generateRuletaPlayers(msg, self.id))
-            embed, file = embedgen.generateRuletaWheel(self.id)
+            embed, file = embedgen.generateRuletaWheel(self.id, fileName)
             message = await channel.send(embed = embed, file = file)
             await asyncio.sleep(15)
 
