@@ -167,9 +167,9 @@ class ruletaView(ui.View):
                         points.addPoints(str(user['discord_id']), earnings)
                         #msg = msg + ""
                         parsedPeople.append([user['name'], pair[1], str(earnings)])
-                        userIds.append(user['discord_id'])
                     else:
                         parsedPeople.append([user['name'], pair[1], "-" + str(self.amount)])
+                    userIds.append(user['discord_id'])
 
             db.updateRouletteEntry(self.id, winner)
             db.addRoulettePlayer(self.id, userIds)
