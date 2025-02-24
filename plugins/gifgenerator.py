@@ -110,17 +110,12 @@ def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
     debug = []
 
     previous_color = None  # Track the previous color for pointer jump
-    #initial_rotation = random.randint(1,360)
-    initial_rotation = 0
+    initial_rotation = random.randint(1,360)
+    #initial_rotation = 0
     angle_offset = (360) + initial_rotation
     color = white
 
     frame, color = draw_wheel(angle_offset, previous_color, getStringFromColor(color))
-
-    debug.append(frame)
-    debug.append(frame)
-    debug.append(frame)
-    debug[0].save("debug.gif", save_all=True, append_images=debug[1:], duration=40, loop=1)
     for i in range(startFrames):
         dynamicOffset = int(frames - i*2)
         angle_offset = (360 * i) / dynamicOffset + initial_rotation

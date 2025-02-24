@@ -18,7 +18,7 @@ helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 
 class ruletaView(ui.View):
     def __init__(self):
-        super().__init__(timeout = 200)
+        super().__init__(timeout = 180)
         self.activeUsers = []
         self.playingUsers = []
         self.sent_messages = []
