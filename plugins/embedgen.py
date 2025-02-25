@@ -54,6 +54,7 @@ BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
                     "Starosc nie radosc!",
                     "Juz tylko rok blizej do smierci!"
                     ]
+PARTY_FACE_ICON = "https://cdn3.emoji.gg/emojis/72795-b-partying-face.png"
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -194,7 +195,7 @@ def generateRuletaResults(players, winner, id = 0):
         color = Colour.dark_red()
         text = "czerwony"
     elif winner == "Green":
-        color = Colour.dark_green(0)
+        color = Colour.dark_green()
         text = "zielony"
         
     embed = Embed(title="Oto wyniki:", description="Wygrywa... " + str(text) + "!", color=color)
@@ -232,10 +233,15 @@ def generateAIResponse(input, response):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     return embed
 
-def generateBirthdayEmbed(user, body):
-    embed = Embed(title="Dzis sa twoje urodziny, " + user['Name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + BIRTHDAY_PHRASES[random.randint(0,len(BIRTHDAY_PHRASES) - 1)], color=Colour.pink())
+def generateBirthdayEmbed(user, facts, wrozba):
+    embed = Embed(title="Dzis sa twoje urodziny, " + user['name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + BIRTHDAY_PHRASES[random.randint(0,len(BIRTHDAY_PHRASES) - 1)], color=Colour.pink())
     embed.set_author(name = "Pizza One Hit AI", icon_url = BIRTHDAY_RANDOM_ICON_ARRAY[random.randint(0,len(BIRTHDAY_RANDOM_ICON_ARRAY) - 1)])
 
-    embed.add_field(name = "Ciekawostki ze swiata: ", value = body)
-    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 ppkt!", icon_url = "https://discord.com/assets/9e487a75040f95a5.svg")
+    body = ""
+    if facts:
+        for fact in facts:
+            body = body + str(fact) + "\n"
+    embed.add_field(name = "Ciekawostki: ", value = body)
+    embed.add_field(name = "Wrozba: ", value = wrozba)
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 ppkt!", icon_url = PARTY_FACE_ICON)
     return embed

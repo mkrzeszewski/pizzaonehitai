@@ -23,10 +23,13 @@ VOICE_CHANNEL_IDS = [
 #1032698616910983168 - league of debils
 #1172911430601822238 - gruby-test
 
-GAMBA_CHANNEL_ID = 1343278156265685092
+GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
+DEFAULT_BDAY_CHANNEL = 1172911430601822238
 if os.environ["PROD_STATUS"] == "PRODUCTION":
-    DEFAULT_TFT_CHANNEL = 1032698616910983168 #GRUBY-TEST
+    DEFAULT_TFT_CHANNEL = 1032698616910983168 #LEAGUEOFDEBILS
+    DEFAULT_BDAY_CHANNEL = 837732320017645581
+    GAMBA_CHANNEL_ID = 1343278156265685092
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -59,18 +62,10 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 5)
     async def rouletteTask():
-        channel = bot.get_channel(1343278156265685092)
+        channel = bot.get_channel(GAMBA_CHANNEL_ID)
         if channel:
             view = responses.ruletaView()
             await view.start(channel)
-
-    #@rouletteTask.before_loop
-    #async def beforeRouletteTask():
-    #    """ Waits until the next 10-minute-aligned mark before starting the loop """
-    #    now = datetime.datetime.now()
-    #    minutes_until_next_run = 10 - (now.minute % 10)  # Time left until the next aligned minute (X:00, X:10, X:20, etc.)
-    #    seconds_until_start = minutes_until_next_run * 60 - now.second
-    #    print(f"Waiting {seconds_until_start} seconds until the next aligned interval...")
 
     async def waitUntil(target_time):
         #wait until specified time to start loop for DC bot
@@ -87,8 +82,14 @@ def runDiscordBot():
     async def sendBirthdayInfo():
         birthdayBoys = birthday.getBirthdayPeople()
         if birthdayBoys:
+            channel = bot.get_channel(DEFAULT_BDAY_CHANNEL)
             for boy in birthdayBoys:
-                print (boy['name'])
+                user = await bot.fetch_user(boy['discord_id'])
+                embed, response = responses.getBirthdayStuff(boy['discord_id'])
+                if embed:
+                    await channel.send(content = user.mention, embed = embed)
+                else:
+                    await channel.send(response)
         else:
             print ("[INFO] " + str(time.strftime('%Y-%m-%d %H:%M', time.gmtime())) + " - Noone has birthday today..")
 
@@ -96,6 +97,7 @@ def runDiscordBot():
     async def beforeBirthdayTask():
         #ensure its 8AM - the bot will send messages ONCE every 24H - this task should only happen ONCE.
         await waitUntil(datetime.time(8, 0))
+        #print('test')
 
     @bot.event
     async def on_ready():
