@@ -6,9 +6,12 @@ import time
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
 dbclient = MongoClient(CONN_URL)
 db = dbclient['discord']
+userCollection = db['users']
+ruletasCollection = db['ruletas']
+matchesCollection = db['parsed_tft_matches']
+aiCollection = db['ai_history']
 
 def addRouletteEntry():
-    ruletasCollection = db['ruletas']
     count = ruletasCollection.estimated_document_count()
     formatted_time = str(time.strftime('%Y-%m-%d %H:%M', time.gmtime()))
     ruletasCollection.insert_one({'date': formatted_time,
@@ -18,7 +21,6 @@ def addRouletteEntry():
     return count
 
 def updateRouletteEntry(ruleta_id, winner):
-    ruletasCollection = db['ruletas']
     ruletasCollection.update_one(
     {"ruleta_id": ruleta_id},
     {"$set": {'winner': winner}}
@@ -28,39 +30,31 @@ def updateRouletteEntry(ruleta_id, winner):
 def addRoulettePlayer(ruleta_id, players):
     if not isinstance(players, list):
         players = [players]
-    ruletasCollection = db['ruletas']
     ruletasCollection.update_one(
     {"ruleta_id": ruleta_id},
     {"$push": {'players': {"$each":players}}}
     )
 
 def retrieveUser(key, value):
-    userCollection = db['users']
     return userCollection.find_one({key: value})
 
 def retrieveAllTFTMatches():
-    matchesCollection = db['parsed_tft_matches']
     allMatches = matchesCollection.find({})
     return allMatches
 
 def retrieveTFTMatch(match_id):
-    matchesCollection = db['parsed_tft_matches']
     return matchesCollection.find_one({'riotid': match_id})
 
 def insertTFTMatch(match_id):
-    matchesCollection = db['parsed_tft_matches']
     matchesCollection.insert_one({"riotid": match_id})
 
 def retrieveAllusers():
-    userCollection = db['users']
     return userCollection.find({})
 
 def retrieveAllUsersSorted(key):
-    userCollection = db['users']
     return userCollection.find({}).sort({key: 1})
 
 def retrieveAllUsersRevSorted(key):
-    userCollection = db['users']
     return userCollection.find({}).sort({key: -1})
 
 def updateDiscordUser(discord_id, key, value):
@@ -68,7 +62,6 @@ def updateDiscordUser(discord_id, key, value):
 
 def updateUser(querykey, queryvalue, key, value):
     text = "User not found."
-    userCollection = db['users']
     user = userCollection.find_one({querykey: queryvalue})
     if user:
         oldValue = user[key]
@@ -80,3 +73,13 @@ def updateUser(querykey, queryvalue, key, value):
         if result.matched_count > 0:
             text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
     return text
+
+def retrieveAllAIHistory(discord_id):
+    result = aiCollection.find({'discord_id': str(discord_id)}, {'_id': 0, 'message': 1})
+    return [doc['message'] for doc in result]
+def insertAIHistory(discord_id, message):
+    aiCollection.insert_one({
+                                'discord_id': discord_id,
+                                'message':message,
+                                'date': str(time.strftime('%Y-%m-%d %H:%M', time.gmtime()))})
+    return None
