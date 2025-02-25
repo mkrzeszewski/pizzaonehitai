@@ -10,15 +10,19 @@ import plugins.points as points
 API_KEY = environ["RIOT_API_TOKEN"]
 
 #get all users from mongodb database
-users = db.retrieveAllusers()
+
 importantPeople = []
 players = []
 oldMatches = []
 
+users = db.retrieveAllusers()
 if users != None:
     for user in users:
-        players.append(user)
-        importantPeople.append(user['riotid'])
+
+        #only add if people actually play league
+        if 'riotid' in user and user['riotid']:
+            players.append(user)
+            importantPeople.append(user['riotid'])
 
 def setAPIKey(updatedApiKey):
     global API_KEY
