@@ -24,13 +24,17 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 
 isBegAvailable = True
-def makeBegAvailable():
-    global isBegAvailable
-    isBegAvailable = True
+lock = asyncio.Lock()
 
-def makeBegUnavailable():
+async def makeBegAvailable():
     global isBegAvailable
-    isBegAvailable = False
+    async with lock:
+        isBegAvailable = True
+
+async def makeBegUnavailable():
+    global isBegAvailable
+    async with lock:
+        isBegAvailable = True
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
     def __init__(self):
@@ -252,7 +256,7 @@ def getBirthdayStuff(discord_id):
         facts = []
         facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
         facts.append(ai.getOneResponse("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
-        wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotkie zartobliwe przewidywanie jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales."))
+        wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotkie zartobliwe przewidywanie jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
         points.addPoints(str(discord_id), 2000)
     else:
