@@ -20,6 +20,7 @@ helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "kurwodawajpunkty", "kierowniku", "beg"]
 aiKeyword = ["ai", "chatgpt", "gemini"]
 horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
+quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 
 class ruletaView(ui.View):
     def __init__(self):
@@ -340,7 +341,7 @@ def handleResponse(userMessage, author) -> str:
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
                 returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
-                
+
         elif commands[0] == "top":
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
