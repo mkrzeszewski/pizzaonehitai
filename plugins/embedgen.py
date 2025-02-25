@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
+BOT_GIF_ADDRESS = "https://cdn3.emoji.gg/emojis/48134-bmodancing.gif"
 GAMBA_ANOTHER_GIF_URL = "https://cdn3.emoji.gg/emojis/3884-gamba.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
 LOSE_ICON_URL = "https://cdn3.emoji.gg/emojis/PepeHands.png"
@@ -189,7 +190,7 @@ def generateRuletaResults(players, winner, id = 0):
         text = "zielony"
         
     embed = Embed(title="Oto wyniki:", description="Wygrywa... " + str(text) + "!", color=color)
-    embed.set_author(name = "Ruleta P1H zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.set_author(name = "Ruleta P1H zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY))])
     listOfPlayers = ""
     for player in players:
         sign = ""
@@ -199,7 +200,6 @@ def generateRuletaResults(players, winner, id = 0):
     embed.add_field(name = "Bilans: ", value = listOfPlayers)
     embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed
-
 
 def generateRuletaChoices(id = 0):
     formatted_time = (datetime.now() + timedelta(minutes=4)).strftime('%H:%M')
@@ -216,4 +216,10 @@ def generateRuletaPlayers(players, id = 0):
     embed.set_author(name = "Ruleta P1H - gracze", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
     embed.add_field(name = "-----------", value = players)
     embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
+    return embed
+
+def generateAIResponse(input, response):
+    embed = Embed(title="Twoje pytanie: ", description=str(input), color=Colour.darker_grey())
+    embed.add_field(name = "Odpowiedz: ", value = response)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     return embed
