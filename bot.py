@@ -86,9 +86,9 @@ def runDiscordBot():
     @tasks.loop(hours = 24.0)
     async def sendBirthdayInfo():
         birthdayBoys = birthday.getBirthdayPeople()
-        if birthdayBoys != None:
+        if birthdayBoys:
             for boy in birthdayBoys:
-                print (boy['username'])
+                print (boy['name'])
         else:
             print ("[INFO] " + str(time.strftime('%Y-%m-%d %H:%M', time.gmtime())) + " - Noone has birthday today..")
 
@@ -102,18 +102,18 @@ def runDiscordBot():
         #bot.add_view(embedgen.ruletaView())
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO] " + f'{bot.user} is now running!')
+        if os.environ["PROD_STATUS"] == "PRODUCTION":
+            if not analyzeMatchHistoryTFT.is_running():
+                analyzeMatchHistoryTFT.start() 
+            
+            if not sendBirthdayInfo.is_running():
+                sendBirthdayInfo.start() 
 
-        if not analyzeMatchHistoryTFT.is_running():
-            analyzeMatchHistoryTFT.start() 
-        
-        if not sendBirthdayInfo.is_running():
-            sendBirthdayInfo.start() 
+            if not rouletteTask.is_running():
+                rouletteTask.start() 
 
-        if not rouletteTask.is_running():
-            rouletteTask.start() 
-
-        if not checkChannelActivityAndAwardPoints.is_running():
-            checkChannelActivityAndAwardPoints.start() 
+            if not checkChannelActivityAndAwardPoints.is_running():
+                checkChannelActivityAndAwardPoints.start() 
         
     @bot.event
     async def on_message(message):
