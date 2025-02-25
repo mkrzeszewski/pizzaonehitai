@@ -6,6 +6,7 @@ import plugins.embedgen as embedgen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
 import plugins.gifgenerator as gif
+import plugins.ai as ai
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import asyncio
@@ -16,6 +17,7 @@ from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "kurwodawajpunkty", "kierowniku", "beg"]
+aiKeyword = ["ai", "chatgpt", "gemini"]
 
 class ruletaView(ui.View):
     def __init__(self):
@@ -266,6 +268,13 @@ def handleResponse(userMessage, author) -> str:
                     returnView = embed_buttons.generate_view()
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
+        elif commands[0] in aiKeyword:
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                #returnText = ai.getResponse(str(author), user['name'], message)
+                #returnText = ai.getResponse(message)
+                returnEmbed = embedgen.generateAIResponse(message[3:], ai.getResponse(message[3:]))
+
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:
                 if str(commands[1]) or str(commands[1]) == "all":
@@ -335,6 +344,12 @@ def handleResponse(userMessage, author) -> str:
 
         if message == 'embed':
             returnText =  "embed_test"
+
+        if message == 'ai':
+            returnText =  "zapytaj o cos, np !ai daj przepis na nalesniki!"
+
+        if message == 'zacopunkty':
+            returnText =  "Punkty mozna dostac za udzial w eventach, przebywaniu na voice chat, przy pomocy hazardu lub na widzimisie glownego admina."
 
         if message == "pogoda":
             returnText =  weather.getLodzWeather()
