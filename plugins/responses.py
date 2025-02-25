@@ -320,6 +320,10 @@ def handleResponse(userMessage, author) -> str:
                 tftapi.setAPIKey(commands[1])
                 returnText = "API Key successfuly replaced"
 
+        elif commands[0] == "birthdaytest":
+            if int(author) == 326259887007072257 and len(commands) == 2:
+                returnEmbed = embedgen.generateBirthdayEmbed(db.retrieveUser('discord_id', str(author)), "Nic")
+
         elif commands[0] == "top":
             if len(commands) == 2:
                 if str(commands[1]).isdigit():

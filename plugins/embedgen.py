@@ -26,6 +26,9 @@ GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
                            "https://cdn3.emoji.gg/emojis/3955-gamba-addict.gif"]
 
+BIRTHDAY_RANDOM_ICON_ARRAY = [ "https://cdn3.emoji.gg/emojis/83280-confettipopper.gif",
+                                "https://cdn3.emoji.gg/emojis/82548-balloons.gif"]
+
 SIGN_ICON_ARRAY = {
     "baran": "https://cdn3.emoji.gg/emojis/42434-aries.png",
     "byk": "https://cdn3.emoji.gg/emojis/44512-taurus.png",
@@ -41,11 +44,16 @@ SIGN_ICON_ARRAY = {
     "ryby": "https://cdn3.emoji.gg/emojis/9982-pisces.png"
 }
 
-
-
-
 PHOTO_REFERENCE_URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="
 API_KEY="&key=" + environ["GOOGLE_MAPS_API_KEY"]
+
+PEPE_BIRTHDAY_EMOTE = "<:pepebirthday:1127216158974677084>"
+BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
+                    "Wooohoo!",
+                    "Sto lat, sto lat!",
+                    "Starosc nie radosc!",
+                    "Juz tylko rok blizej do smierci!"
+                    ]
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -205,7 +213,7 @@ def generateRuletaChoices(id = 0):
     formatted_time = (datetime.now() + timedelta(hours=1, minutes=4)).strftime('%H:%M:%S')
     embed = Embed(title="50 ppkt", description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
     # Reference the file inside the embed
-    embed.set_author(name = "Ruleta P1H - wybor", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.set_author(name = "Ruleta P1H - wybor", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "", value = "!niebieski = x2!\n!czerwony = x2! \n !zielony = x25!")
     embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
     return embed
@@ -213,13 +221,21 @@ def generateRuletaChoices(id = 0):
 def generateRuletaPlayers(players, id = 0):
     embed = Embed(title="Oto zawodnicy:", description="", color=Colour.darker_grey())
     # Reference the file inside the embed
-    embed.set_author(name = "Ruleta P1H - gracze", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
+    embed.set_author(name = "Ruleta P1H - gracze", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "-----------", value = players)
-    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png")
+    embed.set_footer(text = "Ruletka ID: #" + str(id), icon_url = CASINO_ICON_URL)
     return embed
 
 def generateAIResponse(input, response):
     embed = Embed(title="Twoje pytanie: ", description=str(input), color=Colour.darker_grey())
     embed.add_field(name = "Odpowiedz: ", value = response)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    return embed
+
+def generateBirthdayEmbed(user, body):
+    embed = Embed(title="Dzis sa twoje urodziny, " + user['Name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + BIRTHDAY_PHRASES[random.randint(0,len(BIRTHDAY_PHRASES) - 1)], color=Colour.pink())
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BIRTHDAY_RANDOM_ICON_ARRAY[random.randint(0,len(BIRTHDAY_RANDOM_ICON_ARRAY) - 1)])
+
+    embed.add_field(name = "Ciekawostki ze swiata: ", value = body)
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 ppkt!", icon_url = "https://discord.com/assets/9e487a75040f95a5.svg")
     return embed
