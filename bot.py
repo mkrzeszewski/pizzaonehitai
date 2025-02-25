@@ -99,6 +99,10 @@ def runDiscordBot():
         await waitUntil(datetime.time(8, 0))
         #print('test')
 
+    @tasks.loop(minutes = 10.0)
+    async def allowBeggars():
+        responses.makeBegAvailable()
+
     @bot.event
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())
@@ -113,6 +117,9 @@ def runDiscordBot():
 
             if not rouletteTask.is_running():
                 rouletteTask.start() 
+
+            if not allowBeggars.is_running():
+                allowBeggars.start() 
 
             if not checkChannelActivityAndAwardPoints.is_running():
                 checkChannelActivityAndAwardPoints.start() 

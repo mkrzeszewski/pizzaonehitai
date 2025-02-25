@@ -10,6 +10,7 @@ userCollection = db['users']
 ruletasCollection = db['ruletas']
 matchesCollection = db['parsed_tft_matches']
 aiCollection = db['ai_history']
+quotesCollection = db['quotes']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -77,13 +78,28 @@ def updateUser(querykey, queryvalue, key, value):
             text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
     return text
 
-
 def retrieveAllAIHistory(discord_id):
     result = aiCollection.find({'discord_id': str(discord_id)}, {'_id': 0, 'message': 1})
     return [doc['message'] for doc in result]
+
 def insertAIHistory(discord_id, message):
     aiCollection.insert_one({
                                 'discord_id': discord_id,
                                 'message':message,
                                 'date': str(time.strftime('%Y-%m-%d %H:%M', time.gmtime()))})
     return None
+
+def insertQuote(discord_id, quote):
+    quotesCollection.insert_one({
+                                'discord_id': discord_id,
+                                'quote':quote,
+                                'date': str(time.strftime('%Y-%m-%d %H:%M', time.gmtime()))})
+    return None
+
+def retrieveRandomQuote(discord_id):
+    return quotesCollection.aggregate([
+    {"$match": {"discord_id": discord_id}},  
+    {"$sample": {"size": 1}},                
+    {"$project": {"quote": 1, "date": 1, "_id": 0}}
+])
+
