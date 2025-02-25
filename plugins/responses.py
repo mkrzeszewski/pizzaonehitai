@@ -411,7 +411,7 @@ def handleResponse(userMessage, author) -> str:
                     if isBegAvailable:
                         db.updateUser('discord_id', str(author), 'points', 100)
                         returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
-                        makeBegUnavailable()
+                        isBegAvailable = False
                     else:
                         returnText = "Cooldown! Sprobuj ponownie pozniej."
                 else:
