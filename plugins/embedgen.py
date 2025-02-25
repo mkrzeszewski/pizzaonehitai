@@ -202,7 +202,7 @@ def generateRuletaResults(players, winner, id = 0):
     return embed
 
 def generateRuletaChoices(id = 0):
-    formatted_time = (datetime.now() + timedelta(minutes=4)).strftime('%H:%M')
+    formatted_time = (datetime.now() + timedelta(hours=1, minutes=4)).strftime('%H:%M:%S')
     embed = Embed(title="50 ppkt", description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
     # Reference the file inside the embed
     embed.set_author(name = "Ruleta P1H - wybor", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,2)])
