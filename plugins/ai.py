@@ -9,3 +9,8 @@ def getResponse(message):
     message += "\n Also ensure the response is rather short, no longer than 1000 characters"
     response = client.models.generate_content(model="gemini-2.0-flash", contents=message)
     return response.text[:MAX_LENGTH] 
+
+def getOneResponse(message):
+    message += "\n Also ensure the response is rather short, no longer than 1000 characters"
+    response = client.models.generate_content(model="gemini-2.0-flash", contents=message)
+    return response.text[:MAX_LENGTH] 
