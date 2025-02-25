@@ -190,7 +190,7 @@ def generateRuletaResults(players, winner, id = 0):
         text = "zielony"
         
     embed = Embed(title="Oto wyniki:", description="Wygrywa... " + str(text) + "!", color=color)
-    embed.set_author(name = "Ruleta P1H zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY))])
+    embed.set_author(name = "Ruleta P1H zakonczona!", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     listOfPlayers = ""
     for player in players:
         sign = ""
