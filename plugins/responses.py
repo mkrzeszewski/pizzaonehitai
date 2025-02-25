@@ -274,7 +274,9 @@ def handleResponse(userMessage, author) -> str:
             if user:
                 #returnText = ai.getResponse(str(author), user['name'], message)
                 #returnText = ai.getResponse(message)
-                returnEmbed = embedgen.generateAIResponse(message[3:], ai.getResponse(message[3:]))
+                query = message[3:]
+                db.insertAIHistory(str(author), query)
+                returnEmbed = embedgen.generateAIResponse(query, ai.getResponse(query))
 
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:
@@ -311,7 +313,7 @@ def handleResponse(userMessage, author) -> str:
                 else:
                     returnText = "Niepoprawnie uzyta komenda. Uzyj np !set 326259887007072257 20"
             else:
-                returnText = "Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
+                returnText = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 
         elif commands[0] == "setriotkey":
             if int(author) == 326259887007072257 and len(commands) == 2:
@@ -351,6 +353,9 @@ def handleResponse(userMessage, author) -> str:
 
         if message == 'zacopunkty':
             returnText =  "Punkty mozna dostac za udzial w eventach, przebywaniu na voice chat, przy pomocy hazardu lub na widzimisie glownego admina."
+
+        if message == 'pocopunkty':
+            returnText =  "Punkty mozna wymienic u prowadzacego na wiele nagrod! Zapytaj prowadzacego na PRIV <:PepoG:837735016481030144>"
 
         if message == "pogoda":
             returnText =  weather.getLodzWeather()
