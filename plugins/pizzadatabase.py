@@ -38,6 +38,9 @@ def addRoulettePlayer(ruleta_id, players):
 def retrieveUser(key, value):
     return userCollection.find_one({key: value})
 
+def retrieveUsers(key, value):
+    return userCollection.find({key: value})
+
 def retrieveAllTFTMatches():
     allMatches = matchesCollection.find({})
     return allMatches
@@ -73,6 +76,7 @@ def updateUser(querykey, queryvalue, key, value):
         if result.matched_count > 0:
             text = "Zaktualizowano pole " + str(key) + " dla uzytkownika: " + str(user['name']) + "."
     return text
+
 
 def retrieveAllAIHistory(discord_id):
     result = aiCollection.find({'discord_id': str(discord_id)}, {'_id': 0, 'message': 1})
