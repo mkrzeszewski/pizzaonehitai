@@ -21,7 +21,17 @@ begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "k
 aiKeyword = ["ai", "chatgpt", "gemini"]
 horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
+rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 
+isBegAvailable = True
+def makeBegAvailable():
+    global isBegAvailable
+    isBegAvailable = True
+
+def makeBegUnavailable():
+    global isBegAvailable
+    isBegAvailable = False
+#view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
     def __init__(self):
         super().__init__(timeout = 180)
@@ -180,6 +190,7 @@ class ruletaView(ui.View):
             db.addRoulettePlayer(self.id, userIds)
             await channel.send(embed = embedgen.generateRuletaResults(parsedPeople, winner, self.id))               
         
+#view in discord to choose which users in discord You want to include in query - at the moment used for pubfinder plugin
 class usersChooseView:
     def __init__(self, users, radius):
         self.users = users
@@ -232,6 +243,7 @@ class usersChooseView:
 def getWeather():
     return weather.getLodzWeather()
 
+#this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
 def getBirthdayStuff(discord_id):
     user = db.retrieveUser('discord_id', str(discord_id))
     returnEmbed = None
@@ -247,7 +259,7 @@ def getBirthdayStuff(discord_id):
         returnText = "Nie znaleziono uzytkownika " + str(discord_id) + "!"
     return returnEmbed, returnText
 
-
+#this is main body of this module - it performs manual if check depending on my widzimisie
 def handleResponse(userMessage, author) -> str:
     #message = userMessage.lower()
     returnEmbed = None
@@ -256,6 +268,8 @@ def handleResponse(userMessage, author) -> str:
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
     message = userMessage[1:]
     commands = message.split(" ")
+
+    #esnure it matches the command even if its in lower
     commands[0] = str(commands[0].lower())
     #komendy wielokomendowe
     if len(commands) > 1:
@@ -356,6 +370,9 @@ def handleResponse(userMessage, author) -> str:
             elif len(commands) == 3:
                 returnText = "Losujemy: " + commands[1] + " - " + commands[2] + " -> " + str(random.randint(int(commands[1]),int(commands[2])))
     else:
+
+        #if its a singular commmand - transform message to lower.
+        message = message.lower()
         if message == 'whoami' or message == 'kimjestem' or message == 'ktoja':
             returnText =  db.retrieveUser('discord_id', str(author))['name']
 
@@ -387,9 +404,12 @@ def handleResponse(userMessage, author) -> str:
             if user:
                 curr = int(user['points'])
                 if curr < 100:
-                    db.updateUser('discord_id', str(author), 'points', 100)
-                    #chuja a nie globalny cooldown, do dodania - na razie nie istnotne
-                    returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
+                    if isBegAvailable:
+                        db.updateUser('discord_id', str(author), 'points', 100)
+                        returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
+                        makeBegUnavailable()
+                    else:
+                        returnText = "Cooldown! Sprobuj ponownie pozniej."
                 else:
                     returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
