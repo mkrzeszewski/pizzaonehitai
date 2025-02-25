@@ -237,7 +237,7 @@ def getBirthdayStuff(discord_id):
     returnText = "[ERROR] Error przy wysylaniu info o urodzinach"
     if user:
         facts = []
-        facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + user['birthday']))
+        facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
         facts.append(ai.getOneResponse("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
         wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotkie zartobliwe przewidywanie jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
@@ -339,18 +339,8 @@ def handleResponse(userMessage, author) -> str:
 
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
-                user = db.retrieveUser('discord_id', str(commands[1]))
-                if user:
-                    #birthdayGuy = birthday.getBirthdayPeople(user['birthday'])
-                    #if birthdayGuy:
-                    facts = []
-                    facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + user['birthday']))
-                    facts.append(ai.getOneResponse("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
-                    wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotkie zartobliwe przewidywanie jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales."))
-                    returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
-                else:
-                    returnText = "Nie znaleziono uzytkownika " + str(commands[1]) + "!"
-
+                returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
+                
         elif commands[0] == "top":
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
