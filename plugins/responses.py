@@ -18,6 +18,7 @@ restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "kurwodawajpunkty", "kierowniku", "beg"]
 aiKeyword = ["ai", "chatgpt", "gemini"]
+horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 
 class ruletaView(ui.View):
     def __init__(self):
@@ -360,6 +361,7 @@ def handleResponse(userMessage, author) -> str:
                 curr = int(user['points'])
                 if curr < 100:
                     db.updateUser('discord_id', str(author), 'points', 100)
+                    #chuja a nie globalny cooldown, do dodania - na razie nie istnotne
                     returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
                 else:
                     returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
@@ -370,7 +372,7 @@ def handleResponse(userMessage, author) -> str:
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
-        if message == "horoskop" or message == "zodiak" or message == "mojhoroskop":
+        if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
