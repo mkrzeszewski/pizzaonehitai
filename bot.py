@@ -85,7 +85,7 @@ def runDiscordBot():
             channel = bot.get_channel(DEFAULT_BDAY_CHANNEL)
             for boy in birthdayBoys:
                 user = await bot.fetch_user(boy['discord_id'])
-                embed, response = responses.getBirthdayStuff(boy['discord_id'])
+                embed, response = responses.getBirthdayStuff(boy)
                 if embed:
                     await channel.send(content = user.mention, embed = embed)
                 else:
@@ -99,7 +99,7 @@ def runDiscordBot():
         await waitUntil(datetime.time(8, 0))
         #print('test')
 
-    @tasks.loop(minutes = 10.0)
+    @tasks.loop(minutes = 15.0)
     async def allowBeggars():
         responses.makeBegAvailable()
 
