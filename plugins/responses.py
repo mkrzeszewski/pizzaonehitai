@@ -248,19 +248,17 @@ def getWeather():
     return weather.getLodzWeather()
 
 #this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
-def getBirthdayStuff(discord_id):
-    user = db.retrieveUser('discord_id', str(discord_id))
+def getBirthdayStuff(user):
     returnEmbed = None
-    returnText = "[ERROR] Error przy wysylaniu info o urodzinach"
+    print("[ERROR] Error przy wysylaniu info o urodzinach")
+    returnText = ""
     if user:
         facts = []
         facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
         facts.append(ai.getOneResponse("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
-        wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotkie zartobliwe przewidywanie jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
+        wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
-        points.addPoints(str(discord_id), 2000)
-    else:
-        returnText = "Nie znaleziono uzytkownika " + str(discord_id) + "!"
+        points.addPoints(str(user['discord_id']), 2000)
     return returnEmbed, returnText
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
@@ -408,12 +406,15 @@ def handleResponse(userMessage, author) -> str:
             if user:
                 curr = int(user['points'])
                 if curr < 100:
-                    if isBegAvailable:
+                    if db.isBegAvailable():
                         db.updateUser('discord_id', str(author), 'points', 100)
+                        db.createBegEntry()
                         returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
                         #isBegAvailable = False
                     else:
-                        returnText = "Cooldown! Sprobuj ponownie pozniej."
+                        begPerson = db.getBegPerson()
+                        if begPerson:
+                            returnText = "Cooldown! Sprobuj ponownie pozniej. Ostatnia szansa wykorzystana przez: " + str(begPerson['name']) + "."
                 else:
                     returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
