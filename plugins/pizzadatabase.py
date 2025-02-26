@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from os import environ
 import time
+from datetime import datetime, timezone
 
 #connect to mongodb database and get proper database
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
@@ -11,6 +12,7 @@ ruletasCollection = db['ruletas']
 matchesCollection = db['parsed_tft_matches']
 aiCollection = db['ai_history']
 quotesCollection = db['quotes']
+begCollection = db['beg']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -103,3 +105,21 @@ def retrieveRandomQuote(discord_id):
     {"$project": {"quote": 1, "date": 1, "_id": 0}}
 ])
 
+def createBegEntry(discord_id):
+    if begCollection.estimated_document_count() == 0:
+        begCollection.create_index('createdAt', expireAfterSeconds=600)
+        begCollection.insert_one({
+                                'discord_id': discord_id,
+                                'createdAt': datetime.now(timezone.utc)})
+    
+    return None
+
+def isBegAvailable():
+    if begCollection.estimated_document_count() == 0:
+        return True
+    return False
+
+def getBegPerson():
+    if begCollection.estimated_document_count() != 0:
+        return retrieveUser('discord_id', begCollection.find_one()['discord_id'])
+    return None
