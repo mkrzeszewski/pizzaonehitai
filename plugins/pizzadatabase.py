@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 from os import environ
 import time
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 #connect to mongodb database and get proper database
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
@@ -110,7 +111,7 @@ def createBegEntry(discord_id):
         begCollection.create_index('createdAt', expireAfterSeconds=600)
         begCollection.insert_one({
                                 'discord_id': discord_id,
-                                'createdAt': datetime.now(timezone.utc)})
+                                'createdAt': datetime.now(ZoneInfo("Europe/Warsaw"))})
     
     return None
 
