@@ -116,9 +116,7 @@ def createBegEntry(discord_id):
     return None
 
 def isBegAvailable():
-    if begCollection.estimated_document_count() == 0:
-        return True
-    return False
+    return begCollection.estimated_document_count() == 0
 
 def getBegPerson():
     if begCollection.estimated_document_count() != 0:
