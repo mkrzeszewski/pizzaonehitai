@@ -68,15 +68,31 @@ def runDiscordBot():
             await view.start(channel)
 
     async def waitUntil(target_time):
-        #wait until specified time to start loop for DC bot
         now = datetime.datetime.now()
         target_datetime = datetime.datetime.combine(now.date(), target_time)
-
-        # If the time has already passed today, schedule for tomorrow
         if now > target_datetime:
             target_datetime += datetime.timedelta(days = 1)
 
         await asyncio.sleep((target_datetime - now).total_seconds())
+
+    @tasks.loop(hours = 24.0)
+    async def generateWinnerAndLoser():
+        channel = bot.get_channel(GAMBA_CHANNEL_ID)
+        winner, loser = points.generateDaily()
+        if winner and loser:
+            winnerUser = await bot.fetch_user(int(winner['discord_id']))
+            winnerAvatarURL = winnerUser.avatar.url if winnerUser.avatar else winnerUser.default_avatar.url
+
+            loserUser = await bot.fetch_user(int(loser['discord_id']))
+            loserAvatarURL = loserUser.avatar.url if loserUser.avatar else loserUser.default_avatar.url
+
+            await channel.send(content = winnerUser.mention, embed = embedgen.generateWinnerEmbed(winner, winnerAvatarURL))
+            await channel.send(content = loserUser.mention, embed = embedgen.generateWinnerEmbed(loser, loserAvatarURL))
+            
+
+    @generateWinnerAndLoser.before_loop
+    async def dailyLottery8AM():
+        await waitUntil(datetime.time(8, 0))
 
     @tasks.loop(hours = 24.0)
     async def sendBirthdayInfo():
@@ -94,14 +110,8 @@ def runDiscordBot():
             print ("[INFO] " + str(time.strftime('%Y-%m-%d %H:%M', time.gmtime())) + " - Noone has birthday today..")
 
     @sendBirthdayInfo.before_loop
-    async def beforeBirthdayTask():
-        #ensure its 8AM - the bot will send messages ONCE every 24H - this task should only happen ONCE.
+    async def dailyBirthday8AM():
         await waitUntil(datetime.time(8, 0))
-        #print('test')
-
-    @tasks.loop(minutes = 15.0)
-    async def allowBeggars():
-        responses.makeBegAvailable()
 
     @bot.event
     async def on_ready():
@@ -118,8 +128,8 @@ def runDiscordBot():
             if not rouletteTask.is_running():
                 rouletteTask.start() 
 
-            if not allowBeggars.is_running():
-                allowBeggars.start() 
+            if not generateWinnerAndLoser.is_running():
+                generateWinnerAndLoser.start() 
 
             if not checkChannelActivityAndAwardPoints.is_running():
                 checkChannelActivityAndAwardPoints.start() 

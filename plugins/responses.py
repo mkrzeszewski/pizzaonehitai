@@ -11,7 +11,7 @@ import plugins.ai as ai
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import asyncio
-
+from datetime import datetime
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
@@ -23,18 +23,6 @@ horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 
-isBegAvailable = True
-lock = asyncio.Lock()
-
-async def makeBegAvailable():
-    global isBegAvailable
-    async with lock:
-        isBegAvailable = True
-
-async def makeBegUnavailable():
-    global isBegAvailable
-    async with lock:
-        isBegAvailable = True
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
     def __init__(self):
@@ -203,8 +191,7 @@ class usersChooseView:
         self.radius = radius
 
     def generate_embed(self):
-        """Creates and returns an embed."""
-        embed = Embed(title="User Selection", description="Click on a user button below:", color=Colour.blue())
+        embed = Embed(title="Wybor uzytkownik", description="Wybierz uzytkownikow, dla ktorych obliczyc mamy do ktorej knajpy sie udac!:", color=Colour.blue())
         return embed
 
     def generate_view(self):
@@ -263,6 +250,7 @@ def getBirthdayStuff(user):
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
 def handleResponse(userMessage, author) -> str:
+    random.seed(datetime.now().timestamp())
     #message = userMessage.lower()
     returnEmbed = None
     returnView = None
@@ -428,13 +416,6 @@ def handleResponse(userMessage, author) -> str:
             name = db.retrieveUser('discord_id', str(author))['name']
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
-
-        #if message == "ruleta":
-            #winner = gif.generate_spinning_wheel_with_pointer("assets/gif/ruleta.gif")
-            #returnEmbed, returnFile = embedgen.generateRuleta(winner)
-            #returnView = ruletaView()
-            #returnView = ruletaView()
-            #returnEmbed = embedgen.generateRuletaChoices()
 
         if message in restaurantKeywords:
             embed_buttons = usersChooseView(db.retrieveAllusers(), 500)

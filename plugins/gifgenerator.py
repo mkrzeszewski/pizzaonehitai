@@ -2,7 +2,6 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import random
 from datetime import datetime
-random.seed(datetime.now().timestamp())
 import math
 
 # Constants
@@ -106,6 +105,7 @@ def getStringFromColor(color):
             return "Red"
         
 def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
+    random.seed(datetime.now().timestamp())
     images = []
     debug = []
 

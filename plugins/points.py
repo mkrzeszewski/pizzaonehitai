@@ -1,4 +1,5 @@
 import plugins.pizzadatabase as db
+import random
 
 def getTop(howMany = 5):    
     users = db.retrieveAllUsersRevSorted('points')
@@ -34,3 +35,19 @@ def modifyPoints(key, value, amount):
         db.updateUser('discord_id', str(user['discord_id']), 'points', newPoints)
         #print("[INFO] Modifying: " + operation + str(amount) + " points for: " +  user['name'] + ".")
     return None
+
+def fetchRandomUser():
+    return random.choice(db.retrieveAllusers())
+
+def generateDaily():
+    winner = fetchRandomUser()
+    loser = fetchRandomUser()
+    while winner == loser:
+        loser = fetchRandomUser()
+
+    #winner gets +10% +200
+    addPoints(winner['discord_id'], int(int(winner['points']) * 0.1) + 200)
+
+    #loser gets -200
+    addPoints(loser['discord_id'], -200)
+    return winner, loser
