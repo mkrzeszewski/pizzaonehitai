@@ -294,11 +294,9 @@ def handleResponse(userMessage, author) -> str:
         elif commands[0] in aiKeyword:
             user = db.retrieveUser('discord_id', str(author))
             if user:
-                #returnText = ai.getResponse(str(author), user['name'], message)
-                #returnText = ai.getResponse(message)
                 query = message[3:]
                 db.insertAIHistory(str(author), query)
-                returnEmbed = embedgen.generateAIResponse(query, ai.getResponse(query))
+                returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
 
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:

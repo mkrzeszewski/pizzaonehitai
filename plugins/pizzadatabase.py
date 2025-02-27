@@ -14,6 +14,7 @@ matchesCollection = db['parsed_tft_matches']
 aiCollection = db['ai_history']
 quotesCollection = db['quotes']
 begCollection = db['beg']
+aiInstructionCollection = db['discord_bot_instructions']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -122,3 +123,9 @@ def getBegPerson():
     if begCollection.estimated_document_count() != 0:
         return retrieveUser('discord_id', begCollection.find_one()['discord_id'])
     return None
+
+def retrieveAllAIInstructions():
+    return aiInstructionCollection.find({})
+
+def insertAIInstruction(message):
+    return aiCollection.insert_one({'instruction':message})
