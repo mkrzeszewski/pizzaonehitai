@@ -178,7 +178,7 @@ def generateTopPointsEmbed(users, amount):
     return embed
 
 def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
-    embed = Embed(title="Ruletka ID: #" + str(id), description="A zwycieza...", color=Colour.darker_grey())
+    embed = Embed(title="Ruleta #" + str(id), description="A zwycieza...", color=Colour.darker_grey())
 
     file = File(gif_path, filename = gif_path.split("/")[-1])
     embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
@@ -197,7 +197,7 @@ def generateRuletaResults(players, winner, id = 0):
         color = Colour.dark_green()
         text = "zielony"
         
-    embed = Embed(title="Ruleta Pizza One Hit #" + str(id), description="Wygrywa... " + str(text) + "!", color=color)
+    embed = Embed(title="Ruleta #" + str(id), description="Wygrywa... " + str(text) + "!", color=color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     listOfPlayers = ""
     for player in players:
@@ -211,14 +211,14 @@ def generateRuletaResults(players, winner, id = 0):
 
 def generateRuletaChoices(id = 0):
     formatted_time = (datetime.now() + timedelta(hours=1, minutes=4)).strftime('%H:%M:%S')
-    embed = Embed(title="Ruleta Pizza One Hit #" + str(id), description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
+    embed = Embed(title="Ruleta #" + str(id), description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Koszt - 50 PPKT", value = "!niebieski = x2!\n!czerwony = x2! \n !zielony = x25!")
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
 def generateRuletaPlayers(players, id = 0):
-    embed = Embed(title="Ruleta Pizza One Hit #" + str(id), description="", color=Colour.darker_grey())
+    embed = Embed(title="Ruleta #" + str(id), description="", color=Colour.darker_grey())
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Oto zawodnicy:", value = players)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -234,7 +234,6 @@ def generateAIResponse(input, response):
 def generateBirthdayEmbed(user, facts, wrozba):
     embed = Embed(title="Dzis sa twoje urodziny, " + user['name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + BIRTHDAY_PHRASES[random.randint(0,len(BIRTHDAY_PHRASES) - 1)], color=Colour.pink())
     embed.set_author(name = "Pizza One Hit AI", icon_url = BIRTHDAY_RANDOM_ICON_ARRAY[random.randint(0,len(BIRTHDAY_RANDOM_ICON_ARRAY) - 1)])
-
     body = ""
     if facts:
         for fact in facts:
