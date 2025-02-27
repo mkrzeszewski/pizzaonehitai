@@ -12,11 +12,7 @@ for record in initialInstructions:
 MAX_LENGTH = 1500
 
 def chatWithAI(message):
-    response = chat.send_message_stream(message)
-    returnMSG = ""
-    for chunk in response:
-        returnMSG += chunk.text
-    return returnMSG
+    return chat.send_message(message).text
 
 def getResponse(message):
     message += "\n Also ensure the response is rather short, no longer than 1000 characters"
