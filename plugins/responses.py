@@ -239,18 +239,18 @@ def generateSlots(amount, user):
     output_path = "assets/gif/slot_machine" + str(id) + ".gif"
     winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
     if count > 1:
-        multiplier = 2
+        multiplier = 3
         if count == 3:
-            multiplier = 5
+            multiplier = 10
 
         #remove assets/gif and .png from string
         winner = winner[11:-4]
         if winner == "pizza":
             multiplier *= 2
         elif winner == "skull":
-            multiplier *= -1
+            multiplier *= -0.5
 
-        earnings = amount * multiplier
+        earnings = int(amount * multiplier)
         points.addPoints(user['discord_id'], earnings)
         db.updateSlotEntry(id, earnings)
     return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
