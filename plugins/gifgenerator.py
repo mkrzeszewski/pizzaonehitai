@@ -4,7 +4,7 @@ import random
 from datetime import datetime
 import math
 
-SLOT_IMAGES = ["assets/gif/pizza.png", "assets/gif/burger.png", "assets/gif/cs.png", "assets/gif/skull.png", "assets/gif/drink.png"]
+SLOT_IMAGES = ["assets/img/pizza.png", "assets/img/burger.png", "assets/img/cs.png", "assets/img/skull.png", "assets/img/drink.png"]
 
 # Constants
 num_fields = 19  # Number of sectors
