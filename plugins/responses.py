@@ -22,6 +22,7 @@ aiKeyword = ["ai", "chatgpt", "gemini"]
 horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
+slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -231,6 +232,29 @@ class usersChooseView:
             await interaction.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(self.selectedUsers, radius = self.radius)))
         return callback
 
+def generateSlots(amount, user):
+    earnings = amount * -1
+    points.addPoints(user['discord_id'], earnings)
+    id = db.insertSlotsEntry(amount, user['discord_id'])
+    output_path = "assets/gif/slot_machine" + str(id) + ".gif"
+    winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
+    if count > 1:
+        multiplier = 5
+        if count == 3:
+            multiplier = 50
+
+        #remove assets/gif and .png from string
+        winner = winner[11:-4]
+        if winner == "pizza":
+            multiplier *= 2
+        elif winner == "skull":
+            multiplier *= -1
+
+        earnings = amount * multiplier
+        points.addPoints(user['discord_id'], earnings)
+        db.updateSlotEntry(id, earnings)
+    return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
+
 def getWeather():
     return weather.getLodzWeather()
 
@@ -297,6 +321,19 @@ def handleResponse(userMessage, author) -> str:
                 query = message[3:]
                 db.insertAIHistory(str(author), query)
                 returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+        elif commands[0] in slotsKeyword:
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    user = db.retrieveUser('discord_id', str(author))
+                    if user:
+                        curr = int(user['points'])
+                        amount = int(str(commands[1]))
+                        if curr >= amount and amount > 0:
+                            returnEmbed, returnFile = generateSlots(amount, user)
+                        else:
+                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                else:
+                    returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
         elif commands[0] == "gamble" or commands[0] == "gamba" or commands[0] == "yolo":
             if len(commands) == 2:
@@ -319,7 +356,7 @@ def handleResponse(userMessage, author) -> str:
                                 returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
-                            returnText = "Masz za malo siana, obecnie masz: " + str(user['points']) + " pizzapkt!"
+                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -377,6 +414,16 @@ def handleResponse(userMessage, author) -> str:
 
         if message == 'ai':
             returnText =  "zapytaj o cos, np !ai daj przepis na nalesniki!"
+
+        if message in slotsKeyword:
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                curr = int(user['points'])
+                amount = int(str(commands[1]))
+                if curr >= amount and amount > 0:
+                    returnEmbed, returnFile = generateSlots(amount, user)
+                else:
+                    returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
 
         if message == 'zacopunkty':
             returnText =  "Punkty mozna dostac za udzial w eventach, przebywaniu na voice chat, przy pomocy hazardu lub na widzimisie glownego admina."
