@@ -151,7 +151,7 @@ def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
         elif color == red:
             return "Red"
         
-def create_slot_machine_gif(output_path, frames=60, step=5, size=(180, 180)):
+def create_slot_machine_gif(output_path, frames=60, step=5, size=(210, 210)):
     images = {img: Image.open(img).convert("RGBA").resize((size[0] // 3, size[1] // 3)) for img in SLOT_IMAGES}
     img_width, img_height = next(iter(images.values())).size
     reel_width = img_width
