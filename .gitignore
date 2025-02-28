@@ -159,5 +159,5 @@ debug-stuff
 riot/puuid-list.json
 riot/puuid-list.json
 torun.txt
-assets/gif/ruleta*.gif
+assets/gif/*.gif
 live.sh
