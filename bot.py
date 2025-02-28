@@ -92,7 +92,7 @@ def runDiscordBot():
 
     @generateWinnerAndLoser.before_loop
     async def dailyLottery8AM():
-        await waitUntil(datetime.time(8, 0))
+        await waitUntil(datetime.time(17, 0))
 
     @tasks.loop(hours = 24.0)
     async def sendBirthdayInfo():
