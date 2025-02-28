@@ -16,11 +16,7 @@ def getTop(howMany = 5):
     return None
 
 def addPoints(discord_id, amount):
-    user = db.retrieveUser('discord_id', discord_id)
-    if user:
-        db.updateUser('discord_id', str(discord_id), 'points', int(user['points']) + amount)
-        #print("[INFO] Adding " + str(amount) + " points to: " +  user['name'] + ".")
-    return None
+    return modifyPoints('discord_id', discord_id, amount)
 
 def modifyPoints(key, value, amount):
     user = db.retrieveUser(key, value)
@@ -29,25 +25,21 @@ def modifyPoints(key, value, amount):
         if (int(user['points']) + int(amount)) > 0:
             newPoints = int(user['points']) + int(amount)
         
-        operation = "+"
-        if(int(amount) < 0):
-            operation = "-"
         db.updateUser('discord_id', str(user['discord_id']), 'points', newPoints)
-        #print("[INFO] Modifying: " + operation + str(amount) + " points for: " +  user['name'] + ".")
     return None
 
 def fetchRandomUser():
     return random.choice(db.retrieveAllusers())
 
 def generateDaily():
-    winner = fetchRandomUser()
-    loser = fetchRandomUser()
+    winner = db.retrieveRandomUser()
+    loser = db.retrieveRandomUser()
     while winner == loser:
-        loser = fetchRandomUser()
+        loser = db.retrieveRandomUser()
 
     #winner gets +10% +200
     addPoints(winner['discord_id'], int(int(winner['points']) * 0.1) + 200)
 
     #loser gets -200
-    addPoints(loser['discord_id'], -200)
+    addPoints(loser['discord_id'], int(int(loser['points']) * 0.1) * -1)
     return winner, loser
