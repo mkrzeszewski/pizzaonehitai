@@ -161,7 +161,7 @@ def create_slot_machine_gif(output_path, frames=60, step=5, size=(210, 210)):
     reels = [random.sample(SLOT_IMAGES, len(SLOT_IMAGES)) for _ in range(3)]
     
     # Create blank slot machine frame with transparency support
-    slot_machine = Image.new("RGB", size, (0, 0, 0, 0))
+    slot_machine = Image.new("RGB", size, (0, 0, 0))
     
     # Initialize positions for each reel with fractional offsets for smooth motion
     reel_offsets = [random.uniform(0, len(SLOT_IMAGES)) for _ in range(3)]
