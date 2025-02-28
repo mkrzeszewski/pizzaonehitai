@@ -15,6 +15,7 @@ from datetime import datetime
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
+securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
 begKeyword = ["wyzebraj", "zebraj", "dejno", "prosze", "grubasiedawajpunkty", "kurwodawajpunkty", "kierowniku", "beg"]
@@ -267,9 +268,9 @@ def getBirthdayStuff(user):
     returnText = ""
     if user:
         facts = []
-        facts.append(ai.getOneResponse("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
-        facts.append(ai.getOneResponse("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
-        wrozba = str(ai.getOneResponse("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
+        facts.append(ai.askAI("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
+        facts.append(ai.askAI("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
+        wrozba = str(ai.askAI("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
         points.addPoints(str(user['discord_id']), 2000)
     return returnEmbed, returnText
@@ -322,7 +323,8 @@ def handleResponse(userMessage, author) -> str:
             if user:
                 query = message[3:]
                 db.insertAIHistory(str(author), query)
-                returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+                text = ""
+                returnEmbed = embedgen.generateAIResponse(query, ai.chatwithAI(query))
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
@@ -372,7 +374,7 @@ def handleResponse(userMessage, author) -> str:
                 else:
                     returnText = "Niepoprawnie uzyta komenda. Uzyj np !set 326259887007072257 20"
             else:
-                returnText = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
+                returnText = securityResponse
 
         elif commands[0] == "setriotkey":
             if int(author) == 326259887007072257 and len(commands) == 2:
@@ -432,6 +434,12 @@ def handleResponse(userMessage, author) -> str:
 
         if message == 'pocopunkty':
             returnText =  "Punkty mozna wymienic u prowadzacego na wiele nagrod! Zapytaj prowadzacego na PRIV <:PepoG:837735016481030144>"
+
+        if message == 'resetai':
+            returnText = securityResponse
+            if int(author) == 326259887007072257:
+                ai.resetModel()
+                returnText =  "AI zostal przywrocony do stanu pierwotnego."
 
         if message == "pogoda":
             returnText =  weather.getLodzWeather()
