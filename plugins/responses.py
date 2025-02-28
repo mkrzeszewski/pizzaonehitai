@@ -239,9 +239,9 @@ def generateSlots(amount, user):
     output_path = "assets/gif/slot_machine" + str(id) + ".gif"
     winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
     if count > 1:
-        multiplier = 3
+        multiplier = 2
         if count == 3:
-            multiplier = 40
+            multiplier = 6
 
         #remove assets/gif and .png from string
         winner = winner[11:-4]
