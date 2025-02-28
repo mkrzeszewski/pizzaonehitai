@@ -40,6 +40,6 @@ def generateDaily():
     #winner gets +10% +200
     addPoints(winner['discord_id'], int(int(winner['points']) * 0.1) + 200)
 
-    #loser gets -200
+    #loser gets -10%
     addPoints(loser['discord_id'], int(int(loser['points']) * 0.1) * -1)
     return winner, loser
