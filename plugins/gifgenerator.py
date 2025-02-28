@@ -186,7 +186,7 @@ def create_slot_machine_gif(output_path, frames=60, step=5, size=(210, 210)):
         
         # Draw horizontal red line in the middle
         draw = ImageDraw.Draw(frame)
-        draw.rectangle([(0, int(size[1] / 3 )), (size[0], int(size[1] / 3 * 2 ))], outline="white", fill = None, width = 5)
+        draw.rectangle([(0, int(size[1] / 3 )), (size[0], int(size[1] / 3 * 2 ))], outline=(200,200,200), fill = None, width = 5)
         #draw.line([(0, size[1] // 2), (size[0], size[1] // 2)], fill="red", width=5)
         
         
@@ -206,6 +206,8 @@ def create_slot_machine_gif(output_path, frames=60, step=5, size=(210, 210)):
 
     for _ in range(10):  # 10 extra frames for 1 second at 100ms per frame
         frames_list.append(frame.copy())
+
+    frames_list = [frame.convert("RGB") for frame in frames_list]
     frames_list[0].save(output_path, save_all=True, append_images=frames_list[1:], duration=30, loop=1, transparency=0)
     for item in final_result:
         count = final_result.count(item)
