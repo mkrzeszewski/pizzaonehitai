@@ -241,7 +241,7 @@ def generateSlots(amount, user):
     if count > 1:
         multiplier = 3
         if count == 3:
-            multiplier = 35
+            multiplier = 40
 
         #remove assets/gif and .png from string
         winner = winner[11:-4]
