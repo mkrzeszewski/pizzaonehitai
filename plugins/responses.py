@@ -376,6 +376,16 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
+        elif commands[0] == "instructai":
+            if int(author) == 326259887007072257:
+                if len(commands) > 1:
+                    user = db.retrieveUser('discord_id', str(author))
+                    db.insertAIInstruction(message[12:])
+                    ai.resetModel()
+            else:
+                returnText = securityResponse
+
+
         elif commands[0] == "setriotkey":
             if int(author) == 326259887007072257 and len(commands) == 2:
                 tftapi.setAPIKey(commands[1])
