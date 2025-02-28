@@ -234,10 +234,13 @@ class usersChooseView:
 
 def generateSlots(amount, user):
     earnings = amount * -1
+    print("im here")
     points.addPoints(user['discord_id'], earnings)
     id = db.insertSlotsEntry(amount, user['discord_id'])
+    print("im here2")
     output_path = "assets/gif/slot_machine" + str(id) + ".gif"
     winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
+    print("im here3")
     if count > 1:
         multiplier = 5
         if count == 3:
@@ -253,6 +256,7 @@ def generateSlots(amount, user):
         earnings = amount * multiplier
         points.addPoints(user['discord_id'], earnings)
         db.updateSlotEntry(id, earnings)
+    print("im here4")
     return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
 
 def getWeather():
