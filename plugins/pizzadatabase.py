@@ -57,6 +57,9 @@ def retrieveTFTMatch(match_id):
 def insertTFTMatch(match_id):
     matchesCollection.insert_one({"riotid": match_id})
 
+def retrieveRandomUser():
+    return userCollection.aggregate([{"$sample": {"size": 1}}]).next()
+
 def retrieveAllusers():
     return userCollection.find({})
 
@@ -148,3 +151,5 @@ def updateSlotEntry(slots_id, earnings):
         if result.matched_count > 0:
             return result
     return None
+
+
