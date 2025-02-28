@@ -324,7 +324,7 @@ def handleResponse(userMessage, author) -> str:
                 query = message[3:]
                 db.insertAIHistory(str(author), query)
                 text = ""
-                returnEmbed = embedgen.generateAIResponse(query, ai.chatwithAI(query))
+                returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
