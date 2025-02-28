@@ -253,6 +253,8 @@ def generateSlots(amount, user):
         earnings = int(amount * multiplier)
         points.addPoints(user['discord_id'], earnings)
         db.updateSlotEntry(id, earnings)
+        
+        earnings = earnings - amount
     return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
 
 def getWeather():
