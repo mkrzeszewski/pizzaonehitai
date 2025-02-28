@@ -15,6 +15,7 @@ aiCollection = db['ai_history']
 quotesCollection = db['quotes']
 begCollection = db['beg']
 aiInstructionCollection = db['discord_bot_instructions']
+slotsCollection = db['slots']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -129,3 +130,21 @@ def retrieveAllAIInstructions():
 
 def insertAIInstruction(message):
     return aiCollection.insert_one({'instruction':message})
+
+def insertSlotsEntry(wage, discord_id):
+    count = slotsCollection.estimated_document_count()
+    slotsCollection.insert_one({'wage': wage,
+                                  'player': discord_id,
+                                  'earnings': 0,
+                                  'slots_id': count})
+    return count
+
+def updateSlotEntry(slots_id, earnings):
+    if slotsCollection.find_one({'slots_id': slots_id}):
+        result = slotsCollection.update_one(
+        {'slots_id': slots_id},
+        {"$set": {'earnings': earnings}}
+        )
+        if result.matched_count > 0:
+            return result
+    return None
