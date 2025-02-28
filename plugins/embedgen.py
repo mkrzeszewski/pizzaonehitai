@@ -258,3 +258,27 @@ def generateLoserEmbed(user, userAvatarURL):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
+
+def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0, user = None):
+    description = "Gratulacje " + user['name'] + "!"
+    color = Colour.dark_green()
+    infoString = " wygrales " + str(amount) + " pizzopunktow!"
+    if amount < 0:
+        description = "Oops.."
+        color = Colour.dark_red()
+        infoString = " przegrales " + str(amount * -1) + " pizzopunktow.."
+    embed = Embed(title="Slotsy #" + str(id), description=description, color=color)
+
+    file = File(gif_path, filename = gif_path.split("/")[-1])
+    embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
+
+    embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
+    embed.add_field(name = "Bilans gry:", value= user['name'] + infoString)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed, file
+
+def generateUnknownUser(discord_id):
+    embed = Embed(title="Nieznany uzytkownik" + str(discord_id), description="Uzytkownik o podanym ID nie istnieje w bazie!", color=Colour.red)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
