@@ -87,7 +87,7 @@ def runDiscordBot():
             loserAvatarURL = loserUser.avatar.url if loserUser.avatar else loserUser.default_avatar.url
 
             await channel.send(content = winnerUser.mention, embed = embedgen.generateWinnerEmbed(winner, winnerAvatarURL))
-            await channel.send(content = loserUser.mention, embed = embedgen.generateWinnerEmbed(loser, loserAvatarURL))
+            await channel.send(content = loserUser.mention, embed = embedgen.generateLoserEmbed(loser, loserAvatarURL))
             
 
     @generateWinnerAndLoser.before_loop
