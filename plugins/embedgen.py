@@ -240,13 +240,13 @@ def generateBirthdayEmbed(user, facts, wrozba):
             body = body + str(fact) + "\n"
     embed.add_field(name = "Ciekawostki: ", value = body)
     embed.add_field(name = "Wrozba: ", value = wrozba)
-    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 ppkt!", icon_url = PARTY_FACE_ICON)
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 pizzopkt!", icon_url = PARTY_FACE_ICON)
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
     embed = Embed(title="Gratulacje, " + user['name'] + "!", description="Wygrales dzienne losowanie!", color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej wartosci!", value="Woohoo!")
+    embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!")
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -260,13 +260,13 @@ def generateLoserEmbed(user, userAvatarURL):
     return embed
 
 def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0, user = None):
-    description = "Gratulacje " + user['name'] + "!"
+    description = "Gratulacje, " + user['name'] + "!"
     color = Colour.dark_green()
-    infoString = " wygrales " + str(amount) + " pizzopunktow!"
+    infoString = " - wygrales " + str(amount) + " pizzopunktow!"
     if amount < 0:
         description = "Oops.."
         color = Colour.dark_red()
-        infoString = " przegrales " + str(amount * -1) + " pizzopunktow.."
+        infoString = " - przegrales " + str(amount * -1) + " pizzopunktow.."
     embed = Embed(title="Slotsy #" + str(id), description=description, color=color)
 
     file = File(gif_path, filename = gif_path.split("/")[-1])
