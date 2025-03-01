@@ -25,6 +25,7 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 
+
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
     def __init__(self):
@@ -232,6 +233,29 @@ class usersChooseView:
             await interaction.channel.send(f"Wybrane osoby: {userListString}.")
             await interaction.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(self.selectedUsers, radius = self.radius)))
         return callback
+icons = ["pizza", "skull", "apple", "grill", "juicer", "bike", ""]
+def simulateSlots(amount, tries, user):
+    multiplier = 3
+    earnings = 0
+    for _ in range(tries):
+        spinResult = random.choices(icons, k=3)
+        count = len(set(spinResult))
+        if count > 1:
+            if count == 3:
+                multiplier = 15
+            #remove assets/gif and .png from string
+            winner = winner[11:-4]
+            if list(set(spinResult))[0] == "pizza":
+                multiplier *= 3
+            elif list(set(spinResult))[0] == "skull":
+                multiplier *= -2
+
+            earnings = int(amount * multiplier)
+            points.addPoints(user['discord_id'], earnings)
+            db.updateSlotEntry(id, earnings - amount)
+    #in case of skulls
+    if multiplier < 0:
+        earnings = earnings - amount
 
 def generateSlots(amount, user):
     multiplier = 3
@@ -241,15 +265,20 @@ def generateSlots(amount, user):
     output_path = "assets/gif/slot_machine" + str(id) + ".gif"
     winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
     if count > 1:
-        if count == 3:
-            multiplier = 15
+
         #remove assets/gif and .png from string
         winner = winner[11:-4]
+
         if winner == "pizza":
             multiplier *= 3
         elif winner == "skull":
             multiplier *= -2
-
+        if count == 3:
+            multiplier *= 5
+            if winner == "skull":
+                #game over
+                multiplier *= 21372137
+                #gg
         earnings = int(amount * multiplier)
         points.addPoints(user['discord_id'], earnings)
         db.updateSlotEntry(id, earnings - amount)
