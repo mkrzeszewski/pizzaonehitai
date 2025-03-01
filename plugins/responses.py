@@ -348,7 +348,7 @@ def handleResponse(userMessage, author) -> str:
                         curr = int(user['points'])
                         if str(commands[1]) == "all":
                             amount = curr
-                        if curr >= amount and amount > 0:
+                        if curr >= amount and amount >= 25:
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
@@ -358,7 +358,7 @@ def handleResponse(userMessage, author) -> str:
                                 returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
-                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                            returnText = "Masz za malo pizzopunktow (minimalna ilosc do 50/50 - 25!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
