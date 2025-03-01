@@ -248,7 +248,7 @@ def generateSlots(amount, user):
         if winner == "pizza":
             multiplier *= 3
         elif winner == "skull":
-            multiplier *= -0.5
+            multiplier *= -2
 
         earnings = int(amount * multiplier)
         points.addPoints(user['discord_id'], earnings)
