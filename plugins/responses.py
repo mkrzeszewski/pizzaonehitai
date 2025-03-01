@@ -246,7 +246,7 @@ def generateSlots(amount, user):
         #remove assets/gif and .png from string
         winner = winner[11:-4]
         if winner == "pizza":
-            multiplier *= 5
+            multiplier *= 3
         elif winner == "skull":
             multiplier *= -0.5
 
