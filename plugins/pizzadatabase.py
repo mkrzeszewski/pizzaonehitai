@@ -3,6 +3,7 @@ from os import environ
 import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import json
 
 #connect to mongodb database and get proper database
 CONN_URL = "mongodb://" + environ["MONGO_USERNAME"] + ":" + environ["MONGO_PASSWORD"] + "@" + environ["MONGO_ENDPOINT"]
@@ -16,6 +17,8 @@ quotesCollection = db['quotes']
 begCollection = db['beg']
 aiInstructionCollection = db['discord_bot_instructions']
 slotsCollection = db['slots']
+heistCollection = db['heist_history']
+currHeistCollection = db['current_heist']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -152,4 +155,44 @@ def updateSlotEntry(slots_id, earnings):
             return result
     return None
 
+def isHeistOngoing():
+    return currHeistCollection.estimated_document_count() == 0
 
+def initializeHeist(heist_name, potential_loot, success_chance):
+    currHeistCollection.insert_one({
+                                      'heist_name': heist_name,
+                                      'members': [],
+                                      'potential_loot': potential_loot,
+                                      'success_chance': success_chance,
+                                      'ongoing': False})
+
+def addMemberToHeist(member):
+    currHeistCollection.update_one({},{"$push": {"members": member}})
+
+def moveCurrentHeistToHistory(json_result):
+    currHeistCollection.delete_one({})
+    if json_result:
+        heistCollection.insert_one(json.loads(json_result))
+    
+def appendHeistMember(name, value):
+    new_entry = [name, value]
+    currHeistCollection.update_one(
+        {},
+        {"$push": {"members": new_entry}}
+    )
+
+def isUserPartOfCurrentHeist(name):
+    return currHeistCollection.find_one({"members": {"$elemMatch": {"0": name}}})
+
+def isHeistAvailable():
+    result = currHeistCollection.find_one({})
+    if result and result["ongoing"] == False:
+        return True
+    else:
+        return False
+    
+def setHeistOngoing():
+    currHeistCollection.update_one({},{"$set": {"members": True}})
+
+def retrieveHeistMembers():
+    return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']

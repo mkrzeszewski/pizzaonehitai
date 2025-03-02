@@ -10,6 +10,7 @@ import asyncio
 import datetime
 import plugins.birthday as birthday
 import plugins.points as points
+import plugins.heist as heist
 
 VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
@@ -26,10 +27,12 @@ VOICE_CHANNEL_IDS = [
 GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
 DEFAULT_BDAY_CHANNEL = 1172911430601822238
+DEFAULT_HEIST_CHANNEL = 1172911430601822238
 if os.environ["PROD_STATUS"] == "PRODUCTION":
     DEFAULT_TFT_CHANNEL = 1032698616910983168 #LEAGUEOFDEBILS
     DEFAULT_BDAY_CHANNEL = 993905203084529865 #OGOLNY
     GAMBA_CHANNEL_ID = 1343278156265685092
+    DEFAULT_HEIST_CHANNEL = 1345732567776890890
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -74,6 +77,23 @@ def runDiscordBot():
             target_datetime += datetime.timedelta(days = 1)
 
         await asyncio.sleep((target_datetime - now).total_seconds())
+
+    @tasks.loop(hours = 1)
+    async def generateHeist():
+        channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
+        level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
+        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
+        await asyncio.sleep(1800)
+        intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
+        if middle:
+            await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
+            await asyncio.sleep(300)
+            await channel.send(embed = embedgen.generateHeistBody(level, heist_name, middle))
+            await asyncio.sleep(300)
+            await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
+            heist.finalizeHeist(score_json)
+        else:
+            heist.finalizeHeist(None)
 
     @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
@@ -125,8 +145,11 @@ def runDiscordBot():
             if not sendBirthdayInfo.is_running():
                 sendBirthdayInfo.start() 
 
-            if not rouletteTask.is_running():
-                rouletteTask.start() 
+            #if not rouletteTask.is_running():
+            #    rouletteTask.start() 
+
+            if not generateHeist.is_running():
+                generateHeist.start()
 
             if not generateWinnerAndLoser.is_running():
                 generateWinnerAndLoser.start() 

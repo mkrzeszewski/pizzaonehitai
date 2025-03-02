@@ -4,6 +4,7 @@ import time
 from os import environ
 from datetime import datetime, timedelta
 
+CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
@@ -238,15 +239,15 @@ def generateBirthdayEmbed(user, facts, wrozba):
     if facts:
         for fact in facts:
             body = body + str(fact) + "\n"
-    embed.add_field(name = "Ciekawostki: ", value = body)
-    embed.add_field(name = "Wrozba: ", value = wrozba)
+    embed.add_field(name = "Ciekawostki: ", value = body, inline = False)
+    embed.add_field(name = "Wrozba: ", value = wrozba, inline = False)
     embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 pizzopkt!", icon_url = PARTY_FACE_ICON)
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
     embed = Embed(title="Gratulacje, " + user['name'] + "!", description="Wygrales dzienne losowanie!", color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!")
+    embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -254,7 +255,7 @@ def generateWinnerEmbed(user, userAvatarURL):
 def generateLoserEmbed(user, userAvatarURL):
     embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Z twojego konta zostalo odebrane 200 ppkt.", value="Sprobuj sie odbic na hazard-lounge!")
+    embed.add_field(name = "Z twojego konta zostalo odebrane 200 ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -280,5 +281,60 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
 def generateUnknownUser(discord_id):
     embed = Embed(title="Nieznany uzytkownik" + str(discord_id), description="Uzytkownik o podanym ID nie istnieje w bazie!", color=Colour.red)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistInvite(level, heist_name, message, id = 0):
+    formatted_time = (datetime.now() + timedelta(hours=1, minutes=5)).strftime('%H:%M:%S')
+    color = Colour.dark_orange()
+    if level == "hard":
+        color = Colour.dark_red()
+    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(formatted_time) + ".", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = heist_name, value=message, inline = False)
+
+    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistIntro(level, heist_name, message, id = 0):
+    color = Colour.dark_orange()
+    if level == "hard":
+        color = Colour.dark_red()
+    embed = Embed(title=heist_name, description="", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = "Wstep:", value=message, inline = False)
+
+    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak wypadliscie!", inline = False)
+    
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistBody(level, heist_name, message, id = 0):
+    color = Colour.dark_orange()
+    if level == "hard":
+        color = Colour.dark_red()
+    embed = Embed(title=heist_name, description="", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = "", value=message, inline = False)
+    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak sie zakonczyl!", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistEnding(level, heist_name, message, id = 0):
+    color = Colour.dark_orange()
+    if level == "hard":
+        color = Colour.dark_red()
+    embed = Embed(title=heist_name, description="", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = "", value=message, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
