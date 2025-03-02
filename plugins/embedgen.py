@@ -285,7 +285,7 @@ def generateUnknownUser(discord_id):
     return embed
 
 def generateHeistInvite(level, heist_name, message, id = 0):
-    formatted_time = (datetime.now() + timedelta(hours=1, minutes=5)).strftime('%H:%M:%S')
+    formatted_time = (datetime.now() + timedelta(hours=1, minutes=30)).strftime('%H:%M:%S')
     color = Colour.dark_orange()
     if level == "hard":
         color = Colour.dark_red()
