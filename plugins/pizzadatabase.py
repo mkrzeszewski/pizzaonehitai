@@ -184,9 +184,9 @@ def appendHeistMember(name, value):
 def isUserPartOfCurrentHeist(name):
     return currHeistCollection.find_one({"members": {"$elemMatch": {"0": name}}})
 
-def isHeistOngoing():
+def isHeistAvailable():
     result = currHeistCollection.find_one({})
-    if result and result.get("ongoing", False):
+    if result and result["ongoing"] == False:
         return True
     else:
         return False

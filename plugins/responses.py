@@ -357,7 +357,7 @@ def handleResponse(userMessage, author) -> str:
 
         elif commands[0] in heistKeyword:
             if len(commands) == 2:
-                if db.isHeistOngoing():
+                if db.isHeistAvailable():
                     if str(commands[1]).isdigit():
                         user = db.retrieveUser('discord_id', str(author))
                         if user:
