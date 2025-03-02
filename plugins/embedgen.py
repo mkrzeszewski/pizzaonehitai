@@ -323,7 +323,7 @@ def generateHeistBody(level, heist_name, message, id = 0):
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
     embed.add_field(name = "", value=message, inline = False)
-
+    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak sie zakonczyl!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
