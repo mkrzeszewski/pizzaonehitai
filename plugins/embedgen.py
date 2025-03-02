@@ -286,9 +286,9 @@ def generateUnknownUser(discord_id):
 
 def generateHeistInvite(level, heist_name, message):
     formatted_time = (datetime.now() + timedelta(hours=1, minutes=5)).strftime('%H:%M:%S')
-    color = Colour.dark_orange
+    color = Colour.dark_orange()
     if level == "hard":
-        color = Colour.dark_red
+        color = Colour.dark_red()
     embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(formatted_time) + ".", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
@@ -301,10 +301,9 @@ def generateHeistInvite(level, heist_name, message):
     return embed
 
 def generateHeistIntro(level, heist_name, message):
-    color = Colour.dark_orange
+    color = Colour.dark_orange()
     if level == "hard":
-        color = Colour.dark_red
-
+        color = Colour.dark_red()
     embed = Embed(title=heist_name, description="", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
