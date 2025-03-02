@@ -514,7 +514,7 @@ def handleResponse(userMessage, author) -> str:
                     if db.isBegAvailable():
                         db.updateUser('discord_id', str(author), 'points', 100)
                         db.createBegEntry(str(author))
-                        returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 15 min."
+                        returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 10 min."
                         #isBegAvailable = False
                     else:
                         begPerson = db.getBegPerson()
