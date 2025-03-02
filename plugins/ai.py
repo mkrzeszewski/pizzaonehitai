@@ -25,7 +25,7 @@ heistModel = genai.GenerativeModel(
 )
 heistChat = heistModel.start_chat()
 
-def chatwithAI(message):
+def chatWithAI(message):
     return chat.send_message(message).text
 
 def askAI(message):
