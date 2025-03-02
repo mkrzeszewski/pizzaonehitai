@@ -311,7 +311,7 @@ def generateHeistIntro(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak wypadliscie!", inline = False)
+    embed.add_field(name = "", value = "Trwaja przygotowania do napadu! Za jakis czas dowiecie sie, jakie role zostaly Wam przydzielone!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
@@ -323,7 +323,7 @@ def generateHeistBody(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak sie zakonczyl!", inline = False)
+    embed.add_field(name = "", value = "Czas na napad! Wkrotce zobaczycie, jak sie zakonczyl!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
