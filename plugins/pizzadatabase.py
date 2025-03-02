@@ -154,6 +154,5 @@ def updateSlotEntry(slots_id, earnings):
             return result
     return None
 
-
-def isBegAvailable():
+def isHeistOngoing():
     return currHeistCollection.estimated_document_count() == 0
