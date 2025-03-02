@@ -1,7 +1,9 @@
 import random
 import plugins.ai as ai
 import plugins.pizzadatabase as db
+from datetime import datetime
 
+random.seed(datetime.now().timestamp())
 medium_chance = 80
 
 medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii"]
