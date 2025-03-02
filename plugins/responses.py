@@ -270,7 +270,7 @@ def generateSlots(amount, user):
         winner = winner[11:-4]
 
         if winner == "pizza":
-            multiplier *= 3
+            multiplier *= 2
         elif winner == "skull":
             multiplier *= -2
         if count == 3:
