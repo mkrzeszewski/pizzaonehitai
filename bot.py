@@ -78,21 +78,18 @@ def runDiscordBot():
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
-    @tasks.loop(minutes = 15)
+    @tasks.loop(hours = 1)
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
         await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
-        await asyncio.sleep(300)
-        await channel.send(content = "[DEBUG] - startujemy heist")
+        await asyncio.sleep(1800)
         intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
         if middle:
             await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
             await asyncio.sleep(300)
-            await channel.send(content = "[DEBUG] - debug - middle")
             await channel.send(embed = embedgen.generateHeistBody(level, heist_name, middle))
             await asyncio.sleep(300)
-            await channel.send(content = "[DEBUG] - debug - final")
             await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
             heist.finalizeHeist(score_json)
         else:
