@@ -163,7 +163,8 @@ def initializeHeist(heist_name, potential_loot, success_chance):
                                       'heist_name': heist_name,
                                       'members': [],
                                       'potential_loot': potential_loot,
-                                      'success_chance': success_chance})
+                                      'success_chance': success_chance,
+                                      'ongoing': False})
 
 def addMemberToHeist(member):
     currHeistCollection.update_one({},{"$push": {"members": member}})
@@ -183,5 +184,15 @@ def appendHeistMember(name, value):
 def isUserPartOfCurrentHeist(name):
     return currHeistCollection.find_one({"members": {"$elemMatch": {"0": name}}})
 
+def isHeistOngoing():
+    result = currHeistCollection.find_one({}, {"is_successful": 1, "_id": 0})
+    if result and result.get("ongoing", False):
+        return True
+    else:
+        return False
+    
+def setHeistOngoing():
+    currHeistCollection.update_one({},{"$set": {"members": True}})
+    
 def retrieveHeistMembers():
     return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
