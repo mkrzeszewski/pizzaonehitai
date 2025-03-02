@@ -16,6 +16,8 @@ quotesCollection = db['quotes']
 begCollection = db['beg']
 aiInstructionCollection = db['discord_bot_instructions']
 slotsCollection = db['slots']
+heistCollection = db['heist_history']
+currHeistCollection = db['current_heist']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -153,3 +155,5 @@ def updateSlotEntry(slots_id, earnings):
     return None
 
 
+def isBegAvailable():
+    return currHeistCollection.estimated_document_count() == 0
