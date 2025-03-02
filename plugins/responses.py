@@ -24,7 +24,7 @@ horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
-
+heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -354,6 +354,25 @@ def handleResponse(userMessage, author) -> str:
                 db.insertAIHistory(str(author), query)
                 text = ""
                 returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+
+        elif commands[0] in heistKeyword:
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    user = db.retrieveUser('discord_id', str(author))
+                    if user:
+                        curr = int(user['points'])
+                        amount = int(str(commands[1]))
+                        if curr >= amount and amount > 0:
+                            if (db.isUserPartOfCurrentHeist(user['name'])):
+                                returnText = "Jestes juz czlonkiem aktualnego napadu!"
+                            else:
+                                db.appendHeistMember(user['name'], amount)
+                                returnText = "Pomyslnie dolaczyles do napadu!"
+                        else:
+                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                else:
+                    returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
+
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
