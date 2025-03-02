@@ -78,23 +78,25 @@ def runDiscordBot():
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
-    @tasks.loop(minutes = 15.0)
+    @tasks.loop(minutes = 15)
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
-        level, heist_name = heist.generateHeistName()
+        level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
         await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
         await asyncio.sleep(300)
         await channel.send(content = "[DEBUG] - startujemy heist")
-        tempMembers = [["Mati", 1000], ["Bartolo", 2000], ["Trzcina", 500]]
-        intro, middle, final, score_json = heist.heistGeneration(heist_name, tempMembers)
-        await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
-        await asyncio.sleep(300)
-        await channel.send(content = "[DEBUG] - debug - middle")
-        await channel.send(embed = embedgen.generateHeistBody(level, heist_name, middle))
-        await asyncio.sleep(300)
-        await channel.send(content = "[DEBUG] - debug - final")
-        await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
-        heist.finalizeHeist(score_json)
+        intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
+        if middle:
+            await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
+            await asyncio.sleep(300)
+            await channel.send(content = "[DEBUG] - debug - middle")
+            await channel.send(embed = embedgen.generateHeistBody(level, heist_name, middle))
+            await asyncio.sleep(300)
+            await channel.send(content = "[DEBUG] - debug - final")
+            await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
+            heist.finalizeHeist(score_json)
+        else:
+            heist.finalizeHeist(None)
 
     @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
