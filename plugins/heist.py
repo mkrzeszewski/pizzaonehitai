@@ -10,7 +10,7 @@ medium_chance = 90
 
 medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii", "Disneyland", "Siedzibe Valve", "Salon Dacia", "Kopalnie soli w Wieliczce", "Kopalnie w Belchatowie", "Siedzibe Gangu Albanii"]
 hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedziba El Chapo w Meksyku"]
-circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem balonow na wode", " z uzyciem konfetti", " w strojach mikolajow", " z karlem na plecach"]
+circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem balonow na wode", " z uzyciem konfetti", " w strojach mikolajow", " z karlem na plecach", " - Sylwestrowa Akcja", " na hulajnogach", " - Wielkanocna Akcja"]
 
 
 #returns level ["hard", "medium"] and heist name
