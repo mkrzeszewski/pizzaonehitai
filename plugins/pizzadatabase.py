@@ -184,4 +184,4 @@ def isUserPartOfCurrentHeist(name):
     return currHeistCollection.find_one({"members": {"$elemMatch": {"0": name}}})
 
 def retrieveHeistMembers():
-    return currHeistCollection.find_one({}, {"members": 1, "_id": 0})
+    return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
