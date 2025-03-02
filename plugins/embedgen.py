@@ -4,6 +4,7 @@ import time
 from os import environ
 from datetime import datetime, timedelta
 
+CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
@@ -280,5 +281,37 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
 def generateUnknownUser(discord_id):
     embed = Embed(title="Nieznany uzytkownik" + str(discord_id), description="Uzytkownik o podanym ID nie istnieje w bazie!", color=Colour.red)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistInvite(level, heist_name, message):
+    formatted_time = (datetime.now() + timedelta(hours=1, minutes=5)).strftime('%H:%M:%S')
+    color = Colour.dark_orange
+    if level == "hard":
+        color = Colour.dark_red
+    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(formatted_time) + ".", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = heist_name, value=message)
+
+    embed.add_field(name = "", value = "Aby dolaczyc napisz !joinheist <KWOTA> - twoj wklad ma wplyw na wysokosc nagrody!")
+    
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistIntro(level, heist_name, message):
+    color = Colour.dark_orange
+    if level == "hard":
+        color = Colour.dark_red
+
+    embed = Embed(title=heist_name, description="", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = "Przebieg:", value=message)
+
+    embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak wypadliscie!")
+    
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
