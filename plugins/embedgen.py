@@ -5,6 +5,7 @@ from os import environ
 from datetime import datetime, timedelta
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
+PEPE_PRISON_URL = ""
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
@@ -293,7 +294,7 @@ def generateHeistInvite(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = heist_name, value=message, inline = False)
+    embed.add_field(name = heist_name, value=message[:1000], inline = False)
 
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -307,7 +308,7 @@ def generateHeistIntro(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "Wstep:", value=message, inline = False)
+    embed.add_field(name = "Wstep:", value=message[:1000], inline = False)
 
     embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak wypadliscie!", inline = False)
     
@@ -322,7 +323,7 @@ def generateHeistBody(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "", value=message, inline = False)
+    embed.add_field(name = "", value=message[:1000], inline = False)
     embed.add_field(name = "", value = "Napad trwa! Za jakis czas dowiecie sie, jak sie zakonczyl!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -335,6 +336,6 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "", value=message, inline = False)
+    embed.add_field(name = "", value=message[:1000], inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
