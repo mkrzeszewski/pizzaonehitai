@@ -70,7 +70,10 @@ def finalizeHeist(json_result):
             if member['arrested']:
                 print("omegalul")
             else:
-                points.addPoints(db.retrieveUser('name', member['name'])['discord_id'], int(member['loot']) + int(member['contribution']))
+                if json_result['heist_success']:
+                    points.addPoints(db.retrieveUser('name', member['name'])['discord_id'], int(member['loot']) + int(member['contribution']))
+                else:
+                    points.addPoints(db.retrieveUser('name', member['name'])['discord_id'], int(member['loot']))
         else:
             return "OH"
         return None
