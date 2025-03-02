@@ -48,7 +48,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
                 memberStr += str(member[0]) + ":" +str(member[1]) + ","
                 totalContribution += int(member[1])
                 finalChance += 2
-            finalChance += int(totalContribution / 1000)
+            finalChance += int(totalContribution / 10000)
 
             listOfCommands.append("members: "+memberStr[:-1])
             listOfCommands.append("chance: " + str(finalChance) + "%")
