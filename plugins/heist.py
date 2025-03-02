@@ -1,7 +1,6 @@
 import random
 import plugins.ai as ai
-import pizzadatabase as db
-import json
+import plugins.pizzadatabase as db
 
 medium_chance = 80
 
