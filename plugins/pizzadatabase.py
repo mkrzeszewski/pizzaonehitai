@@ -185,7 +185,7 @@ def isUserPartOfCurrentHeist(name):
     return currHeistCollection.find_one({"members": {"$elemMatch": {"0": name}}})
 
 def isHeistOngoing():
-    result = currHeistCollection.find_one({}, {"is_successful": 1, "_id": 0})
+    result = currHeistCollection.find_one({})
     if result and result.get("ongoing", False):
         return True
     else:
@@ -193,6 +193,6 @@ def isHeistOngoing():
     
 def setHeistOngoing():
     currHeistCollection.update_one({},{"$set": {"members": True}})
-    
+
 def retrieveHeistMembers():
     return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
