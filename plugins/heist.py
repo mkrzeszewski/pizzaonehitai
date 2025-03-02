@@ -8,7 +8,7 @@ import json
 random.seed(datetime.now().timestamp())
 medium_chance = 90
 
-medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii", "Disneyland", "Siedzibe Valve", "Salon Dacia", "Kopalnie soli w Wieliczce", "Kopalnie w Belchatowie", "Siedzibe Gangu Albanii"]
+medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii", "Disneyland", "Siedzibe Valve", "Salon Dacia", "Kopalnie soli w Wieliczce", "Kopalnie w Belchatowie", "Siedzibe Gangu Albanii", "Hurtownie Jaboli"]
 hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedziba El Chapo w Meksyku"]
 circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem balonow na wode", " z uzyciem konfetti", " w strojach mikolajow", " z karlem na plecach", " - Sylwestrowa Akcja", " na hulajnogach", " - Wielkanocna Akcja"]
 
@@ -22,7 +22,7 @@ def generateHeist():
     if random.randint(1, 100) > medium_chance:
         heist_list = hard_target_list
         initial_loot = random.randint(10000,50000)
-        initial_chance = random.randint(20,50)
+        initial_chance = random.randint(10,30)
         level = "hard"
     
     
@@ -47,7 +47,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             for member in members:
                 memberStr += str(member[0]) + ":" +str(member[1]) + ","
                 totalContribution += int(member[1])
-                finalChance += 2
+                finalChance += 1
             finalChance += int(totalContribution / 10000)
 
             listOfCommands.append("members: "+memberStr[:-1])
