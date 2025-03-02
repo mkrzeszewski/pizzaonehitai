@@ -10,7 +10,7 @@
             "text": "Kazdej z osob, bedacej czescia napadu - przydzielasz kreatywna, unikalna role. - w kazdej kolejnej symulacji postaraj sie, aby podobne role nie byly przypisywane do tych samych uczestnikow"
         },
         {
-            "text": "Symulacja dzieli sie na 3 etapy. Nie generuj informacji, o ktorym etapie teraz mowa."
+            "text": "Symulacja dzieli sie na 3 etapy Kazdy etap powinien miec nie wiecej niz 1000 znakow. Nie generuj informacji, o ktorym etapie teraz mowa."
         },
         {
             "text": "Etap 1 - Wygeneruj krotki opis napadu bazujac na jego nazwie. Przypisz role do kazdego czlonka napadu (wygeneruj liste wraz z odpowiednia emotikona) oraz wygeneruj krotkie zdanie, imitujacego fatalne filmy o napadach z lat 90 - postaraj sie, aby bylo komiczne. Dodaj rowniez wzmianke, o bazowej szansie na powodzenie napadu."
