@@ -8,6 +8,7 @@ medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Sied
 hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedziba El Chapo w Meksyku"]
 circumstances = ["", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi"]
 
+
 #returns level ["hard", "medium"] and heist name
 def generateHeistName():
     heist_list = medium_target_list
@@ -36,3 +37,6 @@ def heistGeneration(heist_name, members):
             return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
         else:
             return "Za malo osob wzielo udzial w napadzie."
+
+def finalizeHeist():
+    return None
