@@ -357,21 +357,25 @@ def handleResponse(userMessage, author) -> str:
 
         elif commands[0] in heistKeyword:
             if len(commands) == 2:
-                if str(commands[1]).isdigit():
-                    user = db.retrieveUser('discord_id', str(author))
-                    if user:
-                        curr = int(user['points'])
-                        amount = int(str(commands[1]))
-                        if curr >= amount and amount > 0:
-                            if (db.isUserPartOfCurrentHeist(user['name'])):
-                                returnText = "Jestes juz czlonkiem aktualnego napadu!"
+                if db.isHeistOngoing():
+                    if str(commands[1]).isdigit():
+                        user = db.retrieveUser('discord_id', str(author))
+                        if user:
+                            curr = int(user['points'])
+                            amount = int(str(commands[1]))
+                            if curr >= amount and amount > 0:
+                                if (db.isUserPartOfCurrentHeist(user['name'])):
+                                    returnText = "Jestes juz czlonkiem aktualnego napadu!"
+                                else:
+                                    db.appendHeistMember(user['name'], amount)
+                                    points.addPoints(str(author), -1 * amount)
+                                    returnText = "Pomyslnie dolaczyles do napadu!"
                             else:
-                                db.appendHeistMember(user['name'], amount)
-                                returnText = "Pomyslnie dolaczyles do napadu!"
-                        else:
-                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                    else:
+                        returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
                 else:
-                    returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
+                    returnText = "Obecnie nie mozesz dolaczyc do napadu!"
 
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
