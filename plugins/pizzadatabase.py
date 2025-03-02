@@ -192,7 +192,7 @@ def isHeistAvailable():
         return False
     
 def setHeistOngoing():
-    currHeistCollection.update_one({},{"$set": {"members": True}})
+    currHeistCollection.update_one({},{"$set": {"ongoing": True}})
 
 def retrieveHeistMembers():
     return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
