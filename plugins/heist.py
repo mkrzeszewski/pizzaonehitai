@@ -16,11 +16,11 @@ circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie
 def generateHeist():
     heist_list = medium_target_list
     level = "medium"
-    initial_loot = random.randint(1000,10000)
+    initial_loot = random.randint(5000,15000)
     initial_chance = random.randint(20,80)
     if random.randint(1, 100) > medium_chance:
         heist_list = hard_target_list
-        initial_loot = random.randint(10000,50000)
+        initial_loot = random.randint(30000,100000)
         initial_chance = random.randint(10,30)
         level = "hard"
     
