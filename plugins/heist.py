@@ -41,8 +41,10 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             listOfCommands.append("heist_name: " + str(heist_name))
             memberStr = ""
             totalContribution = 0
+            finalLoot = initial_loot
             finalChance = initial_chance
             for member in members:
+                finalLoot += finalLoot * 0.2
                 memberStr += str(member[0]) + ":" +str(member[1]) + ","
                 totalContribution += int(member[1])
                 finalChance += 1
@@ -50,7 +52,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
 
             listOfCommands.append("members: "+memberStr[:-1])
             listOfCommands.append("chance: " + str(finalChance) + "%")
-            listOfCommands.append("expected_loot: "+str(initial_loot))
+            listOfCommands.append("expected_loot: "+str(finalLoot))
             acts = ai.generateHeist(listOfCommands).split("ROZDZIELNIK_ETAP")
             return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
         else:
