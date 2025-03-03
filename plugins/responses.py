@@ -636,7 +636,7 @@ def handleResponse(userMessage, author) -> str:
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
-        if message == "heistinfo":
+        if message == "heistinfo" or message == "currentheist" or message == "napad":
             currentHeist = db.retrieveHeistInfo()
             if currentHeist:
                 returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'])
