@@ -57,7 +57,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
         else:
             #return points to player
-            points.addPoints(db.retrieveUser('name', member[0])['discord_id'], int(member[1]))
+            points.addPoints(db.retrieveUser('name', members[0][1])['discord_id'], int(members[0][1]))
             return "Za malo osob wzielo udzial w napadzie.", None, None, None
     else:
         return "Nikt nie wzial udzialu w napadzie.", None, None, None
