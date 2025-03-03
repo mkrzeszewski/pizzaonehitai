@@ -44,7 +44,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             finalLoot = initial_loot
             finalChance = initial_chance
             for member in members:
-                finalLoot += finalLoot * 0.2
+                finalLoot += int(finalLoot * 0.2)
                 memberStr += str(member[0]) + ":" +str(member[1]) + ","
                 totalContribution += int(member[1])
                 finalChance += 1
