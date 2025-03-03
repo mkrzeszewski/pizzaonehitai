@@ -25,6 +25,7 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
+tranfserKeyword = ["transfer", "masz", "tip", "trzymaj"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -428,6 +429,16 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
+        elif commands[0] in tranfserKeyword:
+            if len(commands) == 3:
+                if str(commands[2]).isdigit():
+                    returnText = "Tu pojawi sie funkcja TIPa - wkrotce!"
+                else:
+                    returnText = "ERROR: ostatnia wartosc to musi byc int!"
+            else:
+                returnText = "Niepoprawnie uzyta komenda. Uzyj np !tip Mati 20"
+
+
         elif commands[0] == "instructai":
             if int(author) == 326259887007072257:
                 if len(commands) > 1:
@@ -529,6 +540,11 @@ def handleResponse(userMessage, author) -> str:
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
+        if message == "!heistinfo":
+            currentHeist = db.retrieveHeistInfo()
+            if currentHeist:
+                returnEmbed = embedgen.generateHeistInvite(currentHeist['heist_name'])
+
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
             sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
