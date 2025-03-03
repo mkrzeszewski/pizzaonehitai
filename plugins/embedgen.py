@@ -346,7 +346,7 @@ def generateHeistInfo(heist_name, members):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for user in members:
-        description += "(*)" + user[0] + "\n"
+        description += "* " + user[0] + "\n"
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
     embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
 
@@ -365,7 +365,7 @@ def generatePrisonRelease(users):
     color = Colour.dark_orange()
     description = ""
     for user in users:
-        description += "(*)" + user['name'] + "\n"
+        description += "* " + user['name'] + "\n"
     embed = Embed(title="Czlonkowie Pizza One Hit opuszczaja wiezienie!", description=description, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
@@ -398,7 +398,7 @@ def generateArrestedUsersInfo(users):
     color = Colour.dark_gray()
     description = ""
     for user in users:
-        description += "(*)" + user['name'] + "\n"
+        description += "* " + user['name'] + "\n"
     embed = Embed(title="Oto obecni zaaresztowani zloczyncy:", description=description, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
