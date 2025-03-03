@@ -5,10 +5,12 @@ from os import environ
 from datetime import datetime, timedelta
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
-PEPE_PRISON_URL = ""
+PEPE_PRISON_URL = "https://i.pinimg.com/736x/21/5a/95/215a95772a3aa17024df7d010513ee88.jpg"
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
+PEPE_LAWYER_URL = "https://pbs.twimg.com/media/FwAU5HMXsAEIXdI.jpg"
 GAMBA_GIF_URL = "https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f3b0.gif"
+MONOPOLY_GUY_URL = "https://e7.pngegg.com/pngimages/663/406/png-clipart-monopoly-party-prison-board-game-others-miscellaneous-game-thumbnail.png"
 BOT_GIF_ADDRESS = "https://cdn3.emoji.gg/emojis/48134-bmodancing.gif"
 GAMBA_ANOTHER_GIF_URL = "https://cdn3.emoji.gg/emojis/3884-gamba.gif"
 WIN_ICON_URL = "https://cdn.discordapp.com/emojis/804525960345944146.webp?size=96&quality=lossless"
@@ -347,5 +349,50 @@ def generateHeistInfo(heist_name):
     embed.add_field(name = heist_name, value="", inline = False)
 
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generatePrisonRelease(users):
+    color = Colour.dark_orange()
+    description = ""
+    for user in users:
+        description += "(*)" + user['name'] + "\n"
+    embed = Embed(title="Czlonkowie Pizza One Hit opuszczaja wiezienie!", description=description, color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = PEPE_PRISON_URL)
+    embed.add_field(name = "Mozecie ponownie korzystac z komend na DC!", value="", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateUserArrestedInfo(user):
+    color = Colour.dark_gray()
+    embed = Embed(title="Niestety, jestes aresztowany!", description="Nie mozesz korzystac z funkcjonalnosci bota.. Zostaniesz wypuszczony o 7 rano.", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = PEPE_PRISON_URL)
+    pointsInfo = "W Twoim wypadku koszt wyniesie: "
+    if user:
+        pointsInfo += str(int(user['points'] * 0.5)) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
+    embed.add_field(name = "Mozesz sprobowac sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateFreedUser(user, cost):
+    color = Colour.dark_green()
+    embed = Embed(title="Witamy na wolnosci, " + user['name'] + "!", description="Po uiszczeniu oplaty w wysokosci "+str(cost)+" twoj prawnik Cie wyciagnal!", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = PEPE_LAWYER_URL)
+    embed.add_field(name = "Mozesz ponownie korzystac z komend na DC!", value="", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateArrestedUsersInfo(users):
+    color = Colour.dark_gray()
+    description = ""
+    for user in users:
+        description += "(*)" + user['name'] + "\n"
+    embed = Embed(title="Oto obecni zaaresztowani zloczyncy:", description=description, color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = PEPE_PRISON_URL)
+    embed.add_field(name = "", value="Wyslijcie im paczki na swieta..", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed

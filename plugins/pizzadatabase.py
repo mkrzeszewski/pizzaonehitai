@@ -199,3 +199,21 @@ def retrieveHeistMembers():
 
 def retrieveHeistInfo():
     return currHeistCollection.find_one({}, {"heist_name": 1, "members": 1, "_id": 0})
+
+def isUserArrested(key, value):
+    user = userCollection.find_one({key: value},{"arrested": 1})
+    return user['arrested'] if user else False
+
+def retrieveArrestedUsers():
+    return userCollection.find({"arrested": True}, {"_id": 0, "name":1})
+
+def freeAllUsers():
+    freedUsers = userCollection.find({"arrested": True}, {"_id": 0, "name":1})
+    userCollection.update_many({}, {"$set": {"arrested": False}})
+    return freedUsers
+
+def arrestUser(key, value):
+    return userCollection.update_one({key: value},{"$set": {"arrested": True}})
+
+def freeUser(key, value):
+    return userCollection.update_one({key: value},{"$set": {"arrested": False}})

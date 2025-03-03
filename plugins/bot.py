@@ -11,6 +11,7 @@ import datetime
 import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
+import plugins.pizzadatabase as db
 
 VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
@@ -98,6 +99,17 @@ def runDiscordBot():
             heist.finalizeHeist(None)
 
     @tasks.loop(hours = 24.0)
+    async def freePeopleFromPrison():
+        freedUsers = db.freeAllUsers()
+        if freedUsers:
+            channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
+            await channel.send(embed = embedgen.generatePrisonRelease(freedUsers))
+
+    @freePeopleFromPrison.before_loop
+    async def dailyPrisonEscape7AM():
+        await waitUntil(datetime.time(6, 0))
+
+    @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
         channel = bot.get_channel(GAMBA_CHANNEL_ID)
         winner, loser = points.generateDaily()
@@ -149,6 +161,9 @@ def runDiscordBot():
 
             #if not rouletteTask.is_running():
             #    rouletteTask.start() 
+
+            if not freePeopleFromPrison.is_running():
+                freePeopleFromPrison.start()
 
             if not generateHeist.is_running():
                 generateHeist.start()
@@ -220,7 +235,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def checkChannelActivityAndAwardPoints():
-        amount = 5
+        amount = 50
         for id in VOICE_CHANNEL_IDS:
             channel = bot.get_channel(id)
             members = channel.members

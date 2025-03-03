@@ -26,6 +26,7 @@ rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
 tranfserKeyword = ["transfer", "masz", "tip", "trzymaj"]
+escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -318,6 +319,22 @@ def handleResponse(userMessage, author) -> str:
 
     #esnure it matches the command even if its in lower
     commands[0] = str(commands[0].lower())
+
+    user = db.retrieveUser('discord_id', str(author))
+    if user == None:
+        returnText = "User o ID: " + str(author) + "nie znajduje sie w bazie danych. Uderz do roLab."
+        return returnEmbed, returnText, returnView, returnFile   
+    
+    if user['arrested'] and commands[0] in escapeKeyword:
+        if int(user['points']) > 300:
+            cost = int(int(user['points']) * -0.5)
+            points.addPoints(cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            return returnEmbed, returnText, returnView, returnFile  
+    elif user['arrested']:
+        returnEmbed = embedgen.generateUserArrestedInfo(user)
+        return returnEmbed, returnText, returnView, returnFile  
+    
     #komendy wielokomendowe
     if len(commands) > 1:
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
@@ -491,6 +508,12 @@ def handleResponse(userMessage, author) -> str:
 
         if message == 'ai':
             returnText =  "zapytaj o cos, np !ai daj przepis na nalesniki!"
+
+        if message in escapeKeyword:
+            returnText = "Nie jest obecnie aresztowany!"
+
+        if message == "ktosiedzi":
+            returnEmbed = embedgen.generateArrestedUsersInfo(db.retrieveArrestedUsers())
 
         if message in slotsKeyword:
             user = db.retrieveUser('discord_id', str(author))
