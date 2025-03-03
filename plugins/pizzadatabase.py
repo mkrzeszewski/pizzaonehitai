@@ -196,3 +196,6 @@ def setHeistOngoing():
 
 def retrieveHeistMembers():
     return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
+
+def retrieveHeistInfo():
+    return currHeistCollection.find_one({}, {"heist_name": 1, "members": 1, "_id": 0})
