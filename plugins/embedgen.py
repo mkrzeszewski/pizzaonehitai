@@ -369,9 +369,9 @@ def generateUserArrestedInfo(user):
     embed = Embed(title="Niestety, jestes aresztowany!", description="Nie mozesz korzystac z funkcjonalnosci bota.. Zostaniesz wypuszczony o 7 rano.", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
-    pointsInfo = "W Twoim wypadku koszt wyniesie: "
+    pointsInfo = "Obecnie posiadasz "
     if user:
-        pointsInfo += str(int(user['points'] * 0.5)) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
+        pointsInfo += str(user['points']) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
     embed.add_field(name = "Mozesz sprobowac sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
