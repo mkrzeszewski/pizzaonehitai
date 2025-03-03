@@ -475,6 +475,22 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
+        elif commands[0] == "uwolnij":
+            if int(author) == 326259887007072257:
+                if len(commands) == 2:
+                    if str(commands[1]).isdigit():
+                        arrested_user = db.retrieveUser('discord_id', str(commands[1]))
+                    else:
+                        arrested_user = db.retrieveUser('name', str(commands[1]))
+                    if db.freeUser('discord_id', str(arrested_user['discord_id'])):
+                        returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
+                    else:
+                        returnText = "Nieznany user : " + str(commands[1]) + "."
+                else:
+                    returnText = "Niepoprawnie uzyta komenda. Uzyj np !uwolnij 326259887007072257"
+            else:
+                returnText = securityResponse
+
         elif commands[0] in tranfserKeyword:
             if len(commands) == 3:
                 if str(commands[2]).isdigit():
