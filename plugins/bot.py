@@ -13,6 +13,8 @@ import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
 
+user_cooldowns = {}
+
 VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
     837732320017645582, #HOBBISTYCZNI HAZARDZISCI
@@ -184,7 +186,18 @@ def runDiscordBot():
         # If message is empty (e.g., image, embed, sticker)
         if not userMessage:
             return
+        
         if userMessage[0] == '!':
+            user_id = message.author.id
+            cooldown_time = 1
+            if user_id in user_cooldowns:
+                elapsed_time = time.time() - user_cooldowns[user_id]
+                if elapsed_time < cooldown_time:
+                    remaining_time = cooldown_time - elapsed_time
+                    await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
+                    return
+
+            user_cooldowns[user_id] = time.time()
             await sendMessage(message, userMessage, is_private=False)
 
     @tasks.loop(minutes = 5.0)
