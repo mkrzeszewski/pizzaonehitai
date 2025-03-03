@@ -540,10 +540,10 @@ def handleResponse(userMessage, author) -> str:
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
-        if message == "!heistinfo":
+        if message == "heistinfo":
             currentHeist = db.retrieveHeistInfo()
             if currentHeist:
-                returnEmbed = embedgen.generateHeistInvite(currentHeist['heist_name'])
+                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'])
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
