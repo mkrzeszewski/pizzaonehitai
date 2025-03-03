@@ -79,14 +79,14 @@ def runDiscordBot():
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
-    @tasks.loop(hours = 6)
+    @tasks.loop(hours = 4)
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
         await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
 
-        #5.5hours
-        await asyncio.sleep(20000)
+        #3.5hours
+        await asyncio.sleep(12600)
         intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
         if middle:
             await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
