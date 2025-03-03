@@ -289,7 +289,7 @@ def generateUnknownUser(discord_id):
     return embed
 
 def generateHeistInvite(level, heist_name, message, id = 0):
-    formatted_time = (datetime.now() + timedelta(hours=1, minutes=30)).strftime('%H:%M:%S')
+    formatted_time = (datetime.now() + timedelta(hours=6, minutes=30)).strftime('%H:%M:%S')
     color = Colour.dark_orange()
     if level == "hard":
         color = Colour.dark_red()
@@ -335,5 +335,17 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateHeistInfo(heist_name):
+    color = Colour.dark_orange()
+    embed = Embed(title="Obecnie zbieramy ekipe na :", description="", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = heist_name, value="", inline = False)
+
+    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
