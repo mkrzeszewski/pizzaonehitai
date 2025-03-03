@@ -25,7 +25,7 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
-tranfserKeyword = ["transfer", "masz", "tip", "trzymaj"]
+transferKeyword = ["transfer", "masz", "tip", "trzymaj"]
 escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
@@ -491,10 +491,10 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] in tranfserKeyword:
+        elif commands[0] in transferKeyword:
             if len(commands) == 3:
                 if str(commands[2]).isdigit():
-                    if(int(commands[2]) > int(user['points'])):
+                    if(int(commands[2]) <= int(user['points'])):
                         if str(commands[1]).isdigit():
                             dest_user = db.retrieveUser('discord_id', commands[1])
                         else:
@@ -504,6 +504,8 @@ def handleResponse(userMessage, author) -> str:
                             returnText = "Pomyslnie przetransferowano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
                         else:
                             returnText = "Nieznany user : " + str(commands[1]) + "."
+                    else:
+                        returnText = "Mozesz dac tylko tyle ile masz!"
                 else:
                     returnText = "ERROR: ostatnia wartosc to musi byc int!"
             else:
