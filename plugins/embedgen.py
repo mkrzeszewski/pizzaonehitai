@@ -306,6 +306,7 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
     bartolo_url = uploadDoBartola(gif_path)
 
     if bartolo_url is not None:
+        file = None
         embed.set_image(url=bartolo_url)
     else:
         file = File(gif_path, filename = gif_path.split("/")[-1])
