@@ -500,8 +500,11 @@ def handleResponse(userMessage, author) -> str:
                         else:
                             dest_user = db.retrieveUser('name', commands[1])
                         if dest_user:
-                            points.transferPoints(str(author), dest_user['discord_id'], int(commands[2]))
-                            returnText = "Pomyslnie przetransferowano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
+                            if dest_user != user:
+                                points.transferPoints(str(author), dest_user['discord_id'], int(commands[2]))
+                                returnText = "Pomyslnie przetransferowano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
+                            else:
+                                returnText = "Nie mozesz przelac Sobie punktow!"
                         else:
                             returnText = "Nieznany user : " + str(commands[1]) + "."
                     else:
