@@ -509,6 +509,25 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = "Niepoprawnie uzyta komenda. Uzyj np !tip Mati 20"
 
+        elif commands[0] == "add":
+            if int(author) == 326259887007072257:
+                if len(commands) == 3:
+                    if str(commands[2]).isdigit():
+                        if str(commands[1]).isdigit():
+                            dest_user = db.retrieveUser('discord_id', commands[1])
+                        else:
+                            dest_user = db.retrieveUser('name', commands[1])
+                        if dest_user:
+                            points.addPoints(dest_user['discord_id'], int(commands[2]))
+                            returnText = "Pomyslnie dodano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
+                        else:
+                            returnText = "Nieznany user : " + str(commands[1]) + "."
+                    else:
+                        returnText = "ERROR: ostatnia wartosc to musi byc int!"
+                else:
+                    returnText = "Niepoprawnie uzyta komenda. Uzyj np !add Bartolo 20"
+            else:
+                returnText = securityResponse
 
         elif commands[0] == "instructai":
             if int(author) == 326259887007072257:
