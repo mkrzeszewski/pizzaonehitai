@@ -620,7 +620,7 @@ def handleResponse(userMessage, author) -> str:
         if message == "heistinfo":
             currentHeist = db.retrieveHeistInfo()
             if currentHeist:
-                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'])
+                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'])
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']

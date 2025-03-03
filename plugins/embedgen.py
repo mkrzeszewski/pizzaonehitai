@@ -340,13 +340,15 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateHeistInfo(heist_name):
+def generateHeistInfo(heist_name, members):
     color = Colour.dark_orange()
-    embed = Embed(title="Obecnie zbieramy ekipe na :", description="", color = color)
+    embed = Embed(title="Obecnie zbieramy ekipe na :", description=heist_name, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
-
+    description = ""
+    for user in members:
+        description += "(*)" + user[0] + "\n"
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = heist_name, value="", inline = False)
+    embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
 
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
