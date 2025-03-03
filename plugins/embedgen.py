@@ -288,6 +288,7 @@ def uploadDoBartola(gif_path):
             points.addPoints(db.retrieveUser('name', "Bartolo")['discord_id'], 10) # prowizja 
             return response.json()["url"]
         else:
+            points.addPoints(db.retrieveUser('name', "Bartolo")['discord_id'], -1000) # kara
             return None
     except Exception as e:
         return None
