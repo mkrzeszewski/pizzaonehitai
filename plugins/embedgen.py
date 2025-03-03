@@ -354,6 +354,13 @@ def generateHeistInfo(heist_name, members):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
+def generateHeistCanceled(heist_name):
+    color = Colour.dark_orange()
+    embed = Embed(title="Napad zostaje anulowany z powodu braku wystarczajacych uczestnikow! (min 2):", description=heist_name, color = color)
+    embed.set_thumbnail(url = CRIMINAL_ICON_URL)
+    embed.add_field(name = "Sprobujcie szczescia w nastepnym napadzie..", value="Punkty zostaly zwrocone.", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
 def generatePrisonRelease(users):
     color = Colour.dark_orange()
     description = ""

@@ -96,6 +96,7 @@ def runDiscordBot():
             await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
             heist.finalizeHeist(score_json)
         else:
+            await channel.send(embed = embedgen.generateHeistCanceled(heist_name))
             heist.finalizeHeist(None)
 
     @tasks.loop(hours = 24.0)
