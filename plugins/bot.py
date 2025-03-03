@@ -11,6 +11,9 @@ import datetime
 import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
+import plugins.pizzadatabase as db
+
+user_cooldowns = {}
 
 VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
@@ -78,14 +81,14 @@ def runDiscordBot():
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
-    @tasks.loop(hours = 6)
+    @tasks.loop(hours = 4)
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
         await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
 
-        #5.5hours
-        await asyncio.sleep(20000)
+        #3.5hours
+        await asyncio.sleep(12600)
         intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
         if middle:
             await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
@@ -95,7 +98,19 @@ def runDiscordBot():
             await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
             heist.finalizeHeist(score_json)
         else:
+            await channel.send(embed = embedgen.generateHeistCanceled(heist_name))
             heist.finalizeHeist(None)
+
+    @tasks.loop(hours = 24.0)
+    async def freePeopleFromPrison():
+        freedUsers = db.freeAllUsers()
+        if freedUsers:
+            channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
+            await channel.send(embed = embedgen.generatePrisonRelease(freedUsers))
+
+    @freePeopleFromPrison.before_loop
+    async def dailyPrisonEscape7AM():
+        await waitUntil(datetime.time(6, 0))
 
     @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
@@ -133,7 +148,7 @@ def runDiscordBot():
 
     @sendBirthdayInfo.before_loop
     async def dailyBirthday8AM():
-        await waitUntil(datetime.time(8, 0))
+        await waitUntil(datetime.time(7, 0))
 
     @bot.event
     async def on_ready():
@@ -149,6 +164,9 @@ def runDiscordBot():
 
             #if not rouletteTask.is_running():
             #    rouletteTask.start() 
+
+            if not freePeopleFromPrison.is_running():
+                freePeopleFromPrison.start()
 
             if not generateHeist.is_running():
                 generateHeist.start()
@@ -168,7 +186,18 @@ def runDiscordBot():
         # If message is empty (e.g., image, embed, sticker)
         if not userMessage:
             return
+        
         if userMessage[0] == '!':
+            user_id = message.author.id
+            cooldown_time = 1
+            if user_id in user_cooldowns:
+                elapsed_time = time.time() - user_cooldowns[user_id]
+                if elapsed_time < cooldown_time:
+                    remaining_time = cooldown_time - elapsed_time
+                    await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
+                    return
+
+            user_cooldowns[user_id] = time.time()
             await sendMessage(message, userMessage, is_private=False)
 
     @tasks.loop(minutes = 5.0)
@@ -220,7 +249,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def checkChannelActivityAndAwardPoints():
-        amount = 5
+        amount = 50
         for id in VOICE_CHANNEL_IDS:
             channel = bot.get_channel(id)
             members = channel.members

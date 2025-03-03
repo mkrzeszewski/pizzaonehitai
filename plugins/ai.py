@@ -32,7 +32,9 @@ def askAI(message):
     return model.generate_content(message).text
 
 def resetModel():
-    return None
+    global model, chat
+    model = genai.GenerativeModel("models/gemini-2.0-flash", system_instruction = instructionString)
+    chat = model.start_chat()
 
 def generateHeist(message):
     return heistModel.generate_content(message).text

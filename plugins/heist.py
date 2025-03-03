@@ -9,22 +9,20 @@ random.seed(datetime.now().timestamp())
 medium_chance = 90
 
 medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii", "Disneyland", "Siedzibe Valve", "Salon Dacia", "Kopalnie soli w Wieliczce", "Kopalnie w Belchatowie", "Siedzibe Gangu Albanii", "Hurtownie Jaboli"]
-hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedziba El Chapo w Meksyku"]
+hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedzibe El Chapo w Meksyku"]
 circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem balonow na wode", " z uzyciem konfetti", " w strojach mikolajow", " - Sylwestrowa Akcja", " na hulajnogach", " - Wielkanocna Akcja"]
-
 
 #returns level ["hard", "medium"] and heist name
 def generateHeist():
     heist_list = medium_target_list
     level = "medium"
-    initial_loot = random.randint(1000,10000)
+    initial_loot = random.randint(5000,15000)
     initial_chance = random.randint(20,80)
     if random.randint(1, 100) > medium_chance:
         heist_list = hard_target_list
-        initial_loot = random.randint(10000,50000)
+        initial_loot = random.randint(30000,100000)
         initial_chance = random.randint(10,30)
         level = "hard"
-    
     
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
     db.initializeHeist(heist_name, initial_loot, initial_chance)
@@ -43,8 +41,10 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             listOfCommands.append("heist_name: " + str(heist_name))
             memberStr = ""
             totalContribution = 0
+            finalLoot = initial_loot
             finalChance = initial_chance
             for member in members:
+                finalLoot += int(finalLoot * 0.2)
                 memberStr += str(member[0]) + ":" +str(member[1]) + ","
                 totalContribution += int(member[1])
                 finalChance += 1
@@ -52,7 +52,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
 
             listOfCommands.append("members: "+memberStr[:-1])
             listOfCommands.append("chance: " + str(finalChance) + "%")
-            listOfCommands.append("expected_loot: "+str(initial_loot))
+            listOfCommands.append("expected_loot: "+str(finalLoot))
             acts = ai.generateHeist(listOfCommands).split("ROZDZIELNIK_ETAP")
             return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
         else:
@@ -68,12 +68,10 @@ def finalizeHeist(json_result):
         json_result = json.loads(json_result)
         for member in json_result['members']:
             if member['arrested']:
-                print("omegalul")
+                db.arrestUser('name', member['name'])
             else:
                 if json_result['heist_success']:
                     points.addPoints(db.retrieveUser('name', member['name'])['discord_id'], int(member['loot']) + int(member['contribution']))
                 else:
                     points.addPoints(db.retrieveUser('name', member['name'])['discord_id'], int(member['loot']))
-        else:
-            return "OH"
-        return None
+    return None

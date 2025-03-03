@@ -43,3 +43,7 @@ def generateDaily():
     #loser gets -10%
     addPoints(loser['discord_id'], int(int(loser['points']) * 0.1) * -1)
     return winner, loser
+
+def transferPoints(source_discord_id, destination_discord_id, amount):
+    addPoints(source_discord_id, int(amount * -1))
+    addPoints(destination_discord_id, amount)

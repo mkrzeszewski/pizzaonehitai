@@ -25,7 +25,8 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
-tranfserKeyword = ["transfer", "masz", "tip", "trzymaj"]
+transferKeyword = ["transfer", "masz", "tip", "trzymaj"]
+escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -318,6 +319,33 @@ def handleResponse(userMessage, author) -> str:
 
     #esnure it matches the command even if its in lower
     commands[0] = str(commands[0].lower())
+
+    user = db.retrieveUser('discord_id', str(author))
+    if user == None:
+        returnText = "User o ID: " + str(author) + "nie znajduje sie w bazie danych. Uderz do roLab."
+        return returnEmbed, returnText, returnView, returnFile   
+    
+    if user['arrested'] and commands[0] in escapeKeyword:
+        if int(user['points']) == 300:
+            cost = int(int(user['points']) * -1)
+            points.addPoints(cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+        elif int(user['points']) > 300 and int(user['points']) < 600:
+            cost = int((int(user['points'] + 300)) * -0.5)
+            points.addPoints(cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+        elif int(user['points']) > 600:
+            cost = int(int(user['points']) * -1)
+            points.addPoints(cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+        else:
+            returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
+
+        return returnEmbed, returnText, returnView, returnFile
+    elif user['arrested']:
+        returnEmbed = embedgen.generateUserArrestedInfo(user)
+        return returnEmbed, returnText, returnView, returnFile  
+    
     #komendy wielokomendowe
     if len(commands) > 1:
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
@@ -429,15 +457,82 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] in tranfserKeyword:
+        elif commands[0] == "arrest":
+            if int(author) == 326259887007072257:
+                if len(commands) == 2:
+                    if str(commands[1]).isdigit():
+                        if db.arrestUser('discord_id', str(commands[1])):
+                            returnText = "Pomyslnie zaaresztowano " + str(commands[1]) + "."
+                        else:
+                            returnText = "Nieznany user : " + str(commands[1]) + "."
+                    else:
+                        if db.arrestUser('name', str(commands[1])):
+                            returnText = "Pomyslnie zaaresztowano " + str(commands[1]) + "."
+                        else:
+                            returnText = "Nieznany user : " + str(commands[1]) + "."
+                else:
+                    returnText = "Niepoprawnie uzyta komenda. Uzyj np !arrest 326259887007072257"
+            else:
+                returnText = securityResponse
+
+        elif commands[0] == "uwolnij":
+            if int(author) == 326259887007072257:
+                if len(commands) == 2:
+                    if str(commands[1]).isdigit():
+                        arrested_user = db.retrieveUser('discord_id', str(commands[1]))
+                    else:
+                        arrested_user = db.retrieveUser('name', str(commands[1]))
+                    if db.freeUser('discord_id', str(arrested_user['discord_id'])):
+                        returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
+                    else:
+                        returnText = "Nieznany user : " + str(commands[1]) + "."
+                else:
+                    returnText = "Niepoprawnie uzyta komenda. Uzyj np !uwolnij 326259887007072257"
+            else:
+                returnText = securityResponse
+
+        elif commands[0] in transferKeyword:
             if len(commands) == 3:
                 if str(commands[2]).isdigit():
-                    returnText = "Tu pojawi sie funkcja TIPa - wkrotce!"
+                    if(int(commands[2]) <= int(user['points'])):
+                        if str(commands[1]).isdigit():
+                            dest_user = db.retrieveUser('discord_id', commands[1])
+                        else:
+                            dest_user = db.retrieveUser('name', commands[1])
+                        if dest_user:
+                            if dest_user != user:
+                                points.transferPoints(str(author), dest_user['discord_id'], int(commands[2]))
+                                returnText = "Pomyslnie przetransferowano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
+                            else:
+                                returnText = "Nie mozesz przelac Sobie punktow!"
+                        else:
+                            returnText = "Nieznany user : " + str(commands[1]) + "."
+                    else:
+                        returnText = "Mozesz dac tylko tyle ile masz!"
                 else:
                     returnText = "ERROR: ostatnia wartosc to musi byc int!"
             else:
                 returnText = "Niepoprawnie uzyta komenda. Uzyj np !tip Mati 20"
 
+        elif commands[0] == "add":
+            if int(author) == 326259887007072257:
+                if len(commands) == 3:
+                    if str(commands[2]).isdigit():
+                        if str(commands[1]).isdigit():
+                            dest_user = db.retrieveUser('discord_id', commands[1])
+                        else:
+                            dest_user = db.retrieveUser('name', commands[1])
+                        if dest_user:
+                            points.addPoints(dest_user['discord_id'], int(commands[2]))
+                            returnText = "Pomyslnie dodano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
+                        else:
+                            returnText = "Nieznany user : " + str(commands[1]) + "."
+                    else:
+                        returnText = "ERROR: ostatnia wartosc to musi byc int!"
+                else:
+                    returnText = "Niepoprawnie uzyta komenda. Uzyj np !add Bartolo 20"
+            else:
+                returnText = securityResponse
 
         elif commands[0] == "instructai":
             if int(author) == 326259887007072257:
@@ -492,6 +587,12 @@ def handleResponse(userMessage, author) -> str:
         if message == 'ai':
             returnText =  "zapytaj o cos, np !ai daj przepis na nalesniki!"
 
+        if message in escapeKeyword:
+            returnText = "Nie jest obecnie aresztowany!"
+
+        if message == "ktosiedzi":
+            returnEmbed = embedgen.generateArrestedUsersInfo(db.retrieveArrestedUsers())
+
         if message in slotsKeyword:
             user = db.retrieveUser('discord_id', str(author))
             if user:
@@ -540,10 +641,10 @@ def handleResponse(userMessage, author) -> str:
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
-        if message == "heistinfo":
+        if message == "heistinfo" or message == "currentheist" or message == "napad":
             currentHeist = db.retrieveHeistInfo()
             if currentHeist:
-                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'])
+                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'])
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
