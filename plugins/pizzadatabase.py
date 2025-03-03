@@ -213,7 +213,7 @@ def freeAllUsers():
     return freedUsers
 
 def arrestUser(key, value):
-    return userCollection.update_one({key: value},{"$set": {"arrested": True}})
+    return userCollection.update_one({key: value},{"$set": {"arrested": True}}).matched_count
 
 def freeUser(key, value):
-    return userCollection.update_one({key: value},{"$set": {"arrested": False}})
+    return userCollection.update_one({key: value},{"$set": {"arrested": False}}).matched_count
