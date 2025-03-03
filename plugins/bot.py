@@ -148,7 +148,7 @@ def runDiscordBot():
 
     @sendBirthdayInfo.before_loop
     async def dailyBirthday8AM():
-        await waitUntil(datetime.time(8, 0))
+        await waitUntil(datetime.time(7, 0))
 
     @bot.event
     async def on_ready():
