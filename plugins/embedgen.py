@@ -278,8 +278,8 @@ def uploadDoBartola(gif_path):
         }
 
         fc = None
-        with open(gif_path, "r") as f:
-            fc = gif_path.read()
+        with open(gif_path, "rb") as f:
+            fc = f.read()
 
         files = {
             "file":fc
