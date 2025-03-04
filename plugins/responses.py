@@ -295,7 +295,6 @@ def getWeather():
 #this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
 def getBirthdayStuff(user):
     returnEmbed = None
-    print("[ERROR] Error przy wysylaniu info o urodzinach")
     returnText = ""
     if user:
         facts = []
@@ -328,15 +327,15 @@ def handleResponse(userMessage, author) -> str:
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) == 300:
             cost = int(int(user['points']) * -1)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         elif int(user['points']) > 300 and int(user['points']) < 600:
             cost = int((int(user['points'] + 300)) * -0.5)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         elif int(user['points']) > 600:
             cost = int(int(user['points']) * -1)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         else:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
@@ -644,7 +643,7 @@ def handleResponse(userMessage, author) -> str:
         if message == "heistinfo" or message == "currentheist" or message == "napad":
             currentHeist = db.retrieveHeistInfo()
             if currentHeist:
-                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'])
+                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'], currentHeist['when_starts'])
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']

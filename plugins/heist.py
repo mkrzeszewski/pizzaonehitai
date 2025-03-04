@@ -2,15 +2,15 @@ import random
 import plugins.ai as ai
 import plugins.pizzadatabase as db
 import plugins.points as points
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 random.seed(datetime.now().timestamp())
 medium_chance = 90
 
-medium_target_list = ["KFC", "McDonalds", "Pizzerie IT&AM", "Bank Spermy", "Siedzibe Discorda", "Dozorce z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny w Lodzi", "Bank na de_overpass w CS2", "Bank w Tibii", "Disneyland", "Siedzibe Valve", "Salon Dacia", "Kopalnie soli w Wieliczce", "Kopalnie w Belchatowie", "Siedzibe Gangu Albanii", "Hurtownie Jaboli"]
-hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedzibe El Chapo w Meksyku"]
-circumstances = ["", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " podczas burzy piaskowej", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem balonow na wode", " z uzyciem konfetti", " w strojach mikolajow", " - Sylwestrowa Akcja", " na hulajnogach", " - Wielkanocna Akcja"]
+medium_target_list = ["KFC", "McDonalds", "Pizzerie \"IT&AM\"", "Bank Spermy", "Bank Zywnosci", "Budke z Kebabem", "Siedzibe Discorda", "Dozorce z Metin2", "Skarbiec Kowala z Metin2", "Muzeum Figur Woskowych", "Wesole miasteczko", "Teatr Muzyczny", "Zaklad Wyrobow Metalowych", "Tibijski Bank", "Disneyland", "Siedzibe Valve", "Salon Samochodowy", "Kopalnie soli w Wieliczce", "Automatyczne Myjnie Samochodowe", "Siedzibe Gangu Albanii", "Hurtownie Jaboli", "Jubilera"]
+hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedzibe El Chapo w Meksyku", "Baze Klientow Orange Polska", "Posesje na ulicy Smolika"]
+circumstances = ["", "", "", "", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem pistoletow na wode", " z uzyciem konfetti", " w strojach mikolajow", " - Sylwestrowa Akcja", " przebrani za krasnale ogrodowe", " - Wielkanocna Akcja", " w asyscie Golebia", " w calkowitej ciszy", " w rytmie walca wiedenskeigo", " przebrani za postacie z bajek"]
 
 #returns level ["hard", "medium"] and heist name
 def generateHeist():
@@ -23,9 +23,8 @@ def generateHeist():
         initial_loot = random.randint(30000,100000)
         initial_chance = random.randint(10,30)
         level = "hard"
-    
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
-    db.initializeHeist(heist_name, initial_loot, initial_chance)
+    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S'))
     return level, heist_name, initial_loot, initial_chance
 
 def generateHeistIntro(heist_name):
@@ -57,7 +56,7 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
         else:
             #return points to player
-            points.addPoints(db.retrieveUser('name', members[0][1])['discord_id'], int(members[0][1]))
+            points.addPoints(db.retrieveUser('name', members[0][0])['discord_id'], int(members[0][1]))
             return "Za malo osob wzielo udzial w napadzie.", None, None, None
     else:
         return "Nikt nie wzial udzialu w napadzie.", None, None, None

@@ -85,7 +85,7 @@ def runDiscordBot():
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
-        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
+        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name), db.retrieveHeistInfo()['when_starts']))
 
         #3.5hours
         await asyncio.sleep(12600)
@@ -249,12 +249,13 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def checkChannelActivityAndAwardPoints():
-        amount = 50
+        amount = 15
         for id in VOICE_CHANNEL_IDS:
             channel = bot.get_channel(id)
             members = channel.members
             for member in members:
-                points.addPoints(str(member.id), amount)
+                if not member.voice.self_mute:
+                    points.addPoints(str(member.id), amount)
         return None
     
     bot.run(TOKEN)

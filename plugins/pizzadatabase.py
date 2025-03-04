@@ -158,13 +158,17 @@ def updateSlotEntry(slots_id, earnings):
 def isHeistOngoing():
     return currHeistCollection.estimated_document_count() == 0
 
-def initializeHeist(heist_name, potential_loot, success_chance):
+def initializeHeist(heist_name, potential_loot, success_chance, date):
     currHeistCollection.insert_one({
                                       'heist_name': heist_name,
                                       'members': [],
                                       'potential_loot': potential_loot,
                                       'success_chance': success_chance,
+                                      'when_starts': date,
                                       'ongoing': False})
+
+def retrieveCurrentHeist():
+     return currHeistCollection.find_one({})
 
 def addMemberToHeist(member):
     currHeistCollection.update_one({},{"$push": {"members": member}})
@@ -198,7 +202,7 @@ def retrieveHeistMembers():
     return currHeistCollection.find_one({}, {"members": 1, "_id": 0})['members']
 
 def retrieveHeistInfo():
-    return currHeistCollection.find_one({}, {"heist_name": 1, "members": 1, "_id": 0})
+    return currHeistCollection.find_one({}, {"heist_name": 1, "members": 1, "_id": 0, "when_starts": 1})
 
 def isUserArrested(key, value):
     user = userCollection.find_one({key: value},{"arrested": 1})

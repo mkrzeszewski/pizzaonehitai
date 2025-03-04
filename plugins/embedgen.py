@@ -326,12 +326,12 @@ def generateUnknownUser(discord_id):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateHeistInvite(level, heist_name, message, id = 0):
-    formatted_time = (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S')
+def generateHeistInvite(level, heist_name, message, time, id = 0):
+    
     color = Colour.dark_orange()
     if level == "hard":
         color = Colour.dark_red()
-    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(formatted_time) + ".", color = color)
+    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(time) + ".", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
@@ -349,7 +349,7 @@ def generateHeistIntro(level, heist_name, message, id = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "", value = "Trwaja przygotowania do napadu! Za jakis czas dowiecie sie, jakie role zostaly Wam przydzielone!", inline = False)
+    embed.add_field(name = "", value = "Trwaja przygotowania do napadu! Za jakis czas dowiecie sie, jak sprawdziliscie sie w swoich rolach!", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
@@ -376,17 +376,20 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateHeistInfo(heist_name, members):
+def generateHeistInfo(heist_name, members, time):
     color = Colour.dark_orange()
     embed = Embed(title="Obecnie zbieramy ekipe na :", description=heist_name, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for user in members:
-        description += "(*)" + user[0] + "\n"
+        description += "* " + user[0] + "\n"
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
+    if description != "":
+        embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
+    else:
+        embed.add_field(name = "Obecnie nie ma chetnych na ten napad. Mozesz byc pierwszy!", value=description, inline = False)
 
-    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
+    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Czas na dolaczenie do: " + str(time) + ".", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
   
@@ -401,7 +404,7 @@ def generatePrisonRelease(users):
     color = Colour.dark_orange()
     description = ""
     for user in users:
-        description += "(*)" + user['name'] + "\n"
+        description += "* " + user['name'] + "\n"
     embed = Embed(title="Czlonkowie Pizza One Hit opuszczaja wiezienie!", description=description, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
@@ -417,7 +420,7 @@ def generateUserArrestedInfo(user):
     pointsInfo = "Obecnie posiadasz "
     if user:
         pointsInfo += str(user['points']) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
-    embed.add_field(name = "Mozesz sprobowac sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
+    embed.add_field(name = "Mozesz sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
@@ -434,7 +437,7 @@ def generateArrestedUsersInfo(users):
     color = Colour.dark_gray()
     description = ""
     for user in users:
-        description += "(*)" + user['name'] + "\n"
+        description += "* " + user['name'] + "\n"
     embed = Embed(title="Oto obecni zaaresztowani zloczyncy:", description=description, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
