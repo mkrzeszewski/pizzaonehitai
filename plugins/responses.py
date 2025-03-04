@@ -327,15 +327,15 @@ def handleResponse(userMessage, author) -> str:
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) == 300:
             cost = int(int(user['points']) * -1)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         elif int(user['points']) > 300 and int(user['points']) < 600:
             cost = int((int(user['points'] + 300)) * -0.5)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         elif int(user['points']) > 600:
             cost = int(int(user['points']) * -1)
-            points.addPoints(cost)
+            points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
         else:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
