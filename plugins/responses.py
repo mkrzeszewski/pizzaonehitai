@@ -295,7 +295,6 @@ def getWeather():
 #this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
 def getBirthdayStuff(user):
     returnEmbed = None
-    print("[ERROR] Error przy wysylaniu info o urodzinach")
     returnText = ""
     if user:
         facts = []
