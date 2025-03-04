@@ -85,7 +85,7 @@ def runDiscordBot():
     async def generateHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
-        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name)))
+        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name), db.retrieveHeistInfo()['when_starts']))
 
         #3.5hours
         await asyncio.sleep(12600)

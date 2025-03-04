@@ -2,7 +2,7 @@ import random
 import plugins.ai as ai
 import plugins.pizzadatabase as db
 import plugins.points as points
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 random.seed(datetime.now().timestamp())
@@ -24,7 +24,7 @@ def generateHeist():
         initial_chance = random.randint(10,30)
         level = "hard"
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
-    db.initializeHeist(heist_name, initial_loot, initial_chance)
+    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S'))
     return level, heist_name, initial_loot, initial_chance
 
 def generateHeistIntro(heist_name):

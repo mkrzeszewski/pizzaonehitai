@@ -290,12 +290,12 @@ def generateUnknownUser(discord_id):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateHeistInvite(level, heist_name, message, id = 0):
-    formatted_time = (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S')
+def generateHeistInvite(level, heist_name, message, time, id = 0):
+    
     color = Colour.dark_orange()
     if level == "hard":
         color = Colour.dark_red()
-    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(formatted_time) + ".", color = color)
+    embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(time) + ".", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
 
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
@@ -340,7 +340,7 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateHeistInfo(heist_name, members):
+def generateHeistInfo(heist_name, members, time):
     color = Colour.dark_orange()
     embed = Embed(title="Obecnie zbieramy ekipe na :", description=heist_name, color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
@@ -348,9 +348,12 @@ def generateHeistInfo(heist_name, members):
     for user in members:
         description += "* " + user[0] + "\n"
     embed.set_thumbnail(url = CRIMINAL_ICON_URL)
-    embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
+    if description != "":
+        embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
+    else:
+        embed.add_field(name = "Obecnie nie ma chetnych na ten napad. Mozesz byc pierwszy!", value=description, inline = False)
 
-    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
+    embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Czas na dolaczenie do: " + str(time) + ".", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
