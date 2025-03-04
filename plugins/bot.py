@@ -254,7 +254,8 @@ def runDiscordBot():
             channel = bot.get_channel(id)
             members = channel.members
             for member in members:
-                points.addPoints(str(member.id), amount)
+                if not member.voice.self_mute:
+                    points.addPoints(str(member.id), amount)
         return None
     
     bot.run(TOKEN)
