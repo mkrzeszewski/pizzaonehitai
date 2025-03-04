@@ -249,7 +249,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def checkChannelActivityAndAwardPoints():
-        amount = 50
+        amount = 15
         for id in VOICE_CHANNEL_IDS:
             channel = bot.get_channel(id)
             members = channel.members
