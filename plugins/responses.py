@@ -391,7 +391,7 @@ def handleResponse(userMessage, author) -> str:
                         if user:
                             curr = int(user['points'])
                             amount = int(str(commands[1]))
-                            if curr >= amount and amount > 0:
+                            if curr >= amount and amount > 200:
                                 if (db.isUserPartOfCurrentHeist(user['name'])):
                                     returnText = "Jestes juz czlonkiem aktualnego napadu!"
                                 else:
@@ -399,7 +399,7 @@ def handleResponse(userMessage, author) -> str:
                                     points.addPoints(str(author), -1 * amount)
                                     returnText = "Pomyslnie dolaczyles do napadu!"
                             else:
-                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
                     else:
                         returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
                 else:
