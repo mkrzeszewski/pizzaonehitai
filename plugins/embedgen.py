@@ -381,7 +381,7 @@ def generateUserArrestedInfo(user):
     pointsInfo = "Obecnie posiadasz "
     if user:
         pointsInfo += str(user['points']) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
-    embed.add_field(name = "Mozesz sprobowac sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
+    embed.add_field(name = "Mozesz sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
