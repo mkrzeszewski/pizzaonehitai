@@ -23,7 +23,6 @@ def generateHeist():
         initial_loot = random.randint(30000,100000)
         initial_chance = random.randint(10,30)
         level = "hard"
-    
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
     db.initializeHeist(heist_name, initial_loot, initial_chance)
     return level, heist_name, initial_loot, initial_chance
