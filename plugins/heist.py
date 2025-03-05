@@ -12,7 +12,7 @@ medium_target_list = ["KFC", "McDonalds", "Pizzerie \"IT&AM\"", "Bank Spermy", "
 hard_target_list = ["Platinum Casino w Bulgarii", "Bank Narodowy", "Lotnisko Chopina w Warszawie", "Bialy Dom w Waszyngtonie", "Siedzibe El Chapo w Meksyku", "Baze Klientow Orange Polska", "Posesje na ulicy Smolika"]
 circumstances = ["", "", "", "", "", " w bialy dzien", " pod oslona nocy", " w samo poludnie", " w czarny piatek", " - Walentynkowy Rabunek", " z udzialem tresowanej papugi", " z uzyciem gumowych kurczakow", " z uzyciem pistoletow na wode", " z uzyciem konfetti", " w strojach mikolajow", " - Sylwestrowa Akcja", " przebrani za krasnale ogrodowe", " - Wielkanocna Akcja", " w asyscie Golebia", " w calkowitej ciszy", " w rytmie walca wiedenskiego", " przebrani za postacie z bajek"]
 
-#returns level ["hard", "medium"] and heist name
+#inserts DB
 def generateHeist():
     heist_list = medium_target_list
     level = "medium"
@@ -24,8 +24,8 @@ def generateHeist():
         initial_chance = random.randint(10,30)
         level = "hard"
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
-    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S'))
-    return level, heist_name, initial_loot, initial_chance
+    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S'), level)
+    return None
 
 def generateHeistIntro(heist_name):
     return ai.askAI("Wygeneruj zabawny, krotki wstep do napadu o nazwie:" + str(heist_name) + ", zachejaca uczestnikow gry tekstowej do przystapienia do zabawy. Nie informuj jak dolaczyc do napadu - ta czesc zostanie dodana przeze mnie.")
@@ -55,13 +55,12 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             acts = ai.generateHeist(listOfCommands).split("ROZDZIELNIK_ETAP")
             #debug for acts
             print(acts)
-            return acts[0], acts[1], acts[2], acts[-1].strip().lstrip('```json\n').rstrip('```')
+            return True, acts
+            #return acts[0], acts[1], acts[2], acts[-1].strip().lstrip('```json\n').rstrip('```')
         else:
             #return points to player
             points.addPoints(db.retrieveUser('name', members[0][0])['discord_id'], int(members[0][1]))
-            return "Za malo osob wzielo udzial w napadzie.", None, None, None
-    else:
-        return "Nikt nie wzial udzialu w napadzie.", None, None, None
+            return False, "Za malo osob wzielo udzial w napadzie."
 
 def finalizeHeist(json_result):
     db.moveCurrentHeistToHistory(json_result)
