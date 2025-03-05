@@ -43,6 +43,17 @@ async def sendEmbedToChannel(interaction, embed, is_private=False):
     else:
         await interaction.channel.send(embed=embed)
 
+async def triggerHeist(channel):
+    currHeist = db.retrieveHeistInfo()
+    started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['success_chance']))
+    if started:
+        for act in acts[:-1]:
+            await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
+            await asyncio.sleep(300)
+        heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
+    else:
+        await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
+        heist.finalizeHeist(None)
         
 async def sendMessage(message, user_message, is_private):
     try:
@@ -86,21 +97,15 @@ def runDiscordBot():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         if not db.isHeistAvailable():
             heist.generateHeist()
-
-        currHeist = db.retrieveHeistInfo()
-        await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
-
-        #3.5hours
-        waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
-        started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['success_chance']))
-        if started:
-            for act in acts[:-1]:
-                await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
-                await asyncio.sleep(300)
-            heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
+            currHeist = db.retrieveHeistInfo()
+            await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
         else:
-            await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
-            heist.finalizeHeist(None)
+            await channel.send(embed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_started'],currHeist['members']))
+        currHeist = db.retrieveHeistInfo()
+        
+        #starts upon the time in DB
+        waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
+        triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
     async def freePeopleFromPrison():
@@ -197,6 +202,8 @@ def runDiscordBot():
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
+            if userMessage == "!triggerheist" and message.author == 326259887007072257:
+                triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
 
             user_cooldowns[user_id] = time.time()
             await sendMessage(message, userMessage, is_private=False)
