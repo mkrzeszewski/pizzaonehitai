@@ -10,7 +10,7 @@ import plugins.ai as ai
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 PEPE_PRISON_URL = "https://i.pinimg.com/736x/21/5a/95/215a95772a3aa17024df7d010513ee88.jpg"
-PEPE_PUCHAR_URL = "https://cdn.drawception.com/images/panels/2016/10-23/YS2wa2tM4d-5.png"
+PEPE_PUCHAR_URL = "https://static.vecteezy.com/system/resources/thumbnails/027/517/375/small_2x/pixel-art-champoin-golden-cup-icon-png.png"
 PEPE_COIN_URL = "https://s2.coinmarketcap.com/static/img/coins/200x200/24835.png"
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
