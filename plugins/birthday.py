@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import plugins.pizzadatabase as db
 from bs4 import BeautifulSoup
 import random
@@ -18,7 +18,7 @@ def getBirthdayPeople():
     #connect to mongodb database and get proper database
     
     #get todays date - format it accordingly to <MONTH>-<DAY> - 31st of January would be 1-31
-    current_time = datetime.now()
+    current_time = datetime.datetime.now() + datetime.timedelta(hours=1)
 
     users = db.retrieveUsers('birthday', str(current_time.month) + "-" + str(current_time.day))
 
