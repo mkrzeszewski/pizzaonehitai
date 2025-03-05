@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import requests
 import plugins.points as points
 import plugins.pizzadatabase as db
+import plugins.ai as ai
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 PEPE_PRISON_URL = "https://i.pinimg.com/736x/21/5a/95/215a95772a3aa17024df7d010513ee88.jpg"
@@ -65,6 +66,8 @@ BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
 PARTY_FACE_ICON = "https://cdn3.emoji.gg/emojis/72795-b-partying-face.png"
 
 BARTOLO_KEY = environ["BARTOLO_KEY"]
+
+GRATULACJE = ["mlodziezowy i smieszny","jak bandzior","dostojny i wykwintny","niczym 2 letnie dziecko"]
 
 def split_text(text: str, max_length: int = 1000):
     return [text[i:i + max_length] for i in range(0, len(text), max_length)]
@@ -256,7 +259,7 @@ def generateBirthdayEmbed(user, facts, wrozba):
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
-    embed = Embed(title="Gratulacje, " + user['name'] + "!", description="Wygrales dzienne losowanie!", color=Colour.dark_green())
+    embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow w sposob "+random.choice(GRATULACJE)+"."), color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
