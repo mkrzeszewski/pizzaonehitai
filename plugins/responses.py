@@ -25,8 +25,10 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
-transferKeyword = ["transfer", "masz", "tip", "trzymaj"]
-escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata"]
+transferKeyword = ["transfer", "masz", "tip", "trzymaj", "maszbiedaku"]
+escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata", "letmeout"]
+freeKeyword = ["wypusc", "uwolnij", "lethimout"]
+arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -332,7 +334,7 @@ def handleResponse(userMessage, author) -> str:
                 cost = -300
             else:
                 cost = int(int(user['points']) * -0.5)
-                
+
             points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
             db.freeUser('discord_id',user['discord_id'])
@@ -441,7 +443,7 @@ def handleResponse(userMessage, author) -> str:
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
-        elif commands[0] == "setpoints" or commands[0] == "set" or commands[0] == "points":
+        elif commands[0] == "setpoints" or commands[0] == "set":
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
@@ -453,7 +455,7 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] == "arrest":
+        elif commands[0] in arrestKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
                     if str(commands[1]).isdigit():
@@ -471,7 +473,7 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] == "uwolnij":
+        elif commands[0] in freeKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
                     if str(commands[1]).isdigit():
