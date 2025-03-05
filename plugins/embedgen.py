@@ -266,7 +266,7 @@ def generateWinnerEmbed(user, userAvatarURL):
 def generateLoserEmbed(user, userAvatarURL):
     embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Z twojego konta zostalo odebrane 200 ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
+    embed.add_field(name = "Z twojego konta zostalo odebrane 10% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
