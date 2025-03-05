@@ -50,7 +50,7 @@ async def triggerHeist(channel):
     if started:
         for act in acts[:-1]:
             await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
-            await asyncio.sleep(3)
+            await asyncio.sleep(300)
         heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
     else:
         await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
@@ -95,6 +95,7 @@ def runDiscordBot():
 
     @tasks.loop(hours = 4)
     async def manageHeist():
+        global manual_triggered
         manual_triggered = False
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         if not db.isHeistOngoing():
@@ -207,6 +208,7 @@ def runDiscordBot():
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
             if userMessage == "!triggerheist" and int(message.author.id) == 326259887007072257:
+                global manual_triggered
                 manual_triggered = True
                 await triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
                 return
