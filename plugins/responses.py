@@ -640,9 +640,9 @@ def handleResponse(userMessage, author) -> str:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
         
         if message == "heistinfo" or message == "currentheist" or message == "napad":
-            currentHeist = db.retrieveHeistInfo()
-            if currentHeist:
-                returnEmbed = embedgen.generateHeistInfo(currentHeist['heist_name'], currentHeist['members'], currentHeist['when_starts'])
+            currHeist = db.retrieveHeistInfo()
+            if currHeist:
+                returnEmbed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_started'],currHeist['members'])
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
