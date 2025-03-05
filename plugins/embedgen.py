@@ -446,7 +446,7 @@ def generateArrestedUsersInfo(users):
     return embed
 
 def generateRewards(rewards):
-    color = Colour.dark_magenta()
+    color = Colour.dark_green()
     embed = Embed(title="Nagrody na serwerze Pizza One Hit", description="Aby wykupic nagrode, napisz do roLab na PRIV.", color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
