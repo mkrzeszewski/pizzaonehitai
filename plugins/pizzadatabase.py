@@ -174,9 +174,9 @@ def addMemberToHeist(member):
     currHeistCollection.update_one({},{"$push": {"members": member}})
 
 def moveCurrentHeistToHistory(json_result):
-    currHeistCollection.delete_one({})
     if json_result:
         heistCollection.insert_one(json.loads(json_result))
+    currHeistCollection.delete_one({})
     
 def appendHeistMember(name, value):
     new_entry = [name, value]

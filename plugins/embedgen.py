@@ -3,6 +3,9 @@ from discord import Embed, Colour, File
 import time
 from os import environ
 from datetime import datetime, timedelta
+import requests
+import plugins.points as points
+import plugins.pizzadatabase as db
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 PEPE_PRISON_URL = "https://i.pinimg.com/736x/21/5a/95/215a95772a3aa17024df7d010513ee88.jpg"
@@ -60,6 +63,8 @@ BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
                     "Juz tylko rok blizej do smierci!"
                     ]
 PARTY_FACE_ICON = "https://cdn3.emoji.gg/emojis/72795-b-partying-face.png"
+
+BARTOLO_KEY = environ["BARTOLO_KEY"]
 
 def split_text(text: str, max_length: int = 1000):
     return [text[i:i + max_length] for i in range(0, len(text), max_length)]
@@ -266,6 +271,31 @@ def generateLoserEmbed(user, userAvatarURL):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
+def uploadDoBartola(gif_path):
+    try:
+        headers = {
+            "Authorization":BARTOLO_KEY
+        }
+
+        fc = None
+        with open(gif_path, "rb") as f:
+            fc = f.read()
+
+        files = {
+            "file":fc
+        }
+        response = requests.post('https://slots.smnfbb.com/upload', headers=headers, files=files)
+
+        if response.status_code == 200:
+            points.addPoints(db.retrieveUser('name', "Bartolo")['discord_id'], 10) # prowizja 
+            return response.json()["url"]
+        else:
+            points.addPoints(db.retrieveUser('name', "Bartolo")['discord_id'], -1000) # kara
+            return None
+    except Exception as e:
+        return None
+
+
 def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0, user = None):
     description = "Gratulacje, " + user['name'] + "!"
     color = Colour.dark_green()
@@ -276,8 +306,14 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
         infoString = " - przegrales " + str(amount * -1) + " pizzopunktow.."
     embed = Embed(title="Slotsy #" + str(id), description=description, color=color)
 
-    file = File(gif_path, filename = gif_path.split("/")[-1])
-    embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
+    bartolo_url = uploadDoBartola(gif_path)
+
+    if bartolo_url is not None:
+        file = None
+        embed.set_image(url=bartolo_url)
+    else:
+        file = File(gif_path, filename = gif_path.split("/")[-1])
+        embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
 
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Bilans gry:", value= user['name'] + infoString)
@@ -356,7 +392,7 @@ def generateHeistInfo(heist_name, members, time):
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Czas na dolaczenie do: " + str(time) + ".", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
-
+  
 def generateHeistCanceled(heist_name):
     color = Colour.dark_orange()
     embed = Embed(title="Napad zostaje anulowany z powodu braku wystarczajacych uczestnikow! (min 2):", description=heist_name, color = color)

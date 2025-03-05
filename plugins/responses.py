@@ -25,8 +25,10 @@ quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
-transferKeyword = ["transfer", "masz", "tip", "trzymaj"]
-escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata"]
+transferKeyword = ["transfer", "masz", "tip", "trzymaj", "maszbiedaku"]
+escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata", "letmeout"]
+freeKeyword = ["wypusc", "uwolnij", "lethimout"]
+arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -325,21 +327,18 @@ def handleResponse(userMessage, author) -> str:
         return returnEmbed, returnText, returnView, returnFile   
     
     if user['arrested'] and commands[0] in escapeKeyword:
-        if int(user['points']) == 300:
-            cost = int(int(user['points']) * -1)
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-        elif int(user['points']) > 300 and int(user['points']) < 600:
-            cost = int((int(user['points'] + 300)) * -0.5)
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-        elif int(user['points']) > 600:
-            cost = int(int(user['points']) * -1)
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-        else:
+        if int(user['points']) < 300:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
+        else:
+            if int(user['points']) >= 300 and int(user['points']) < 600:
+                cost = -300
+            else:
+                cost = int(int(user['points']) * -0.5)
 
+            points.addPoints(user['discord_id'], cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            db.freeUser('discord_id',user['discord_id'])
+            
         return returnEmbed, returnText, returnView, returnFile
     elif user['arrested']:
         returnEmbed = embedgen.generateUserArrestedInfo(user)
@@ -391,7 +390,7 @@ def handleResponse(userMessage, author) -> str:
                         if user:
                             curr = int(user['points'])
                             amount = int(str(commands[1]))
-                            if curr >= amount and amount > 0:
+                            if curr >= amount and amount >= 200:
                                 if (db.isUserPartOfCurrentHeist(user['name'])):
                                     returnText = "Jestes juz czlonkiem aktualnego napadu!"
                                 else:
@@ -399,7 +398,7 @@ def handleResponse(userMessage, author) -> str:
                                     points.addPoints(str(author), -1 * amount)
                                     returnText = "Pomyslnie dolaczyles do napadu!"
                             else:
-                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
                     else:
                         returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
                 else:
@@ -444,7 +443,7 @@ def handleResponse(userMessage, author) -> str:
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
-        elif commands[0] == "setpoints" or commands[0] == "set" or commands[0] == "points":
+        elif commands[0] == "setpoints" or commands[0] == "set":
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
@@ -456,7 +455,7 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] == "arrest":
+        elif commands[0] in arrestKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
                     if str(commands[1]).isdigit():
@@ -474,7 +473,7 @@ def handleResponse(userMessage, author) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] == "uwolnij":
+        elif commands[0] in freeKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
                     if str(commands[1]).isdigit():
