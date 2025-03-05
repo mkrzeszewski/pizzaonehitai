@@ -92,7 +92,7 @@ def runDiscordBot():
 
         #3.5hours
         waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
-        started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['succes_chance']))
+        started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['success_chance']))
         if started:
             for act in acts[:-1]:
                 await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
