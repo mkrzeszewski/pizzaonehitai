@@ -101,7 +101,7 @@ def runDiscordBot():
             await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
         else:
             currHeist = db.retrieveHeistInfo()
-            await channel.send(embed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_started'],currHeist['members']))
+            await channel.send(embed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_starts'],currHeist['members']))
         currHeist = db.retrieveHeistInfo()
         
         #starts upon the time in DB
