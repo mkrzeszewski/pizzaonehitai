@@ -156,7 +156,7 @@ def updateSlotEntry(slots_id, earnings):
     return None
 
 def isHeistOngoing():
-    return currHeistCollection.estimated_document_count() == 0
+    return currHeistCollection.estimated_document_count() != 0
 
 def initializeHeist(heist_name, potential_loot, success_chance, date, level):
     currHeistCollection.insert_one({
