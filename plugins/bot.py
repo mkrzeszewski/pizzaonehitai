@@ -203,8 +203,9 @@ def runDiscordBot():
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
-            if userMessage == "!triggerheist" and int(message.author) == 326259887007072257:
-                triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
+            if userMessage == "!triggerheist" and int(message.author.id) == 326259887007072257:
+                await triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
+                return
 
             user_cooldowns[user_id] = time.time()
             await sendMessage(message, userMessage, is_private=False)
