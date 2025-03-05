@@ -329,17 +329,19 @@ def handleResponse(userMessage, author) -> str:
             cost = int(int(user['points']) * -1)
             points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            db.freeUser('discord_id',user['discord_id'])
         elif int(user['points']) > 300 and int(user['points']) < 600:
             cost = int((int(user['points'] + 300)) * -0.5)
             points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            db.freeUser('discord_id',user['discord_id'])
         elif int(user['points']) > 600:
             cost = int(int(user['points']) * -1)
             points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            db.freeUser('discord_id',user['discord_id'])
         else:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
-
         return returnEmbed, returnText, returnView, returnFile
     elif user['arrested']:
         returnEmbed = embedgen.generateUserArrestedInfo(user)
@@ -391,7 +393,7 @@ def handleResponse(userMessage, author) -> str:
                         if user:
                             curr = int(user['points'])
                             amount = int(str(commands[1]))
-                            if curr >= amount and amount > 200:
+                            if curr >= amount and amount >= 200:
                                 if (db.isUserPartOfCurrentHeist(user['name'])):
                                     returnText = "Jestes juz czlonkiem aktualnego napadu!"
                                 else:
