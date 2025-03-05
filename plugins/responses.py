@@ -325,23 +325,18 @@ def handleResponse(userMessage, author) -> str:
         return returnEmbed, returnText, returnView, returnFile   
     
     if user['arrested'] and commands[0] in escapeKeyword:
-        if int(user['points']) == 300:
-            cost = int(int(user['points']) * -1)
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-            db.freeUser('discord_id',user['discord_id'])
-        elif int(user['points']) > 300 and int(user['points']) < 600:
-            cost = -300
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-            db.freeUser('discord_id',user['discord_id'])
-        elif int(user['points']) > 600:
-            cost = int(int(user['points']) * -0.5)
-            points.addPoints(user['discord_id'], cost)
-            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
-            db.freeUser('discord_id',user['discord_id'])
-        else:
+        if int(user['points']) < 300:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
+        else:
+            if int(user['points']) >= 300 and int(user['points']) < 600:
+                cost = -300
+            else:
+                cost = int(int(user['points']) * -0.5)
+                
+            points.addPoints(user['discord_id'], cost)
+            returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
+            db.freeUser('discord_id',user['discord_id'])
+            
         return returnEmbed, returnText, returnView, returnFile
     elif user['arrested']:
         returnEmbed = embedgen.generateUserArrestedInfo(user)
