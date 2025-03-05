@@ -10,6 +10,8 @@ import plugins.ai as ai
 
 CRIMINAL_ICON_URL = "https://static.wikia.nocookie.net/villainsfanon/images/2/2f/Evil_Pepe.jpg"
 PEPE_PRISON_URL = "https://i.pinimg.com/736x/21/5a/95/215a95772a3aa17024df7d010513ee88.jpg"
+PEPE_PUCHAR_URL = "https://cdn.drawception.com/images/panels/2016/10-23/YS2wa2tM4d-5.png"
+PEPE_COIN_URL = "https://s2.coinmarketcap.com/static/img/coins/200x200/24835.png"
 POINTS_ICON_URL = "https://i.gifer.com/7cJ2.gif"#"https://static.thenounproject.com/png/3883695-200.png"
 CASINO_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 PEPE_LAWYER_URL = "https://pbs.twimg.com/media/FwAU5HMXsAEIXdI.jpg"
@@ -440,5 +442,29 @@ def generateArrestedUsersInfo(users):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PRISON_URL)
     embed.add_field(name = "", value="Wyslijcie im paczki na swieta..", inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateRewards(rewards):
+    color = Colour.dark_magenta()
+    embed = Embed(title="Nagrody na serwerze Pizza One Hit", description="Aby wykupic nagrode, napisz do roLab na PRIV.", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    description = ""
+    for reward in rewards:
+        description += "* " + reward['text'] + " - " + reward['cost'] + "\n"
+    embed.set_thumbnail(url = PEPE_COIN_URL)
+    embed.add_field(name = "Oto dostepne nagrody:", value=description, inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateAchievements(achievements):
+    color = Colour.gold()
+    embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description="Najwieksi z najwiekszych!", color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    description = ""
+    for achievement in achievements:
+        description += "* " + achievement['achievement'] + " - " + achievement['user'] + " * " + achievement['description'] + "[\n"
+    embed.set_thumbnail(url = PEPE_PUCHAR_URL)
+    embed.add_field(name = "Oto obecne osiagniecia:", value=description, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed

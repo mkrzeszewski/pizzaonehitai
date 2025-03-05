@@ -23,6 +23,7 @@ aiKeyword = ["ai", "chatgpt", "gemini"]
 horoskopKeyword = ["horoskop", "zodiak", "mojznak", "fortuna", "starszapani"]
 quoteKeyword = ["quote", "cytat", "zanotuj", "cytuje"]
 rewardKeyword = ["rewards", "nagrody", "prizes", "pocopunkty", "wydaj", "wymien"]
+achievementKeyword = ["achivements", "achievement", "osiagniecia", "puchary"]
 slotsKeyword = ["slots", "slot", "automaty", "zakrec", "jeszczeraz"]
 heistKeyword = ["joinheist", "dolacz", "wjezdzam" , "jazda"]
 transferKeyword = ["transfer", "masz", "tip", "trzymaj", "maszbiedaku"]
@@ -604,8 +605,11 @@ def handleResponse(userMessage, author) -> str:
         if message == 'zacopunkty':
             returnText =  "Punkty mozna dostac za udzial w eventach, przebywaniu na voice chat, przy pomocy hazardu lub na widzimisie glownego admina."
 
-        if message == 'pocopunkty':
-            returnText =  "Punkty mozna wymienic u prowadzacego na wiele nagrod! Zapytaj prowadzacego na PRIV <:PepoG:837735016481030144>"
+        if message in rewardKeyword:
+            returnEmbed = embedgen.generateRewards(db.retrieveRewards())
+
+        if message in achievementKeyword:
+            returnEmbed = embedgen.generateAchievements(db.retrieveAchievements())
 
         if message == 'resetai':
             returnText = securityResponse

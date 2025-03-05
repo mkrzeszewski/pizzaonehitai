@@ -19,6 +19,8 @@ aiInstructionCollection = db['discord_bot_instructions']
 slotsCollection = db['slots']
 heistCollection = db['heist_history']
 currHeistCollection = db['current_heist']
+rewardCollection = db['rewards']
+achievementCollection = db['achievements']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -222,3 +224,9 @@ def arrestUser(key, value):
 
 def freeUser(key, value):
     return userCollection.update_one({key: value},{"$set": {"arrested": False}}).matched_count
+
+def retrieveRewards():
+    return rewardCollection.find({})
+
+def retrieveAchievements():
+    return achievementCollection({})
