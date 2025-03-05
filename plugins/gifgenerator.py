@@ -3,10 +3,6 @@ import numpy as np
 import random
 from datetime import datetime
 import math
-import imageio
-import time
-import cv2
-from concurrent.futures import ThreadPoolExecutor
 
 SLOT_IMAGES = ["assets/img/pizza.png", "assets/img/skull.png", "assets/img/image1.png", "assets/img/image2.png", "assets/img/image3.png", "assets/img/image4.png", "assets/img/image5.png"]
 
@@ -156,132 +152,66 @@ def generate_spinning_wheel_with_pointer(filename="assets/gif/ruleta.gif"):
             return "Red"
         
 def create_slot_machine_gif(output_path, frames=60, step=5, size=(180, 180)):
-    t_total = time.time()
+    images = {img: Image.open(img).convert("RGBA").resize((size[0] // 3, size[1] // 3)) for img in SLOT_IMAGES}
+    img_width, img_height = next(iter(images.values())).size
+    reel_width = img_width
+    reel_height = img_height * 3  # 3 images per reel
     
-    # 1. Preprocess images with OpenCV
-    t1 = time.time()
-    slot_size = (size[0] // 3, size[1] // 3)
-    images = {}
-    for path in SLOT_IMAGES:
-        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-        img = cv2.resize(img, slot_size)
-        if img.shape[2] == 3:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-        images[path] = img
-    print(f"Image loading: {time.time()-t1:.3f}s")
-
-    # 2. Precompute reel sequences
-    t1 = time.time()
-    img_h = slot_size[1]
+    # Randomize images for each reel
     reels = [random.sample(SLOT_IMAGES, len(SLOT_IMAGES)) for _ in range(3)]
+    
+    # Create blank slot machine frame with transparency support
+    slot_machine = Image.new("RGBA", size, (0, 0, 0, 0))
+    
+    # Initialize positions for each reel with fractional offsets for smooth motion
     reel_offsets = [random.uniform(0, len(SLOT_IMAGES)) for _ in range(3)]
-    stop_frames = [frames // 3 * (i + 1) for i in range(3)]
-
-    # 3. Create base frame
-    base_frame = np.zeros((size[1], size[0], 4), dtype=np.uint8)
-    
-    # 4. Precompute coordinates
-    reel_y = (size[1] - 3*img_h) // 2
-    positions = [(i*slot_size[0], reel_y) for i in range(3)]
-    middle_rect = [(0, size[1]//3), (size[0], 2*size[1]//3)]
-
-    # 5. Main animation loop
+    stop_frames = [frames // 3 * (i + 1) for i in range(3)]  # Staggered stopping for each reel
     frames_list = []
-    final_result = [None]*3
-    
-    for frame_idx in range(frames + 60):
-        current_frame = base_frame.copy()
+    final_result = [None] * 3  # Store final stopped image names
+    frame = slot_machine.copy()
+    for frame_index in range(frames + 60):
         
-        # Compose reels
-        for i in range(3):
-            # Calculate vertical offset
-            offset = reel_offsets[i] % 1 * img_h
-            base_idx = int(reel_offsets[i]) % len(reels[i])
+        frame = slot_machine.copy()
+        for i in range(3):  # 3 reels
+            reel_img = Image.new("RGBA", (reel_width, reel_height), (0, 0, 0, 0))
+            offset = reel_offsets[i] % 1 * img_height  # Get fractional offset for smooth movement
+            base_index = int(reel_offsets[i]) % len(reels[i])
             
-            # Composite 4 images with alpha blending
-            reel_buffer = np.zeros((3*img_h, slot_size[0], 4), dtype=np.uint8)
-            for j in range(4):
-                img_idx = (base_idx + j) % len(reels[i])
-                alpha = images[reels[i][img_idx]][:, :, 3:].astype(float)/255.0
-                y_pos = j*img_h - int(offset)
+            for j in range(4):  # Use 4 images to smoothly transition
+                img_index = (base_index + j) % len(reels[i])
+                img = images[reels[i][img_index]]
+                reel_img.paste(img, (0, j * img_height - int(offset)), img)
+            frame.paste(reel_img, (i * reel_width, (size[1] - reel_height) // 2), reel_img)
                 
-                if y_pos + img_h <= 0 or y_pos >= 3*img_h:
-                    continue
-                
-                # Alpha blending
-                y_start = max(y_pos, 0)
-                y_end = min(y_pos + img_h, 3*img_h)
-                buffer_slice = reel_buffer[y_start:y_end]
-                img_slice = images[reels[i][img_idx]][y_start-y_pos:y_end-y_pos]
-                
-                buffer_slice[:, :, :3] = buffer_slice[:, :, :3]*(1 - alpha[y_start-y_pos:y_end-y_pos]) + \
-                                       img_slice[:, :, :3]*alpha[y_start-y_pos:y_end-y_pos]
-                buffer_slice[:, :, 3] = np.maximum(buffer_slice[:, :, 3], img_slice[:, :, 3])
-
-            # Composite reel to frame
-            x, y = positions[i]
-            frame_slice = current_frame[y:y+3*img_h, x:x+slot_size[0]]
-            alpha = reel_buffer[:, :, 3:].astype(float)/255.0
-            frame_slice[:, :, :3] = frame_slice[:, :, :3]*(1 - alpha) + reel_buffer[:, :, :3]*alpha
-            frame_slice[:, :, 3] = np.maximum(frame_slice[:, :, 3], reel_buffer[:, :, 3])
-
-        # Draw middle rectangle
-        cv2.rectangle(current_frame, 
-                     (0, middle_rect[0][1]), 
-                     (size[0], middle_rect[1][1]), 
-                     color=(200, 200, 200, 255), 
-                     thickness=5)
-
-        # Update reel positions
+        
+        # Draw horizontal red line in the middle
+        draw = ImageDraw.Draw(frame)
+        draw.rectangle([(0, int(size[1] / 3 )), (size[0], int(size[1] / 3 * 2 ))], outline=(200,200,200), fill = None, width = 5)
+        #draw.line([(0, size[1] // 2), (size[0], size[1] // 2)], fill="red", width=5)
+        
+        
+        # Move each reel down smoothly, stopping progressively
         for i in range(3):
-            if frame_idx <= stop_frames[i]:
-                reel_offsets[i] += 0.2
+            if frame_index <= stop_frames[i]:
+                reel_offsets[i] += 0.2  # Slower smooth motion
             else:
                 reel_offsets[i] = round(reel_offsets[i])
-
-        # Final result detection
-        if frame_idx == frames + 30:
+        
+        if frame_index == frames + 30:
             for i in range(3):
                 final_result[i] = reels[i][(int(reel_offsets[i]) + 1) % len(reels[i])]
 
-        # Convert to RGB and store
-        frames_list.append(cv2.cvtColor(current_frame, cv2.COLOR_BGRA2RGB))
+        
+        frames_list.append(frame.copy())
 
-    # Add final frames
-    last_frame = frames_list[-1]
-    frames_list.extend([last_frame]*10)
+    for _ in range(10):  # 10 extra frames for 1 second at 100ms per frame
+        frames_list.append(frame.copy())
 
-    # 6. Optimized encoding
-    def optimize_frame(frame):
-        img = Image.fromarray(frame)
-        # First convert to palette mode with adaptive colors
-        img = img.convert('P', palette=Image.ADAPTIVE, colors=128)
-        # Then quantize to optimize the palette
-        return img.quantize(method=Image.FASTOCTREE)
-
-    t1 = time.time()
-    
-    # Convert all frames in parallel
-    with ThreadPoolExecutor() as executor:
-        optimized_frames = list(executor.map(optimize_frame, frames_list))
-
-    # Save with optimized settings
-    optimized_frames[0].save(
-        output_path,
-        save_all=True,
-        append_images=optimized_frames[1:],
-        duration=30,
-        loop=0,
-        optimize=True,
-        disposal=2,
-        compress_level=1
-    )
-
-    print(f"Saving time: {time.time()-t1:.3f}s")
-
-    # Result calculation
+    frames_list = [frame.convert("RGB") for frame in frames_list]
+    frames_list[0].save(output_path, save_all=True, append_images=frames_list[1:], duration=30, loop=1, transparency=0)
     for item in final_result:
         count = final_result.count(item)
-        if count >= 2:
-            return item, count
+        if count == 2 or count == 3:
+            return item, count  # Return the value and its count if it's a duplicate (2 or 3 times)
+    
     return None, 1
