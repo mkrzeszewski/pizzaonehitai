@@ -49,8 +49,8 @@ async def triggerHeist(channel):
     started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['success_chance']))
     if started:
         for act in acts[:-1]:
-            await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
             await asyncio.sleep(300)
+            await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act)) 
         heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
     else:
         await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
