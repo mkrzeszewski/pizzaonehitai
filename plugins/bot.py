@@ -82,23 +82,24 @@ def runDiscordBot():
         await asyncio.sleep((target_datetime - now).total_seconds())
 
     @tasks.loop(hours = 4)
-    async def generateHeist():
+    async def manageHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
-        level, heist_name, initial_loot, initial_chance  = heist.generateHeist()
-        await channel.send(embed = embedgen.generateHeistInvite(level, heist_name, heist.generateHeistIntro(heist_name), db.retrieveHeistInfo()['when_starts']))
+        if not db.isHeistAvailable():
+            heist.generateHeist()
+
+        currHeist = db.retrieveHeistInfo()
+        await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
 
         #3.5hours
-        await asyncio.sleep(12600)
-        intro, middle, final, score_json = heist.heistSimulation(heist_name, initial_loot, initial_chance)
-        if middle:
-            await channel.send(embed = embedgen.generateHeistIntro(level, heist_name, intro))
-            await asyncio.sleep(300)
-            await channel.send(embed = embedgen.generateHeistBody(level, heist_name, middle))
-            await asyncio.sleep(300)
-            await channel.send(embed = embedgen.generateHeistEnding(level, heist_name, final))
-            heist.finalizeHeist(score_json)
+        waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
+        started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['succes_chance']))
+        if started:
+            for act in acts[:-1]:
+                await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
+                await asyncio.sleep(300)
+            heist.finalizeHeist(acts[-1])
         else:
-            await channel.send(embed = embedgen.generateHeistCanceled(heist_name))
+            await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
             heist.finalizeHeist(None)
 
     @tasks.loop(hours = 24.0)
@@ -168,8 +169,8 @@ def runDiscordBot():
             if not freePeopleFromPrison.is_running():
                 freePeopleFromPrison.start()
 
-            if not generateHeist.is_running():
-                generateHeist.start()
+            if not manageHeist.is_running():
+                manageHeist.start()
 
             if not generateWinnerAndLoser.is_running():
                 generateWinnerAndLoser.start() 
