@@ -106,7 +106,7 @@ def runDiscordBot():
         
         #starts upon the time in DB
         waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
-        triggerHeist(channel)
+        await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
     async def freePeopleFromPrison():
