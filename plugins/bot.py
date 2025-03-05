@@ -95,8 +95,6 @@ def runDiscordBot():
 
     @tasks.loop(hours = 4)
     async def manageHeist():
-        global manual_triggered
-        manual_triggered = False
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         if not db.isHeistOngoing():
             heist.generateHeist()
@@ -109,8 +107,7 @@ def runDiscordBot():
         
         #starts upon the time in DB
         await waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
-        if not manual_triggered:
-            await triggerHeist(channel)
+        await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
     async def freePeopleFromPrison():
@@ -207,10 +204,14 @@ def runDiscordBot():
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
+                
+                
             if userMessage == "!triggerheist" and int(message.author.id) == 326259887007072257:
-                global manual_triggered
-                manual_triggered = True
-                await triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
+                if manageHeist.is_running():
+                    manageHeist.stop()
+                    await triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
+                    await asyncio.sleep(300)
+                    manageHeist.start()
                 return
 
             user_cooldowns[user_id] = time.time()
