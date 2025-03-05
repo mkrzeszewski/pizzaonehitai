@@ -466,7 +466,7 @@ def generateAchievements(achievements):
         who = achievement['user']
         if who == "":
             who = "[TU MOZESZ BYC TY!]"
-        description += "* " + str(achievement['achievement']) + " - " + str(achievement['user']) + "\n" + str(achievement['description']) + "\n"
+        description += "* " + str(achievement['achievement']) + " - " + str(who) + "\n" + str(achievement['description']) + "\n\n"
     embed.set_thumbnail(url = PEPE_PUCHAR_URL)
     embed.add_field(name = "Oto obecne osiagniecia:", value=description, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
