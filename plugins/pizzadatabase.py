@@ -229,4 +229,4 @@ def retrieveRewards():
     return rewardCollection.find({})
 
 def retrieveAchievements():
-    return achievementCollection({})
+    return achievementCollection.find({})
