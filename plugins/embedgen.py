@@ -451,7 +451,7 @@ def generateRewards(rewards):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for reward in rewards:
-        description += "* " + reward['text'] + " - " + reward['cost'] + "\n"
+        description += "* " + str(reward['text']) + " - " + str(reward['cost']) + "\n"
     embed.set_thumbnail(url = PEPE_COIN_URL)
     embed.add_field(name = "Oto dostepne nagrody:", value=description, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -463,7 +463,7 @@ def generateAchievements(achievements):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for achievement in achievements:
-        description += "* " + achievement['achievement'] + " - " + achievement['user'] + " * " + achievement['description'] + "[\n"
+        description += "* " + str(achievement['achievement']) + " - " + str(achievement['user']) + " * " + str(achievement['description']) + "[\n"
     embed.set_thumbnail(url = PEPE_PUCHAR_URL)
     embed.add_field(name = "Oto obecne osiagniecia:", value=description, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
