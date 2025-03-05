@@ -309,14 +309,8 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
         infoString = " - przegrales " + str(amount * -1) + " pizzopunktow.."
     embed = Embed(title="Slotsy #" + str(id), description=description, color=color)
 
-    bartolo_url = uploadDoBartola(gif_path)
-
-    if bartolo_url is not None:
-        file = None
-        embed.set_image(url=bartolo_url)
-    else:
-        file = File(gif_path, filename = gif_path.split("/")[-1])
-        embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
+    file = File(gif_path, filename = gif_path.split("/")[-1])
+    embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
 
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Bilans gry:", value= user['name'] + infoString)
