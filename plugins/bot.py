@@ -105,7 +105,7 @@ def runDiscordBot():
         currHeist = db.retrieveHeistInfo()
         
         #starts upon the time in DB
-        waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
+        await waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
         await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
