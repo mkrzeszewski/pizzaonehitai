@@ -336,7 +336,7 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
             db.freeUser('discord_id',user['discord_id'])
         elif int(user['points']) > 600:
-            cost = int(int(user['points']) * -1)
+            cost = int(int(user['points']) * -0.5)
             points.addPoints(user['discord_id'], cost)
             returnEmbed = embedgen.generateFreedUser(user, int(cost * -1))
             db.freeUser('discord_id',user['discord_id'])
