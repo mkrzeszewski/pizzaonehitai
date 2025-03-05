@@ -14,7 +14,7 @@ import plugins.heist as heist
 import plugins.pizzadatabase as db
 
 user_cooldowns = {}
-
+manual_triggered = False
 VOICE_CHANNEL_IDS = [
     1166761619351687258, #TFT ENJOYERS
     837732320017645582, #HOBBISTYCZNI HAZARDZISCI
@@ -26,6 +26,7 @@ VOICE_CHANNEL_IDS = [
 
 #1032698616910983168 - league of debils
 #1172911430601822238 - gruby-test
+
 
 GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
@@ -49,7 +50,7 @@ async def triggerHeist(channel):
     if started:
         for act in acts[:-1]:
             await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
-            await asyncio.sleep(300)
+            await asyncio.sleep(3)
         heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
     else:
         await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
@@ -94,8 +95,9 @@ def runDiscordBot():
 
     @tasks.loop(hours = 4)
     async def manageHeist():
+        manual_triggered = False
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
-        if not db.isHeistAvailable():
+        if not db.isHeistOngoing():
             heist.generateHeist()
             currHeist = db.retrieveHeistInfo()
             await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
@@ -106,7 +108,8 @@ def runDiscordBot():
         
         #starts upon the time in DB
         await waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
-        await triggerHeist(channel)
+        if not manual_triggered:
+            await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
     async def freePeopleFromPrison():
@@ -204,6 +207,7 @@ def runDiscordBot():
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
             if userMessage == "!triggerheist" and int(message.author.id) == 326259887007072257:
+                manual_triggered = True
                 await triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
                 return
 
