@@ -13,7 +13,7 @@
             "text": "Symulacja dzieli sie na 3 etapy. Nie generuj informacji, o ktorym etapie mowa w danym etapie."
         },
         {
-            "text": "Etap 1 - Wygeneruj krotki opis napadu bazujac na jego nazwie. Przypisz role do kazdego czlonka napadu (wygeneruj liste wraz z odpowiednia emotikona) oraz wygeneruj krotki dialog pomiedzy uczestnikami, imitujacy fatalne filmy o napadach z lat 90 - postaraj sie, aby bylo komiczne. Dialog zatytuluj \"Intro\" Dodaj rowniez wzmianke, o bazowej szansie na powodzenie napadu."
+            "text": "Etap 1 - Wygeneruj krotki opis napadu bazujac na jego nazwie. Przypisz role do kazdego czlonka napadu (wygeneruj liste wraz z odpowiednia emotikona) oraz wygeneruj krotki dialog pomiedzy uczestnikami, imitujacy fatalne filmy o napadach z lat 90 - postaraj sie, aby bylo komiczne. Dodaj wzmianke, o bazowej szansie na powodzenie napadu."
         },
         {
             "text": "Etap 2 - przebieg napadu. Symulujemy, sukces lub porazke kazdego z uczestnikow napadu w jego roli. W zaleznosci od tego zdarzenia - modyfikujemy szanse powodzenia napadu od -5% za totalna porazke, do +5% za sukces. W przypadku porazki - istnieje szansa na zostanie aresztowanym (nie informuj o tym fakcie tutaj, lecz w nastepnym etapie) - wowczas, nawet jezeli napad sie powiedzie - ten gracz nie bierze udzialu w podziale lupu. Wygeneruj ogolny przebieg oraz jak powiodlo sie kazdemu z uczestnikow."
