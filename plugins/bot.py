@@ -12,7 +12,7 @@ import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
-
+import plugins.ai as ai
 user_cooldowns = {}
 
 VOICE_CHANNEL_IDS = [
