@@ -97,7 +97,7 @@ def runDiscordBot():
             for act in acts[:-1]:
                 await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act))
                 await asyncio.sleep(300)
-            heist.finalizeHeist(acts[-1])
+            heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
         else:
             await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
             heist.finalizeHeist(None)
