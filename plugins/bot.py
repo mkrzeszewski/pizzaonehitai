@@ -12,7 +12,7 @@ import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
-import plugins.ai as ai
+
 user_cooldowns = {}
 
 VOICE_CHANNEL_IDS = [
@@ -100,6 +100,7 @@ def runDiscordBot():
             currHeist = db.retrieveHeistInfo()
             await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
         else:
+            currHeist = db.retrieveHeistInfo()
             await channel.send(embed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_started'],currHeist['members']))
         currHeist = db.retrieveHeistInfo()
         
@@ -202,7 +203,7 @@ def runDiscordBot():
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
-            if userMessage == "!triggerheist" and message.author == 326259887007072257:
+            if userMessage == "!triggerheist" and int(message.author) == 326259887007072257:
                 triggerHeist(bot.get_channel(DEFAULT_HEIST_CHANNEL))
 
             user_cooldowns[user_id] = time.time()
