@@ -53,7 +53,9 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
             listOfCommands.append("chance: " + str(finalChance) + "%")
             listOfCommands.append("expected_loot: "+str(finalLoot))
             acts = ai.generateHeist(listOfCommands).split("ROZDZIELNIK_ETAP")
-            return acts[0], acts[1], acts[2], acts[3].strip().lstrip('```json\n').rstrip('```')
+            #debug for acts
+            print(acts)
+            return acts[0], acts[1], acts[2], acts[-1].strip().lstrip('```json\n').rstrip('```')
         else:
             #return points to player
             points.addPoints(db.retrieveUser('name', members[0][0])['discord_id'], int(members[0][1]))
