@@ -24,7 +24,7 @@ def generateHeist():
         initial_chance = random.randint(10,30)
         level = "hard"
     heist_name = "Napad na " + random.choice(heist_list) + random.choice(circumstances)
-    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=4, minutes=30)).strftime('%H:%M:%S'), level)
+    db.initializeHeist(heist_name, initial_loot, initial_chance, (datetime.now() + timedelta(hours=3, minutes=30)).strftime('%H:%M:%S'), level)
     return None
 
 def generateHeistIntro(heist_name):
