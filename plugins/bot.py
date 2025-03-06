@@ -199,7 +199,7 @@ def runDiscordBot():
             cooldown_time = 1
             if user_id in user_cooldowns:
                 elapsed_time = datetime.now() - user_cooldowns[user_id]
-                if elapsed_time < cooldown_time:
+                if elapsed_time < timedelta(seconds=cooldown_time):
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
                     return
