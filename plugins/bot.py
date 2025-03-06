@@ -3,7 +3,6 @@ import plugins.responses as responses
 from discord.ext import tasks
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
-import time
 import os
 import plugins.embedgen as embedgen
 import asyncio
@@ -152,7 +151,7 @@ def runDiscordBot():
                 else:
                     await channel.send(response)
         else:
-            print ("[INFO] " + str(time.strftime('%Y-%m-%d %H:%M', time.gmtime())) + " - Noone has birthday today..")
+            print ("[INFO] " + str(datetime.now().strftime('%Y-%m-%d %H:%M')) + " - Noone has birthday today..")
 
     @sendBirthdayInfo.before_loop
     async def dailyBirthday8AM():
@@ -199,7 +198,7 @@ def runDiscordBot():
             user_id = message.author.id
             cooldown_time = 1
             if user_id in user_cooldowns:
-                elapsed_time = time.time() - user_cooldowns[user_id]
+                elapsed_time = datetime.now() - user_cooldowns[user_id]
                 if elapsed_time < cooldown_time:
                     remaining_time = cooldown_time - elapsed_time
                     await message.channel.send(f"⏳ {message.author.mention}, nie spamuj! Mozesz uzyc bota za {remaining_time:.2f} sekund!")
@@ -214,7 +213,7 @@ def runDiscordBot():
                     manageHeist.start()
                 return
 
-            user_cooldowns[user_id] = time.time()
+            user_cooldowns[user_id] = datetime.now()
             await sendMessage(message, userMessage, is_private=False)
 
     @tasks.loop(minutes = 5.0)
@@ -237,7 +236,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryLeague():
-        currData = str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        currData = str(datetime.now().strftime('%Y-%m-%d %H:%M'))
         playerList = []
         playersFile = open("./sharedpath/riot-players.txt","r")
         playerList = playersFile.read().splitlines()
