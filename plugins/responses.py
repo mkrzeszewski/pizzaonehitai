@@ -417,10 +417,10 @@ def handleResponse(userMessage, author) -> str:
                         if amount > 5000:
                             returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
                         else:
-                            if curr >= amount and amount > 5:
+                            if curr >= amount and amount >= 5:
                                 returnEmbed, returnFile = generateSlots(amount, user)
                             else:
-                                returnText = "Masz za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
+                                returnText = "Za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -440,10 +440,10 @@ def handleResponse(userMessage, author) -> str:
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
-                                returnText = "<:ez:1343529006162772028>Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
+                                returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:ez:1343529006162772028>"
                             else:
                                 curr = curr - amount
-                                returnText = "<:pepecopium:1094185065925333012>Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
+                                returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
                             returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
@@ -606,7 +606,7 @@ def handleResponse(userMessage, author) -> str:
                 if curr >= amount and amount > 0:
                     returnEmbed, returnFile = generateSlots(amount, user)
                 else:
-                    returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                    returnText = "Za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
 
         if message == 'zacopunkty':
             returnText =  "Punkty mozna dostac za udzial w eventach, przebywaniu na voice chat, przy pomocy hazardu lub na widzimisie glownego admina."
