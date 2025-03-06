@@ -60,7 +60,9 @@ def heistSimulation(heist_name, initial_loot, initial_chance):
         else:
             #return points to player
             points.addPoints(db.retrieveUser('name', members[0][0])['discord_id'], int(members[0][1]))
-            return False, "Za malo osob wzielo udzial w napadzie."
+
+    return False, "Za malo osob wzielo udzial w napadzie."  
+        
 
 def finalizeHeist(json_result):
     db.moveCurrentHeistToHistory(json_result)
