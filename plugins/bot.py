@@ -7,7 +7,7 @@ import time
 import os
 import plugins.embedgen as embedgen
 import asyncio
-import datetime
+from datetime import datetime, timedelta, time
 import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
@@ -86,10 +86,10 @@ def runDiscordBot():
             await view.start(channel)
 
     async def waitUntil(target_time):
-        now = datetime.datetime.now() + datetime.timedelta(hours=1)
-        target_datetime = datetime.datetime.combine(now.date(), target_time)
+        now = datetime.now() + timedelta(hours=1)
+        target_datetime = datetime.combine(now.date(), target_time)
         if now > target_datetime:
-            target_datetime += datetime.timedelta(days = 1)
+            target_datetime += timedelta(days = 1)
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
@@ -106,7 +106,7 @@ def runDiscordBot():
         currHeist = db.retrieveHeistInfo()
         
         #starts upon the time in DB
-        await waitUntil(datetime.datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
+        await waitUntil(datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
         await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
@@ -118,7 +118,7 @@ def runDiscordBot():
 
     @freePeopleFromPrison.before_loop
     async def dailyPrisonEscape7AM():
-        await waitUntil(datetime.time(7, 0))
+        await waitUntil(time(7, 0))
 
     @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
@@ -137,7 +137,7 @@ def runDiscordBot():
 
     @generateWinnerAndLoser.before_loop
     async def dailyLottery6PM():
-        await waitUntil(datetime.time(18, 0))
+        await waitUntil(time(18, 0))
 
     @tasks.loop(hours = 24.0)
     async def sendBirthdayInfo():
@@ -156,7 +156,7 @@ def runDiscordBot():
 
     @sendBirthdayInfo.before_loop
     async def dailyBirthday8AM():
-        await waitUntil(datetime.time(8, 0))
+        await waitUntil(time(8, 0))
 
     @bot.event
     async def on_ready():
