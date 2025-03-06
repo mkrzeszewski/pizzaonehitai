@@ -15,6 +15,8 @@ from datetime import datetime
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
+MAX_SLOT_AMOUNT = 5000
+
 securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
@@ -412,10 +414,13 @@ def handleResponse(userMessage, author) -> str:
                     if user:
                         curr = int(user['points'])
                         amount = int(str(commands[1]))
-                        if curr >= amount and amount > 0:
-                            returnEmbed, returnFile = generateSlots(amount, user)
+                        if amount > 5000:
+                            returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
                         else:
-                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "!"
+                            if curr >= amount and amount > 5:
+                                returnEmbed, returnFile = generateSlots(amount, user)
+                            else:
+                                returnText = "Masz za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -430,17 +435,17 @@ def handleResponse(userMessage, author) -> str:
                         curr = int(user['points'])
                         if str(commands[1]) == "all":
                             amount = curr
-                        if curr >= amount and amount >= 25:
+                        if curr >= amount and amount >= int(curr * 0.1):
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
-                                returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
+                                returnText = "<:ez:1343529006162772028>Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
                             else:
                                 curr = curr - amount
-                                returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
+                                returnText = "<:pepecopium:1094185065925333012>Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ")"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
-                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 25!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
