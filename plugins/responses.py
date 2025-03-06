@@ -446,7 +446,7 @@ def handleResponse(userMessage, author) -> str:
                                 returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
                             db.updateUser('discord_id', str(author), 'points', curr)
                         else:
-                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% (lub 25 gdy jestes biedakiem) pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
