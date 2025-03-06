@@ -435,7 +435,8 @@ def handleResponse(userMessage, author) -> str:
                         curr = int(user['points'])
                         if str(commands[1]) == "all":
                             amount = curr
-                        if curr >= amount and amount >= int(curr * 0.1):
+                        min = int(curr * 0.1)
+                        if curr >= amount and amount >= int(curr * 0.1) and amount >= 25:
                             result = random.randint(1,2)
                             if result == 1:
                                 curr = curr + amount
