@@ -28,7 +28,7 @@
             "text": "Kazdy etap rozdzielaj slowem ROZDZIELNIK_ETAP"
         },
         {
-            "text": "Finalnie, po kolejnym rozdzielniku - wygeneruj JSON, z informacjami o napadzie. Jego format jest nastepujacy: heist_name, final_chance, expected_loot, actual_loot, heist_success (true/false), worst_member, members : [ name, role, contribution, loot, arrested (true/false)]"
+            "text": "Finalnie, po kolejnym rozdzielniku RODZIELNIK_ETAP - wygeneruj JSON, z informacjami o napadzie. Jego format jest nastepujacy: heist_name, final_chance, expected_loot, actual_loot, heist_success (true/false), worst_member, members : [ name, role, contribution, loot, arrested (true/false)]"
         }
     ]
 }
