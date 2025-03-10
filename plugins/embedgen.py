@@ -159,9 +159,8 @@ def generateEmbedFromRestaurant(restaurant):
     return embed
 
 def generateEmbedFromHoroscope(text, sign, name):
-    embed = Embed(colour = Colour.purple())
+    embed = Embed(colour = Colour.purple(), title = str(sign).capitalize(), description = text)
     embed.set_author(name = "Horoskop na dzis - dla Ciebie, " + str(name) + "!", icon_url = SIGN_ICON_ARRAY[sign])
-    embed.add_field(name = str(sign).capitalize(), value = text)
     embed.set_footer(text = "source : https://horoskop.wp.pl/horoskop/horoskop-dzienny/")
     return embed
 
