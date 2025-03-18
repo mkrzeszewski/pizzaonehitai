@@ -15,6 +15,20 @@ def getTop(howMany = 5):
         return returnUsers
     return None
 
+def getBottom(howMany = 5):    
+    users = db.retrieveAllUsersRevSorted('points')
+    if users:
+        increment = 1
+        returnUsers = []
+        for user in reversed(users):
+            if increment == howMany + 1:
+                return returnUsers
+            
+            returnUsers.append(user)
+            increment = increment + 1
+        return returnUsers
+    return None
+
 def addPoints(discord_id, amount):
     return modifyPoints('discord_id', discord_id, amount)
 
