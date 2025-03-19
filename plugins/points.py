@@ -16,7 +16,7 @@ def getTop(howMany = 5):
     return None
 
 def getBottom(howMany = 5):    
-    users = db.retrieveAllUsersRevSorted('points')
+    users = list(db.retrieveAllUsersRevSorted('points'))
     if users:
         increment = 1
         returnUsers = []
