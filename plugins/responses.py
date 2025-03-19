@@ -566,6 +566,14 @@ def handleResponse(userMessage, author) -> str:
                     if users:
                         returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
 
+        elif commands[0] == "bottom":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    amount = int(str(commands[1]))
+                    users = points.getBottom(amount)
+                    if users:
+                        returnEmbed = embedgen.generateBottomPointsEmbed(users, amount)
+
         elif commands[0] == "roll":
             if len(commands) == 2:
                 returnText = "Losujemy: 1 - " + commands[1] + " -> " + str(random.randint(1,int(commands[1])))
@@ -648,6 +656,12 @@ def handleResponse(userMessage, author) -> str:
             users = points.getTop(amount)
             if users:
                 returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
+        
+        if message == "bottom5" or message == "bottom":
+            amount = 5
+            users = points.getBottom(amount)
+            if users:
+                returnEmbed = embedgen.generateBottomPointsEmbed(users, amount)
         
         if message == "heistinfo" or message == "currentheist" or message == "napad":
             currHeist = db.retrieveHeistInfo()

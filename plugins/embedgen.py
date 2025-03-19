@@ -193,6 +193,20 @@ def generateTopPointsEmbed(users, amount):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
+def generateBottomPointsEmbed(users, amount):
+    stringList = ""
+    increment = 0
+    for user in users:
+        increment = increment + 1
+        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
+
+    embed = Embed(title = "pizzopunkty na DC Pizza One Hit!", colour = Colour.og_blurple())
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = POINTS_ICON_URL)
+    embed.add_field(name = "__Bottom " + str(amount) + ":__", value = (stringList), inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
 def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
     embed = Embed(title="Ruleta #" + str(id), description="A zwycieza...", color=Colour.darker_grey())
 
