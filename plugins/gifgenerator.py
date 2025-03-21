@@ -3,6 +3,8 @@ import numpy as np
 import random
 from datetime import datetime
 import math
+import subprocess
+import json
 
 SLOT_IMAGES = ["assets/img/pizza.png", "assets/img/skull.png", "assets/img/image1.png", "assets/img/image2.png", "assets/img/image3.png", "assets/img/image4.png", "assets/img/image5.png"]
 
@@ -215,3 +217,9 @@ def create_slot_machine_gif(output_path, frames=60, step=5, size=(180, 180)):
             return item, count  # Return the value and its count if it's a duplicate (2 or 3 times)
     
     return None, 1
+
+def create_slot_machine_gif_go(output_path):
+    result = subprocess.run(['./gifgenerator_go/gifgenerator', output_path], stdout=subprocess.PIPE)
+    result_json = json.loads(result.stdout.decode('utf-8'))
+
+    return result_json["result"], result_json["count"]
