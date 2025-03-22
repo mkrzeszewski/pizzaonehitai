@@ -197,7 +197,7 @@ def generateBottomPointsEmbed(users, amount):
     stringList = ""
     increment = 0
     for user in users:
-        increment = increment + 1
+        increment = len(users) - increment + 1
         stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
 
     embed = Embed(title = "pizzopunkty na DC Pizza One Hit!", colour = Colour.og_blurple())
