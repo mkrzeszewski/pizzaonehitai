@@ -270,7 +270,7 @@ def generateSlots(amount, user):
     points.addPoints(user['discord_id'], earnings)
     id = db.insertSlotsEntry(amount, user['discord_id'])
     output_path = "assets/gif/slot_machine" + str(id) + ".gif"
-    winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
+    winner, count = gif.create_slot_machine_gif_go(output_path = output_path)
     if count > 1:
 
         #remove assets/gif and .png from string
