@@ -196,9 +196,10 @@ def generateTopPointsEmbed(users, amount):
 def generateBottomPointsEmbed(users, amount):
     stringList = ""
     increment = 0
+    allUsersLen = len(list(db.retrieveAllusers()))
     for user in users:
+        stringList = stringList + str(int(allUsersLen - increment)) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
         increment = increment + 1
-        stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
 
     embed = Embed(title = "pizzopunkty na DC Pizza One Hit!", colour = Colour.og_blurple())
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
