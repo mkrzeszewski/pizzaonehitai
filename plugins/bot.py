@@ -7,6 +7,7 @@ import os
 import plugins.embedgen as embedgen
 import asyncio
 from datetime import datetime, timedelta, time
+import plugins.leetify as leetify
 import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
@@ -165,6 +166,9 @@ def runDiscordBot():
         if os.environ["PROD_STATUS"] == "PRODUCTION":
             if not analyzeMatchHistoryTFT.is_running():
                 analyzeMatchHistoryTFT.start() 
+
+            if not analyzeMatchHistoryLeetify.is_running():
+                analyzeMatchHistoryLeetify.start() 
             
             if not sendBirthdayInfo.is_running():
                 sendBirthdayInfo.start() 
@@ -232,6 +236,23 @@ def runDiscordBot():
                     else:
                         date, results, players = tftapi.analyzeMatch(matchData, True)
                         await channel.send(embed=embedgen.generateEmbedFromTFTMatch(results,players,matchData['metadata']['match_id'], date))
+        return 0
+    
+    @tasks.loop(minutes = 5.0)
+    async def analyzeMatchHistoryLeetify():
+        leetify = leetify.Leetify()
+        new_matches = leetify.get_new_matches()
+        if len(new_matches) == 0:
+            print("[INFO] No new Leetify matches")
+        else:
+            for match in new_matches:
+                p1h_mvp = leetify.get_mvp_if_p1h_player(match)
+                if p1h_mvp:
+                    # dodaj pkt p1h_mvp["player_id"] <- steamId
+                    pass
+
+                db.insertLeetifyMatch(match)
+
         return 0
 
     @tasks.loop(minutes = 5.0)

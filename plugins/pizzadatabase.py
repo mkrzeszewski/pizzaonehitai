@@ -12,6 +12,7 @@ db = dbclient['discord']
 userCollection = db['users']
 ruletasCollection = db['ruletas']
 matchesCollection = db['parsed_tft_matches']
+leetifyMatchesCollection = db['parsed_leetify_matches']
 aiCollection = db['ai_history']
 quotesCollection = db['quotes']
 begCollection = db['beg']
@@ -61,6 +62,12 @@ def retrieveTFTMatch(match_id):
 
 def insertTFTMatch(match_id):
     matchesCollection.insert_one({"riotid": match_id})
+
+def retrieveLeetifyMatch(match_id):
+    return leetifyMatchesCollection.find_one({'id': match_id})
+
+def insertLeetifyMatch(match_id):
+    leetifyMatchesCollection.insert_one({"id": match_id})
 
 def retrieveRandomUser():
     return userCollection.aggregate([{"$sample": {"size": 1}}]).next()
