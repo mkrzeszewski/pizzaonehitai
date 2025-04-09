@@ -240,16 +240,15 @@ def runDiscordBot():
     
     @tasks.loop(minutes = 5.0)
     async def analyzeMatchHistoryLeetify():
-        leetify = leetify.Leetify()
-        new_matches = leetify.get_new_matches()
+        leetify_obj = leetify.Leetify()
+        new_matches = leetify_obj.get_new_matches()
         if len(new_matches) == 0:
             print("[INFO] No new Leetify matches")
         else:
             for match in new_matches:
-                p1h_mvp = leetify.get_mvp_if_p1h_player(match)
+                p1h_mvp = leetify_obj.get_mvp_if_p1h_player(match)
                 if p1h_mvp:
-                    # dodaj pkt p1h_mvp["player_id"] <- steamId
-                    pass
+                    points.addPoints(db.retrieveUser('steamid', p1h_mvp)['discord_id'], 1000)
 
                 db.insertLeetifyMatch(match)
 

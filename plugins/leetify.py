@@ -1,8 +1,4 @@
 import requests
-import urllib.request
-import bz2
-import os
-import shutil
 import plugins.pizzadatabase as db
 
 class Leetify:
@@ -22,22 +18,42 @@ class Leetify:
         if r.status_code == 200:
             d = r.json()
             return d["games"]
+        else:
+            print(f"Leetify status code: {r.status_code}")
         return []
     
+    def _get_match_details(self, match_id):
+        r = requests.get(f"https://api.cs-prod.leetify.com/api/games/{str(match_id)}")
+        if r.status_code == 200:
+            return r.json()
+        else:
+            print(f"Leetify status code: {r.status_code}")
+        return None
+
     def get_new_matches(self):
         matches = []
+        counter = 0
         for id in self.p1h_steamids:
-            matches = self._get_player_recent_matches(id)
+            all_matches = self._get_player_recent_matches(id)
             
-            for m in matches:
+            for m in all_matches:
+                if "gameId" not in m:
+                    continue
+                if counter > 10:
+                    break
+                counter += 1
                 if db.retrieveLeetifyMatch(m["gameId"]) is None and \
                     m["gameId"] not in matches:
                     matches.append(m["gameId"])
             
         return matches
 
-    def get_match_mvp(self, match_data):
+    def get_match_mvp(self, match_id):
         mvp = { "player_id": "", "rating": -100 }
+        match_data = self._get_match_details(match_id)
+
+        if match_data is None:
+            return None
 
         for player in match_data["playerStats"]:
             if player["leetifyRating"] > mvp["rating"]:
@@ -48,10 +64,10 @@ class Leetify:
 
         return mvp
     
-    def get_mvp_if_p1h_player(self, match_data):
-        mvp = self.get_match_mvp(match_data)
+    def get_mvp_if_p1h_player(self, match_id):
+        mvp = self.get_match_mvp(match_id)
 
-        if mvp["player_id"] in self.p1h_steamids:
+        if mvp is not None and mvp["player_id"] in self.p1h_steamids:
             return mvp["player_id"]
         
         return None
