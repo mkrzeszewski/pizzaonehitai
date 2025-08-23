@@ -32,16 +32,13 @@ class Leetify:
 
     def get_new_matches(self):
         matches = []
-        counter = 0
         for id in self.p1h_steamids:
             all_matches = self._get_player_recent_matches(id)
             
             for m in all_matches:
                 if "gameId" not in m:
                     continue
-                if counter > 10:
-                    break
-                counter += 1
+
                 if db.retrieveLeetifyMatch(m["gameId"]) is None and \
                     m["gameId"] not in matches:
                     matches.append(m["gameId"])
