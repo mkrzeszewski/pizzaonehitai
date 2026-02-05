@@ -15,12 +15,12 @@ import plugins.pizzadatabase as db
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
-    1166761619351687258, #TFT ENJOYERS
-    837732320017645582, #HOBBISTYCZNI HAZARDZISCI
-    995377960431394969, #ANDROIDOWCY
-    1154849700021796955, #JABLKARZE
-    1342821212023160842, #HOROSKOP
-    1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
+#    1166761619351687258, #TFT ENJOYERS
+#    837732320017645582 #HOBBISTYCZNI HAZARDZISCI
+#    995377960431394969, #ANDROIDOWCY
+#    1154849700021796955, #JABLKARZE
+#    1342821212023160842, #HOROSKOP
+#    1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
 ]
 
 #1032698616910983168 - league of debils
@@ -163,8 +163,8 @@ def runDiscordBot():
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO] " + f'{bot.user} is now running!')
         if os.environ["PROD_STATUS"] == "PRODUCTION":
-            if not analyzeMatchHistoryTFT.is_running():
-                analyzeMatchHistoryTFT.start() 
+            #if not analyzeMatchHistoryTFT.is_running():
+            #    analyzeMatchHistoryTFT.start() 
             
             if not sendBirthdayInfo.is_running():
                 sendBirthdayInfo.start() 
@@ -172,11 +172,11 @@ def runDiscordBot():
             #if not rouletteTask.is_running():
             #    rouletteTask.start() 
 
-            if not freePeopleFromPrison.is_running():
-                freePeopleFromPrison.start()
+            #if not freePeopleFromPrison.is_running():
+            #    freePeopleFromPrison.start()
 
-            if not manageHeist.is_running():
-                manageHeist.start()
+            #if not manageHeist.is_running():
+            #    manageHeist.start()
 
             if not generateWinnerAndLoser.is_running():
                 generateWinnerAndLoser.start() 

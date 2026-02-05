@@ -307,7 +307,7 @@ def getBirthdayStuff(user):
         facts.append(ai.askAI("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
         wrozba = str(ai.askAI("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
-        points.addPoints(str(user['discord_id']), 2000)
+        points.addPoints(str(user['discord_id']), 5000)
     return returnEmbed, returnText
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
@@ -556,7 +556,11 @@ def handleResponse(userMessage, author) -> str:
 
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
-                returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
+                user = db.retrieveUser('discord_id', str(commands[1]))
+                if user:
+                    returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
+                else:
+                    returnText = "nie znaleziona usera o ID = " + str(commands[1])
 
         elif commands[0] == "top":
             if len(commands) == 2:

@@ -63,13 +63,25 @@ BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
                     "Wooohoo!",
                     "Sto lat, sto lat!",
                     "Starosc nie radosc!",
-                    "Juz tylko rok blizej do smierci!"
+                    "Juz tylko rok blizej do smierci!",
+                    "ty stara kurwo"
                     ]
 PARTY_FACE_ICON = "https://cdn3.emoji.gg/emojis/72795-b-partying-face.png"
 
 BARTOLO_KEY = environ["BARTOLO_KEY"]
 
-GRATULACJE = ["mlodziezowy i smieszny","jak bandzior","dostojny i wykwintny","niczym 2 letnie dziecko"]
+GRATULACJE = ["mlodziezowy i smieszny", 
+              "jak bandzior",
+              "dostojny i wykwintny", 
+              "jak Typowy wujek na weselu", 
+              "jak powazny urzednik", 
+              "niczym sredniowieczny herold", 
+              "jak pasywno-agresywno ciocia",
+              "w nieznanym jezyku elfickim",
+              "jak Maklowicz, który wlasnie odkryl, że w kociolku zamiast papryki jest uran",
+              "jak filozof egzystencjalny, który udowadnia, ze te punkty i tak nie istnieja w obliczu pustki",
+              "niczym reklama w radio, ktora krzyczy glosniej niz muzyka",
+              "jak lektor z chlopakow z barakow"]
 
 def split_text(text: str, max_length: int = 1000):
     return [text[i:i + max_length] for i in range(0, len(text), max_length)]
@@ -271,7 +283,7 @@ def generateBirthdayEmbed(user, facts, wrozba):
             body = body + str(fact) + "\n"
     embed.add_field(name = "Ciekawostki: ", value = body, inline = False)
     embed.add_field(name = "Wrozba: ", value = wrozba, inline = False)
-    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 pizzopkt!", icon_url = PARTY_FACE_ICON)
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 5000 pizzopkt!", icon_url = PARTY_FACE_ICON)
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
@@ -283,7 +295,8 @@ def generateWinnerEmbed(user, userAvatarURL):
     return embed
 
 def generateLoserEmbed(user, userAvatarURL):
-    embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
+    #embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
+    embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Poinformuj uzytkownika: \""+ user['name'] + "\" ze przegral w dziennej loterii pizzopunktow (tj zostaly mu pobrane z konta punkty) w sposob "+random.choice(GRATULACJE)+"."), color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Z twojego konta zostalo odebrane 10% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
@@ -473,15 +486,14 @@ def generateRewards(rewards):
 
 def generateAchievements(achievements):
     color = Colour.gold()
-    embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description="Najwieksi z najwiekszych!", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for achievement in achievements:
         who = achievement['user']
         if who == "":
             who = "[TU MOZESZ BYC TY!]"
         description += "* " + str(achievement['achievement']) + " - " + str(who) + "\n" + str(achievement['description']) + "\n\n"
+    embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PUCHAR_URL)
-    embed.add_field(name = "Oto obecne osiagniecia:", value=description, inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed

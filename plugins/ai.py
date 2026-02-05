@@ -12,9 +12,12 @@ initialInstructions = db.retrieveAllAIInstructions()
 instructionString = ""
 for record in initialInstructions:
     instructionString += record['instruction'] + "\n"
-model = genai.GenerativeModel(
-    "models/gemini-2.0-flash", system_instruction = instructionString
-)
+if instructionString.strip():
+    model = genai.GenerativeModel(
+        "models/gemini-2.0-flash", system_instruction = instructionString
+    )
+else:
+    model = genai.GenerativeModel("models/gemini-2.0-flash")
 chat = model.start_chat()
 
 #ai for heist generation in heist.py
