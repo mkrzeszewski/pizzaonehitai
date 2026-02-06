@@ -52,10 +52,10 @@ def generateDaily():
         loser = db.retrieveRandomUser()
 
     #winner gets +10% +200
-    addPoints(winner['discord_id'], int(int(winner['points']) * 0.1) + 200)
+    addPoints(winner['discord_id'], int(int(winner['points']) * 0.15) + 500)
 
     #loser gets -10%
-    addPoints(loser['discord_id'], int(int(loser['points']) * 0.1) * -1)
+    addPoints(loser['discord_id'], int(int(loser['points']) * 0.15) * -1)
     return winner, loser
 
 def transferPoints(source_discord_id, destination_discord_id, amount):
