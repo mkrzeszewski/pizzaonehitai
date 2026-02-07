@@ -63,7 +63,7 @@ def checkNewEvents():
                     db.updateEvent(w['title'], w['teatr'], w)
                     
                     msg = f"Nowe terminy na **{w["title"]}** w {w["teatr"]}:\n"
-                    eventArray.append(w["title"], new_dates)
+                    eventArray.append([w["title"], new_dates])
                     for d in new_dates:
                         msg += f"- {d["text"]}\n"
                     print(msg)
