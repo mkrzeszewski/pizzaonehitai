@@ -240,7 +240,11 @@ def retrieveTask(key, value):
     return tasksCollection.find_one({key: value})
 
 def isTaskEnabled(name):
-    return tasksCollection.find_one({"name": name},{"enabled": 1})
+    task = tasksCollection.find_one({"name": name},{"enabled": 1})
+    if task:
+        return task['enabled']
+    else:
+        return False
 
 def disableTask(name):
     return tasksCollection.update_one({"name": name},{"$set": {"enabled": False}}).matched_count
