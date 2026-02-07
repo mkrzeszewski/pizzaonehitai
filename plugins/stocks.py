@@ -4,7 +4,7 @@ import plugins.ai as ai
 #we do it once per month
 def generateStocks():
     db.removeAllStocks()
-    users = db.retrieveUsers()
+    users = db.retrieveAllUsers()
     userList = []
     for user in users:
         userList.append(user['name'])
