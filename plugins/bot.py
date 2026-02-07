@@ -13,7 +13,7 @@ import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
 
-target_stock_time = datetime.time(hour=10, minute=0)
+target_stock_time = time(hour=10, minute=0)
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
@@ -138,7 +138,7 @@ def runDiscordBot():
     
     @tasks.loop(time=target_stock_time)
     async def generateStocks():
-        if datetime.datetime.now().weekday() == 0: #monday 10 am
+        if datetime.now().weekday() == 0: #monday 10 am
             stocks.generateStocks()
 
 
