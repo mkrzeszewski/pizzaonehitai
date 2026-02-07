@@ -664,8 +664,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 user = db.retrieveUser('discord_id',match.group(1))
                 if user:
                     flexUser = await dcbot.fetch_user(int(user['discord_id']))
-                    bankruptAvatarURL = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
-                    returnEmbed = embedgen.generateUserPortfolioEmbed(user, bankruptAvatarURL)
+                    flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
+                    returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
                 else:
                     returnText = "User " + str(commands[1]) + "not found."
             else:
@@ -820,7 +820,9 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if user:
                 _stock = db.retrieveStock('ceo',user['name'])
                 if _stock:
-                    returnEmbed = embedgen.generateBankrupcy(_stock)
+                    bankruptUser = await dcbot.fetch_user(int(user['discord_id']))
+                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
+                    returnEmbed = embedgen.generateBankrupcy(_stock, bankruptAvatarURL)
             else:
                 returnText = "xx"
 
