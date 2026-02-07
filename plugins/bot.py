@@ -11,21 +11,22 @@ import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
+import plugins.stocks as stocks
 
+target_stock_time = time(hour=10, minute=0)
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
-    1166761619351687258, #TFT ENJOYERS
-    837732320017645582, #HOBBISTYCZNI HAZARDZISCI
-    995377960431394969, #ANDROIDOWCY
-    1154849700021796955, #JABLKARZE
-    1342821212023160842, #HOROSKOP
-    1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
+#    1166761619351687258, #TFT ENJOYERS
+#    837732320017645582 #HOBBISTYCZNI HAZARDZISCI
+#    995377960431394969, #ANDROIDOWCY
+#    1154849700021796955, #JABLKARZE
+#    1342821212023160842, #HOROSKOP
+#    1200083080371765308 #EVENTOWY CHANNEL - 10x points if possible
 ]
 
 #1032698616910983168 - league of debils
 #1172911430601822238 - gruby-test
-
 
 GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
@@ -36,6 +37,11 @@ if os.environ["PROD_STATUS"] == "PRODUCTION":
     DEFAULT_BDAY_CHANNEL = 993905203084529865 #OGOLNY
     GAMBA_CHANNEL_ID = 1343278156265685092
     DEFAULT_HEIST_CHANNEL = 1345732567776890890
+
+TOKEN = os.environ["DC_TOKEN"]
+intents_temp = discord.Intents.default()
+intents_temp.message_content = True
+bot = discord.Client(intents = intents_temp)
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -58,7 +64,7 @@ async def triggerHeist(channel):
 async def sendMessage(message, user_message, is_private):
     try:
         response = ""
-        embed, response, view, file = responses.handleResponse(user_message, message.author.id)
+        embed, response, view, file = await responses.handleResponse(user_message, message.author.id, bot)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
@@ -67,11 +73,6 @@ async def sendMessage(message, user_message, is_private):
         print(e)
 
 def runDiscordBot():
-    TOKEN = os.environ["DC_TOKEN"]
-    intents_temp = discord.Intents.default()
-    intents_temp.message_content = True
-    bot = discord.Client(intents = intents_temp)
-
     @tasks.loop(hours = 1.0)
     async def sendWeather():
         print (responses.getWeather())
@@ -115,10 +116,34 @@ def runDiscordBot():
             channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
             await channel.send(embed = embedgen.generatePrisonRelease(freedUsers))
 
+    #stock section
+    @tasks.loop(hours = 1.0)
+    async def simulateStockTrends():
+        stocks.simulateTrends()
+
+    @tasks.loop(minutes = 10.0)
+    async def updateStockPrices():
+        bankrupts = stocks.updatePrices()
+        if bankrupts:
+            channel = bot.get_channel(GAMBA_CHANNEL_ID)
+            for bankrupt in bankrupts:
+                user = db.retrieveUser('name',bankrupt['ceo'])
+                if user:
+                    bankruptUser = await bot.fetch_user(int(user['discord_id']))
+                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
+                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL))
+    
+    @tasks.loop(time=target_stock_time)
+    async def generateStocks():
+        if datetime.now().weekday() == 0: #monday 10 am
+            stocks.generateStocks()
+
+    #prison
     @freePeopleFromPrison.before_loop
     async def dailyPrisonEscape7AM():
         await waitUntil(time(7, 0))
 
+    #daily winner
     @tasks.loop(hours = 24.0)
     async def generateWinnerAndLoser():
         channel = bot.get_channel(GAMBA_CHANNEL_ID)
@@ -138,6 +163,7 @@ def runDiscordBot():
     async def dailyLottery6PM():
         await waitUntil(time(18, 0))
 
+    #birthday
     @tasks.loop(hours = 24.0)
     async def sendBirthdayInfo():
         birthdayBoys = birthday.getBirthdayPeople()
@@ -157,32 +183,89 @@ def runDiscordBot():
     async def dailyBirthday8AM():
         await waitUntil(time(11, 0))
 
+    @tasks.loop(minutes = 5.0)
+    async def tasksHandling():
+        if db.isTaskEnabled("tft"):
+            if not analyzeMatchHistoryTFT.is_running():
+                analyzeMatchHistoryTFT.start()
+                print("[INFO] TFT match history analysis has been enabled!")
+        else:
+            if analyzeMatchHistoryTFT.is_running():
+                analyzeMatchHistoryTFT.stop()
+                print("[INFO] TFT match history analysis has been disabled..")
+        
+        if db.isTaskEnabled("birthday"):
+            if not sendBirthdayInfo.is_running():
+                sendBirthdayInfo.start()
+                print("[INFO] Birthday handling has been enabled!")
+        else:
+            if sendBirthdayInfo.is_running():
+                sendBirthdayInfo.stop()
+                print("[INFO] Birthday handling has been disabled..")
+
+        if db.isTaskEnabled("heist"):
+            if not freePeopleFromPrison.is_running():
+                freePeopleFromPrison.start()
+            if not manageHeist.is_running():
+                manageHeist.start()
+                print("[INFO] Heist has been enabled!")
+        else:
+            if freePeopleFromPrison.is_running():
+                freePeopleFromPrison.stop()
+
+            if manageHeist.is_running():
+                manageHeist.stop()
+                print("[INFO] Heist has been disabled..")    
+
+        if db.isTaskEnabled("dailywinner"):
+            if not generateWinnerAndLoser.is_running():
+                generateWinnerAndLoser.start()
+                print("[INFO] Daily winner has been enabled!")
+        else:
+            if generateWinnerAndLoser.is_running():
+                generateWinnerAndLoser.stop()
+                print("[INFO] Daily loser has been disabled..")
+
+        if db.isTaskEnabled("channelpoints"):
+            if not checkChannelActivityAndAwardPoints.is_running():
+                checkChannelActivityAndAwardPoints.start()
+                print("[INFO] Channel activity check has been enabled!")
+        else:
+            if checkChannelActivityAndAwardPoints.is_running():
+                checkChannelActivityAndAwardPoints.stop()
+                print("[INFO] Channel activity check has been disabled..")
+
+        if db.isTaskEnabled("stocks"):
+            if not generateStocks.is_running():
+                generateStocks.start()
+
+            if not simulateStockTrends.is_running():
+                simulateStockTrends.start()
+
+            if not updateStockPrices.is_running():
+                updateStockPrices.start()
+                print("[INFO] Stock investment is enabled!")
+        else:
+            if generateStocks.is_running():
+                generateStocks.stop()
+
+            if simulateStockTrends.is_running():
+                simulateStockTrends.stop()
+
+            if updateStockPrices.is_running():
+                updateStockPrices.stop()
+                print("[INFO] Stock investment is disabled..")
+
     @bot.event
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO] " + f'{bot.user} is now running!')
         if os.environ["PROD_STATUS"] == "PRODUCTION":
-            if not analyzeMatchHistoryTFT.is_running():
-                analyzeMatchHistoryTFT.start() 
+            #in this function we'll enable / disable tasks based on what we have in DB
+            if not tasksHandling.is_running():
+                tasksHandling.start()
             
-            if not sendBirthdayInfo.is_running():
-                sendBirthdayInfo.start() 
-
-            #if not rouletteTask.is_running():
-            #    rouletteTask.start() 
-
-            if not freePeopleFromPrison.is_running():
-                freePeopleFromPrison.start()
-
-            if not manageHeist.is_running():
-                manageHeist.start()
-
-            if not generateWinnerAndLoser.is_running():
-                generateWinnerAndLoser.start() 
-
-            if not checkChannelActivityAndAwardPoints.is_running():
-                checkChannelActivityAndAwardPoints.start() 
         
     @bot.event
     async def on_message(message):

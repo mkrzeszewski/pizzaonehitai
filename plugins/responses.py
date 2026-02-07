@@ -10,12 +10,15 @@ import plugins.birthday as birthday
 import plugins.ai as ai
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+import plugins.stocks as stocks
 import asyncio
 from datetime import datetime
 import re
-from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
+from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound, File, Member, User
 
 MAX_SLOT_AMOUNT = 5000
+
+TAG_PATTERN = re.compile(r'<@!?(\d+)>')
 
 securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
@@ -32,6 +35,9 @@ transferKeyword = ["transfer", "masz", "tip", "trzymaj", "maszbiedaku"]
 escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata", "letmeout"]
 freeKeyword = ["wypusc", "uwolnij", "lethimout"]
 arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
+stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykres"]
+sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
+buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -307,11 +313,26 @@ def getBirthdayStuff(user):
         facts.append(ai.askAI("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
         wrozba = str(ai.askAI("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
         returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
-        points.addPoints(str(user['discord_id']), 2000)
+        points.addPoints(str(user['discord_id']), 5000)
     return returnEmbed, returnText
 
+def userFromPattern(pattern):
+    match = TAG_PATTERN.search(pattern)
+    if match:
+        user = db.retrieveUser('discord_id',match.group(1))
+        if user:
+            return user
+    user = db.retrieveUser('discord_id',str(pattern))
+    if user:
+        return user
+    
+    user = db.retrieveUser('name',str(pattern))
+    if user:
+        return user
+    return None
+
 #this is main body of this module - it performs manual if check depending on my widzimisie
-def handleResponse(userMessage, author) -> str:
+async def handleResponse(userMessage, author, dcbot = None) -> str:
     random.seed(datetime.now().timestamp())
     #message = userMessage.lower()
     returnEmbed = None
@@ -326,7 +347,7 @@ def handleResponse(userMessage, author) -> str:
 
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
-        returnText = "User o ID: " + str(author) + "nie znajduje sie w bazie danych. Uderz do roLab."
+        returnText = "User o ID: " + str(author) + " nie znajduje sie w bazie danych. Uderz do roLab."
         return returnEmbed, returnText, returnView, returnFile   
     
     if user['arrested'] and commands[0] in escapeKeyword:
@@ -373,7 +394,7 @@ def handleResponse(userMessage, author) -> str:
         elif commands[0] in restaurantKeywords:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
-                    embed_buttons = usersChooseView(db.retrieveAllusers(), int(str(commands[1])))
+                    embed_buttons = usersChooseView(db.retrieveAllUsers(), int(str(commands[1])))
                     returnView = embed_buttons.generate_view()
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
@@ -483,12 +504,10 @@ def handleResponse(userMessage, author) -> str:
         elif commands[0] in freeKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
-                    if str(commands[1]).isdigit():
-                        arrested_user = db.retrieveUser('discord_id', str(commands[1]))
-                    else:
-                        arrested_user = db.retrieveUser('name', str(commands[1]))
-                    if db.freeUser('discord_id', str(arrested_user['discord_id'])):
-                        returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
+                    arrested_user = userFromPattern(commands[1])
+                    if arrested_user:
+                        if db.freeUser('discord_id', str(arrested_user['discord_id'])):
+                            returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
                     else:
                         returnText = "Nieznany user : " + str(commands[1]) + "."
                 else:
@@ -500,10 +519,7 @@ def handleResponse(userMessage, author) -> str:
             if len(commands) == 3:
                 if str(commands[2]).isdigit():
                     if(int(commands[2]) <= int(user['points'])):
-                        if str(commands[1]).isdigit():
-                            dest_user = db.retrieveUser('discord_id', commands[1])
-                        else:
-                            dest_user = db.retrieveUser('name', commands[1])
+                        dest_user = userFromPattern(commands[1])
                         if dest_user:
                             if dest_user != user:
                                 points.transferPoints(str(author), dest_user['discord_id'], int(commands[2]))
@@ -523,10 +539,7 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
-                        if str(commands[1]).isdigit():
-                            dest_user = db.retrieveUser('discord_id', commands[1])
-                        else:
-                            dest_user = db.retrieveUser('name', commands[1])
+                        dest_user = userFromPattern(commands[1])
                         if dest_user:
                             points.addPoints(dest_user['discord_id'], int(commands[2]))
                             returnText = "Pomyslnie dodano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
@@ -554,9 +567,19 @@ def handleResponse(userMessage, author) -> str:
                 tftapi.setAPIKey(commands[1])
                 returnText = "API Key successfuly replaced"
 
+        elif commands[0] == "testmessage":
+            if int(author) == 326259887007072257:
+                print(commands)
+                print(message)
+                returnText = message
+
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
-                returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
+                user = userFromPattern(commands[1])
+                if user:
+                    returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
+                else:
+                    returnText = "nie znaleziona usera o ID = " + str(commands[1])
 
         elif commands[0] == "top":
             if len(commands) == 2:
@@ -565,6 +588,28 @@ def handleResponse(userMessage, author) -> str:
                     users = points.getTop(amount)
                     if users:
                         returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
+
+        elif commands[0] == "topstocks":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    if int(str(commands[1])) > 1:
+                        amount = int(str(commands[1]))
+                        _stocks = db.retrieveTopStocks(amount)
+                        if _stocks:
+                            returnEmbed = embedgen.generateStocksOverview(_stocks)
+                        else:
+                            returnText = "Currently there's no stock value."
+
+        elif commands[0] == "bottomstocks":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    if int(str(commands[1])) > 1:
+                        amount = int(str(commands[1]))
+                        _stocks = db.retrieveBottomStocks(amount)
+                        if _stocks:
+                            returnEmbed = embedgen.generateBottomStocks(_stocks)
+                        else:
+                            returnText = "Currently there's no stock value."
 
         elif commands[0] == "bottom":
             if len(commands) == 2:
@@ -579,6 +624,57 @@ def handleResponse(userMessage, author) -> str:
                 returnText = "Losujemy: 1 - " + commands[1] + " -> " + str(random.randint(1,int(commands[1])))
             elif len(commands) == 3:
                 returnText = "Losujemy: " + commands[1] + " - " + commands[2] + " -> " + str(random.randint(int(commands[1]),int(commands[2])))
+
+        elif commands[0] == "enabletask" or commands[0] == "enable":
+            if int(author) == 326259887007072257:
+                if len(commands) > 1:
+                    taskName = str(commands[1])
+                    task = db.retrieveTask('name', taskName)
+                    if task:
+                        db.enableTask(str(commands[1]))
+                        returnText = "Enabled task \"" + taskName + "\"."
+                    else:
+                        returnText = "No task found = \"" + taskName + "\"."
+            else:
+                returnText = securityResponse
+        
+        elif commands[0] == "disabletask" or commands[0] == "disable":
+            if int(author) == 326259887007072257:
+                if len(commands) > 1:
+                    taskName = str(commands[1])
+                    task = db.retrieveTask('name', taskName)
+                    if task:
+                        db.disableTask(str(commands[1]))
+                        returnText = "Disabled task \"" + taskName + "\"."
+                    else:
+                        returnText = "No task found = \"" + taskName + "\"."
+            else:
+                returnText = securityResponse
+
+        elif commands[0] in buyStockKeyword:
+            if len(commands) > 2:
+                stockSymbol = str(commands[1])
+                amount = int(commands[2])
+                returnText = stocks.purchaseStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
+            else:
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+        elif commands[0] in sellStockKeyword:
+            if len(commands) > 2:
+                stockSymbol = str(commands[1])
+                amount = int(commands[2])
+                returnText = stocks.sellStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
+            else:
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
+
+        elif commands[0] == "portfolio" or commands[0] == "flex":
+            user = userFromPattern(commands[1])
+            if user:
+                flexUser = await dcbot.fetch_user(int(user['discord_id']))
+                flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
+                returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
+            else:
+                returnText = "User " + str(commands[1]) + "not found."
     else:
 
         #if its a singular commmand - transform message to lower.
@@ -674,11 +770,65 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
         if message in restaurantKeywords:
-            embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
+            embed_buttons = usersChooseView(db.retrieveAllUsers(), 500)
             returnView = embed_buttons.generate_view()
             returnEmbed = embed_buttons.generate_embed()
 
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
+
+        if message in stocksKeyword:
+            _stocks = db.retrieveAllStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateStocksOverview(_stocks)
+            else:
+                returnText = "Currently there's no stock value"
+
+        if message == "topstocks":
+            _stocks = db.retrieveTopStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateStocksOverview(_stocks)
+            else:
+                returnText = "Currently there's no stock value"
+
+        if message == "bottomstocks":
+            _stocks = db.retrieveBottomStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateBottomStocks(_stocks)
+            else:
+                returnText = "Currently there's no stock value"
+        
+        if message == 'generatestocks':
+            returnText = securityResponse
+            if int(author) == 326259887007072257:
+                returnText = str(stocks.generateStocks())
+
+        if message == 'generatetrends':
+            returnText = securityResponse
+            if int(author) == 326259887007072257:
+                stocks.simulateTrends()
+                returnText = "Przeprowadzono generacje trendow dla stockow."
+
+        if message == "testmarkdown":
+            returnEmbed = embedgen.testMarkdown()
+
+        if message == "fullstonks":
+            _stocks = db.retrieveTopStocks(100)
+            if _stocks:
+                returnEmbed = embedgen.generateFullStonks(_stocks)
+
+        if message == "cashout" or message == "imout":
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                returnText = stocks.cashout(user['name'])
+
+        if message == "testbankrupcy":
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                _stock = db.retrieveStock('ceo',user['name'])
+                if _stock:
+                    bankruptUser = await dcbot.fetch_user(int(user['discord_id']))
+                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
+                    returnEmbed = embedgen.generateBankrupcy(_stock, bankruptAvatarURL)
 
     return returnEmbed, returnText, returnView, returnFile

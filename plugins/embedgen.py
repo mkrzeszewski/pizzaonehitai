@@ -32,6 +32,9 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 PIZZA_ICON_URL = "https://cdn3.emoji.gg/emojis/16965-cutepizza.png"
+STONKS_ICON_URL = "https://cdn3.emoji.gg/emojis/6552-stonks.png"
+STINKS_ICON_URL = "https://cdn3.emoji.gg/emojis/5858-stinks.png"
+BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-95b5dae95553.PNG"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -63,13 +66,25 @@ BIRTHDAY_PHRASES = ["Wszystkiego najlepszego!",
                     "Wooohoo!",
                     "Sto lat, sto lat!",
                     "Starosc nie radosc!",
-                    "Juz tylko rok blizej do smierci!"
+                    "Juz tylko rok blizej do smierci!",
+                    "ty stara kurwo"
                     ]
 PARTY_FACE_ICON = "https://cdn3.emoji.gg/emojis/72795-b-partying-face.png"
 
 BARTOLO_KEY = environ["BARTOLO_KEY"]
 
-GRATULACJE = ["mlodziezowy i smieszny","jak bandzior","dostojny i wykwintny","niczym 2 letnie dziecko"]
+GRATULACJE = ["mlodziezowy i smieszny", 
+              "jak bandzior",
+              "dostojny i wykwintny", 
+              "jak Typowy wujek na weselu", 
+              "jak powazny urzednik", 
+              "niczym sredniowieczny herold", 
+              "jak pasywno-agresywno ciocia",
+              "w nieznanym jezyku elfickim",
+              "jak Maklowicz, który wlasnie odkryl, że w kociolku zamiast papryki jest uran",
+              "jak filozof egzystencjalny, który udowadnia, ze te punkty i tak nie istnieja w obliczu pustki",
+              "niczym reklama w radio, ktora krzyczy glosniej niz muzyka",
+              "jak lektor z chlopakow z barakow"]
 
 def split_text(text: str, max_length: int = 1000):
     return [text[i:i + max_length] for i in range(0, len(text), max_length)]
@@ -196,7 +211,7 @@ def generateTopPointsEmbed(users, amount):
 def generateBottomPointsEmbed(users, amount):
     stringList = ""
     increment = 0
-    allUsersLen = len(list(db.retrieveAllusers()))
+    allUsersLen = len(list(db.retrieveAllUsers()))
     for user in users:
         stringList = stringList + str(int(allUsersLen - increment)) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
         increment = increment + 1
@@ -271,21 +286,22 @@ def generateBirthdayEmbed(user, facts, wrozba):
             body = body + str(fact) + "\n"
     embed.add_field(name = "Ciekawostki: ", value = body, inline = False)
     embed.add_field(name = "Wrozba: ", value = wrozba, inline = False)
-    embed.set_footer(text = "Do twojego konta zostalo przypisane 2000 pizzopkt!", icon_url = PARTY_FACE_ICON)
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 5000 pizzopkt!", icon_url = PARTY_FACE_ICON)
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
     embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow w sposob "+random.choice(GRATULACJE)+"."), color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Do twojego konta przypisalismy 200 pkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
+    embed.add_field(name = "Do twojego konta przypisalismy 500 ppkt + 15% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
 def generateLoserEmbed(user, userAvatarURL):
-    embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
+    #embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
+    embed = Embed(title="Przykro nam, " + user['name'] + "!", description=ai.askAI("Poinformuj uzytkownika: \""+ user['name'] + "\" ze przegral w dziennej loterii pizzopunktow (tj zostaly mu pobrane z konta punkty) w sposob "+random.choice(GRATULACJE)+"."), color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Z twojego konta zostalo odebrane 10% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
+    embed.add_field(name = "Z twojego konta zostalo odebrane 15% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -414,6 +430,7 @@ def generateHeistCanceled(heist_name):
     embed.add_field(name = "Sprobujcie szczescia w nastepnym napadzie..", value="Punkty zostaly zwrocone.", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
+
 def generatePrisonRelease(users):
     color = Colour.dark_orange()
     description = ""
@@ -473,15 +490,100 @@ def generateRewards(rewards):
 
 def generateAchievements(achievements):
     color = Colour.gold()
-    embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description="Najwieksi z najwiekszych!", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     description = ""
     for achievement in achievements:
         who = achievement['user']
         if who == "":
             who = "[TU MOZESZ BYC TY!]"
         description += "* " + str(achievement['achievement']) + " - " + str(who) + "\n" + str(achievement['description']) + "\n\n"
+    embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = PEPE_PUCHAR_URL)
-    embed.add_field(name = "Oto obecne osiagniecia:", value=description, inline = False)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateStocksOverview(stocks):
+    color = Colour.dark_green()
+    description = "Oto obecnie dostepne akcje na gieldzie P1H:\n"
+    for stock in stocks:
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
+    description += "\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = STONKS_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateFullStonks(stocks):
+    color = Colour.dark_green()
+    description = "```py\n"
+    description += f"{'SYM':<5} | {'PRICE':<9} | {'AVAILABLE SHARES':<6}\n"
+    description += "—" * 28 + "\n"
+    for stock in stocks:
+        sym = stock['symbol']
+        prc = f"{stock['price']} PP"
+        shr = f"{stock['shares']}"
+        description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
+    description += "```"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title="WallStreet - Pizza One Hit", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = STONKS_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBottomStocks(stocks):
+    color = Colour.dark_red()
+    description = ""
+    for stock in stocks:
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title="Gielda Pizza One Hit - bottom 5", description=str(description), color = color)
+    embed.set_thumbnail(url = BOGDANOFF_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def testMarkdown():
+    color = Colour.dark_green()
+    description = "```py\ntest\n```"
+    
+    embed = Embed(title="Test backticks.", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBankrupcy(stock, userAvatarURL = 0):
+    color = Colour.dark_red()
+    description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+
+    if userAvatarURL:
+        embed.set_thumbnail(url = userAvatarURL)
+    else:
+        embed.set_thumbnail(url = STINKS_ICON_URL)
+    embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
+    embed.set_thumbnail(url = STINKS_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateUserPortfolioEmbed(user, userAvatarURL = 0):
+    color = Colour.dark_orange()
+    description = ""
+    totalAmount = 0
+    if user['stocksOwned']:
+        for share in user['stocksOwned']:
+            stock = db.retrieveStock('symbol',share['symbol'])
+            description += "* [" + str(stock['symbol']) + "]" + str(stock['name']) + " - " + str(share['amount']) + " udzialow.\n"
+            totalAmount += int(stock['price'] * share['amount'])
+        description += "Obecna wartosc akcji uzytkownika = " + str(totalAmount) + " pizzopuntkow."
+    else:
+        description += "Uzytkownik " + str(user['name']) + " nie posiada obecnie zadnych akcji."
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title="Aktualne akcje - " + str(user['name']), description=str(description), color = color)
+    if userAvatarURL:
+        embed.set_thumbnail(url = userAvatarURL)
+    else:
+        embed.set_thumbnail(url = STINKS_ICON_URL)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed

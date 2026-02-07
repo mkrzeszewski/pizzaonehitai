@@ -21,6 +21,8 @@ heistCollection = db['heist_history']
 currHeistCollection = db['current_heist']
 rewardCollection = db['rewards']
 achievementCollection = db['achievements']
+stocksCollection = db['stocks']
+tasksCollection = db['tasks']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -65,6 +67,10 @@ def insertTFTMatch(match_id):
 def retrieveRandomUser():
     return userCollection.aggregate([{"$sample": {"size": 1}}]).next()
 
+def retrieveAllUsers():
+    return userCollection.find({})
+
+#temporary fix
 def retrieveAllusers():
     return userCollection.find({})
 
@@ -230,3 +236,85 @@ def retrieveRewards():
 
 def retrieveAchievements():
     return achievementCollection.find({})
+
+def retrieveAllTasks():
+    return tasksCollection.find({})
+
+def retrieveTask(key, value):
+    return tasksCollection.find_one({key: value})
+
+def isTaskEnabled(name):
+    task = tasksCollection.find_one({"name": name},{"enabled": 1})
+    if task:
+        return task['enabled']
+    else:
+        return False
+
+def disableTask(name):
+    return tasksCollection.update_one({"name": name},{"$set": {"enabled": False}}).matched_count
+
+def enableTask(name):
+    return tasksCollection.update_one({"name": name},{"$set": {"enabled": True}}).matched_count
+
+def retrieveStock(key, value):
+    return stocksCollection.find_one({key: value})
+
+def retrieveAllStocks():
+    return stocksCollection.find({})
+
+def retrieveTopStocks(amount = 5):
+    return stocksCollection.find({}).sort("price", -1).limit(amount)
+
+def retrieveBottomStocks(amount = 5):
+    return stocksCollection.find({}).sort("price", 1).limit(amount)
+
+def removeAllStocks():
+    return stocksCollection.delete_many({}) #ostroznie!
+
+def removeStock(name):
+    return stocksCollection.delete_one({'name': name})
+
+def insertStock(name, ceo, symbol, shares = 100, price = 1000):
+    return stocksCollection.insert_one({'name': name, 
+                                        'ceo': ceo,
+                                        'symbol' : symbol,
+                                        'shares' : shares,
+                                        'price': price,
+                                        'trend': 0.0,
+                                        'priceHistory': [price]})
+
+def updateStock(querykey, queryvalue, key, value):
+    stock = stocksCollection.find_one({querykey: queryvalue})
+    if stock:
+        return stocksCollection.update_one(
+        {querykey: queryvalue},
+        {"$set": {key: value}}
+        )
+    else:
+        return False
+    
+def updateStockTrend(name, trend):
+    return stocksCollection.update_one({'name': name},{"$set": {"trend": trend}}).matched_count
+
+def updateStockPrice(name, price):
+    return stocksCollection.update_one({'name': name},[{"$set": {"price": price,"priceHistory": { "$concatArrays": [{"$ifNull": ["$priceHistory", []]}, [price] ] }}}]).matched_count
+
+def updateStockShares(name, shares):
+    return stocksCollection.update_one({'name': name},{"$set": {"shares": shares}}).matched_count
+
+def updateStocksForUser(userkey, uservalue, symbol, amount):
+    query = {userkey: uservalue, "stocksOwned.symbol": symbol}
+    update = {"$inc": {"stocksOwned.$.amount": amount}}
+    result = userCollection.update_one(query, update)
+    if result.modified_count == 0:
+        return userCollection.update_one({userkey: uservalue},{"$push": {"stocksOwned": {"symbol": symbol, "amount": amount}}})
+    return False
+
+def removeStocksFromUser(username, symbol, amount):
+    query = {"name": username, "stocksOwned.symbol": symbol}
+    update = {"$inc": {"stocksOwned.$.amount": -amount}}
+    userCollection.update_one(query, update)
+    userCollection.update_one(
+        {"name": username},
+        {"$pull": {"stocksOwned": {"symbol": symbol, "amount": {"$lte": 0}}}}
+    )

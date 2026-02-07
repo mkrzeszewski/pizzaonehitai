@@ -12,7 +12,7 @@ SUMMONERS_DATA_URL = "https://eun1.api.riotgames.com/lol/summoner/v4/summoners/b
 MATCHESID_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" #IEPOyh5KUhgy5fU-6k9PwzEUB8p3G-rgcoNwKwmSA007LBcapaqCPcaYU78N0EbpQa_HiPZnMTZn_g"
 MATCH_DATA_URL = "https://europe.api.riotgames.com/lol/match/v5/matches/"
 URLS = []
-USERLIST = db.retrieveAllusers()
+USERLIST = db.retrieveAllUsers()
 
 def analyzeMatch(match, isAutomatic):
     playersInMatch = ""

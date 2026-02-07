@@ -15,14 +15,15 @@ importantPeople = []
 players = []
 oldMatches = []
 
-users = db.retrieveAllusers()
+users = db.retrieveAllUsers()
 if users != None:
     for user in users:
-        riotid = user.get('riotid')
-        #only add if people actually play league
-        if riotid:
-            players.append(user)
-            importantPeople.append(riotid)
+        if user['riotid']:
+            riotid = user.get('riotid')
+            #only add if people actually play league
+            if riotid:
+                players.append(user)
+                importantPeople.append(riotid)
 
 def setAPIKey(updatedApiKey):
     global API_KEY
