@@ -119,9 +119,8 @@ def sellStocks(username, stocksymbol, amount):
             db.updateStockShares(stock['name'], int(stock['shares']) + amount)
             returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
-            info = str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
-            print(info)
             db.removeStocksFromUser(user['name'],stock['symbol'], amount)
+            return str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
         else: 
             return str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
