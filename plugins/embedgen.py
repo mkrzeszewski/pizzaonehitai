@@ -618,7 +618,7 @@ def generateTheatreEventList(theatre, event, dates):
     description = ""
     for date in dates:
         description += "* " + str(date) + " \n"
-    embed = Embed(title="Nowe daty na wydarzenie w - " + str(theatre['name']) + " - " + str(event) + ".", description=str(description), color = color)
+    embed = Embed(title="Nowe daty na wydarzenie w - " + str(theatre) + " - " + str(event) + ".", description=str(description), color = color)
     embed.set_thumbnail(url = PEPE_CLOWN_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
