@@ -375,7 +375,7 @@ def handleResponse(userMessage, author) -> str:
         elif commands[0] in restaurantKeywords:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
-                    embed_buttons = usersChooseView(db.retrieveAllusers(), int(str(commands[1])))
+                    embed_buttons = usersChooseView(db.retrieveAllUsers(), int(str(commands[1])))
                     returnView = embed_buttons.generate_view()
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
@@ -706,7 +706,7 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
         if message in restaurantKeywords:
-            embed_buttons = usersChooseView(db.retrieveAllusers(), 500)
+            embed_buttons = usersChooseView(db.retrieveAllUsers(), 500)
             returnView = embed_buttons.generate_view()
             returnEmbed = embed_buttons.generate_embed()
 
@@ -720,5 +720,5 @@ def handleResponse(userMessage, author) -> str:
             returnText = securityResponse
             if int(author) == 326259887007072257:
                 returnText = str(stocks.generateStocks())
-                
+
     return returnEmbed, returnText, returnView, returnFile

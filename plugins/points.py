@@ -43,7 +43,7 @@ def modifyPoints(key, value, amount):
     return None
 
 def fetchRandomUser():
-    return random.choice(db.retrieveAllusers())
+    return random.choice(db.retrieveAllUsers())
 
 def generateDaily():
     winner = db.retrieveRandomUser()

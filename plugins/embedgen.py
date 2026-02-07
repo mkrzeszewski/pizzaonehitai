@@ -208,7 +208,7 @@ def generateTopPointsEmbed(users, amount):
 def generateBottomPointsEmbed(users, amount):
     stringList = ""
     increment = 0
-    allUsersLen = len(list(db.retrieveAllusers()))
+    allUsersLen = len(list(db.retrieveAllUsers()))
     for user in users:
         stringList = stringList + str(int(allUsersLen - increment)) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
         increment = increment + 1

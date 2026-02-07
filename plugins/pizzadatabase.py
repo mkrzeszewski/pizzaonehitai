@@ -67,7 +67,7 @@ def insertTFTMatch(match_id):
 def retrieveRandomUser():
     return userCollection.aggregate([{"$sample": {"size": 1}}]).next()
 
-def retrieveAllusers():
+def retrieveAllUsers():
     return userCollection.find({})
 
 def retrieveAllUsersSorted(key):

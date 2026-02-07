@@ -47,7 +47,7 @@ def chooseRestaurant(selectedUsers, radius = 1000):
         print("[ERROR]Google Maps API key not found. Set GOOGLE_MAPS_API_KEY as an environment variable.")
         return
     coords = []
-    users = db.retrieveAllusers()
+    users = db.retrieveAllUsers()
     if users:
         for user in users:
             if user in selectedUsers:
