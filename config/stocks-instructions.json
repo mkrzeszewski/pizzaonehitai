@@ -16,19 +16,19 @@
             "text": "symbol - symbol na gieldzie, skrot od nazwy - upewnij sie, ze symbole sie nie powtarzaja!"
         },
         {
-            "text": "ceo - imie z tabeli users dla ktorego wygenerowales dana nazwe firmy"
+            "text": "ceo - imie z tabeli users dla ktorego wygenerowales dana nazwe firmy - generowanie firmy dla usera A powinno sprawic ze user A bedzie CEO"
         },
         {
             "text": "zapamietaj - ma byc tyle firm ile uzytkownikow, nie myl uzytkownikow miedzy firmami."
         },
         {
-            "text": "zwracasz JSONa, ktory zawiera tabele w formacie - [ {name, symbol, ceo}, {name, symbol, ceo} ] w zaleznosci od ilosci uzytkownikow."
+            "text": "zwracasz JSONa, ktory zawiera tabele w formacie - [ {name, symbol, ceo}, {name, symbol, ceo}, ... ] w zaleznosci od ilosci uzytkownikow."
         },
         {
             "text": "zwracasz tylko JSON, nie piszesz nic wiecej."
         },
         {
-            "text": "w przypadu jak dodatkowo do listy userow zostanie zalaczony JSON w formacie [ {name, symbol}, {name, symbol} ] - upewniasz sie, ze nazwy firm sie nie powtarzaja w kolejnym generowaniu."
+            "text": "w przypadu jak dodatkowo do listy userow zostanie zalaczony JSON w formacie [ {name, symbol, ceo}, {name, symbol, ceo}, ... ] - upewniasz sie, ze nazwy firm sie nie powtarzaja w kolejnym generowaniu."
         }
     ]
 }
