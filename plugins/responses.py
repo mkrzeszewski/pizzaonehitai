@@ -730,5 +730,8 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 stocks.simulateTrends()
                 returnText = "Przeprowadzono generacje trendow dla stockow."
+                
+        if message == "testmarkdown":
+            returnEmbed = embedgen.testMarkdown()
 
     return returnEmbed, returnText, returnView, returnFile

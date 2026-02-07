@@ -32,6 +32,7 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/squad.png", 
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 PIZZA_ICON_URL = "https://cdn3.emoji.gg/emojis/16965-cutepizza.png"
+STONKS_ICON_URL = "https://cdn3.emoji.gg/emojis/6552-stonks.png"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -503,10 +504,18 @@ def generateStocksOverview(stocks):
     color = Colour.dark_green()
     description = ""
     for stock in stocks:
-        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\ndostepne akcje:" + str(stock['shares']) + "\naktualna cena" + str(stock['price']) + "\n"
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
     embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
-    embed.set_thumbnail(url = PEPE_PUCHAR_URL)
+    embed.set_thumbnail(url = STONKS_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def testMarkdown():
+    color = Colour.dark_green()
+    description = "```py\ntest\n```"
+    embed = Embed(title="Test backticks.", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
