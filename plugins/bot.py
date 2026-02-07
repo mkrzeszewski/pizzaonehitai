@@ -138,11 +138,11 @@ def runDiscordBot():
         if bankrupts:
             channel = bot.get_channel(GAMBA_CHANNEL_ID)
             for bankrupt in bankrupts:
-                user = db.retrieveUser('name',bankrupt['ceo'])
+                user = db.retrieveUser('name',bankrupt[0]['ceo'])
                 if user:
                     bankruptUser = await bot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
-                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL))
+                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL, badInvestors))
     
     @tasks.loop(time=target_stock_time)
     async def generateStocks():

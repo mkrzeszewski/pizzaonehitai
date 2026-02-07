@@ -552,9 +552,13 @@ def testMarkdown():
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateBankrupcy(stock, userAvatarURL = 0):
+def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
+    if badInvestors:
+        description += "Nieudacznicy, ktorzy probowali zainwestowac w te firme: \n"
+        for investor in badInvestors:
+            description += " - " + str(investor)
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     if userAvatarURL:
@@ -586,7 +590,6 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
-
 
 def generateTheatreEventList(theatre, events):
     color = Colour.dark_purple()

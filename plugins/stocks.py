@@ -71,15 +71,17 @@ def updatePrices():
             newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
             if newPrice < 50:
                 users = db.retrieveAllUsers()
+                badInvestors = []
                 for user in users:
                     if user['stocksOwned']:
                         for share in user['stocksOwned']:
                             if share['symbol'] == stock['symbol']:
+                                badInvestors.append(user['name'])
                                 db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
                                 break
                 db.removeStock(stock['name'])
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
-                bankrupts.append(stock)
+                bankrupts.append([stock, badInvestors])
             else:
                 db.updateStockPrice(stock['name'], newPrice)
     return bankrupts
