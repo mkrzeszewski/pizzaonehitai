@@ -98,6 +98,7 @@ def runDiscordBot():
     #theatre section
     @tasks.loop(time=target_stock_time)
     async def theatreCheck():
+        print("test")
         channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
         parsedTheatres = theatres.checkNewEvents()
         if parsedTheatres:
