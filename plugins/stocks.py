@@ -65,8 +65,10 @@ def updatePrices():
             if newPrice < 50:
                 db.removeStock(stock['name'])
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
+                bankrupts.append(stock)
             else:
                 db.updateStockPrice(stock['name'], newPrice)
+    return bankrupts
 
 def generateGraph():
     return ""

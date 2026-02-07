@@ -124,7 +124,17 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def updateStockPrices():
-        stocks.updatePrices()
+        bankrupts = stocks.updatePrices()
+        if bankrupts:
+            channel = bot.get_channel(GAMBA_CHANNEL_ID)
+            for bankrupt in bankrupts:
+                user = db.retrieveUser('name',bankrupt['ceo'])
+                if user:
+                    bankruptUser = await bot.fetch_user(int(user['discord_id']))
+                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
+                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL))
+
+
 
     @freePeopleFromPrison.before_loop
     async def dailyPrisonEscape7AM():
