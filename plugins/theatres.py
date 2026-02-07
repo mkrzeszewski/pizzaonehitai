@@ -26,8 +26,10 @@ def getAllEventsIksoris(url):
 
 def checkNewEvents():
     returnText = ""
+    theatreEvents = []
     theatres = db.retrieveAllTheatres()
     for theatre in theatres:
+        
         eventsOnSite = []
         if theatre['system'] == "iksoris":
             eventsOnSite = getAllEventsIksoris(theatre['url'])
@@ -53,4 +55,6 @@ def checkNewEvents():
         if len(newEvents) > 0:
             returnText += "Nowe wydarzenie na stronie " + str(theatre['name']) + "."
             returnText += "\n - ".join(newEvents)
-    return returnText
+            theatreEvents.append([theatre['name'],newEvents])
+    print(returnText)
+    return theatreEvents

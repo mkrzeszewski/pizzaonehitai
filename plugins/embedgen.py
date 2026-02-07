@@ -35,6 +35,7 @@ PIZZA_ICON_URL = "https://cdn3.emoji.gg/emojis/16965-cutepizza.png"
 STONKS_ICON_URL = "https://cdn3.emoji.gg/emojis/6552-stonks.png"
 STINKS_ICON_URL = "https://cdn3.emoji.gg/emojis/5858-stinks.png"
 BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-95b5dae95553.PNG"
+PEPE_CLOWN_ICON_URL = "https://cdn3.emoji.gg/emojis/4825_PepeClown.png"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -546,7 +547,6 @@ def generateBottomStocks(stocks):
 def testMarkdown():
     color = Colour.dark_green()
     description = "```py\ntest\n```"
-    
     embed = Embed(title="Test backticks.", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -585,5 +585,16 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
     else:
         embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+
+def generateTheatreEventList(theatre, events):
+    color = Colour.dark_purple()
+    description = ""
+    for event in events:
+        description += "* [" + str(event) + "] \n"
+    embed = Embed(title="Nowe wydarzenie w - " + str(theatre['name']) + ".", description=str(description), color = color)
+    embed.set_thumbnail(url = PEPE_CLOWN_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
