@@ -572,6 +572,28 @@ def handleResponse(userMessage, author) -> str:
                     if users:
                         returnEmbed = embedgen.generateTopPointsEmbed(users, amount)
 
+        elif commands[0] == "topstocks":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    if int(str(commands[1])) > 1:
+                        amount = int(str(commands[1]))
+                        _stocks = db.retrieveTopStocks(amount)
+                        if _stocks:
+                            returnEmbed = embedgen.generateStocksOverview(_stocks)
+                        else:
+                            returnText = "Currently there's no stock value."
+
+        elif commands[0] == "bottomstocks":
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    if int(str(commands[1])) > 1:
+                        amount = int(str(commands[1]))
+                        _stocks = db.retrieveBottomStocks(amount)
+                        if _stocks:
+                            returnEmbed = embedgen.generateBottomStocks(_stocks)
+                        else:
+                            returnText = "Currently there's no stock value."
+
         elif commands[0] == "bottom":
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
@@ -749,7 +771,7 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.testMarkdown()
 
         if message == "fullstonks":
-            _stocks = db.retrieveBottomStocks()
+            _stocks = db.retrieveTopStocks(100)
             if _stocks:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 

@@ -551,7 +551,9 @@ def testMarkdown():
 def generateBankrupcy(stock, userAvatarURL = ""):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
-    embed = Embed(title="Gielda Pizza One Hit - ouch.", description=str(description), color = color)
+
+    description += "\n\n Aby zweryfikowac sytuacje na gieldzie - !stonks"
+    embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
