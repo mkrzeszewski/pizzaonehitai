@@ -12,8 +12,9 @@ import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
+import plugins.theatres as theatres
 
-target_stock_time = time(hour=10, minute=0)
+target_stock_time = time(hour=7, minute=0)
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
@@ -32,6 +33,7 @@ GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
 DEFAULT_BDAY_CHANNEL = 1172911430601822238
 DEFAULT_HEIST_CHANNEL = 1172911430601822238
+DEFAULT_THEATRES_CHANNEL = 1422322104237297754
 if os.environ["PROD_STATUS"] == "PRODUCTION":
     DEFAULT_TFT_CHANNEL = 1032698616910983168 #LEAGUEOFDEBILS
     DEFAULT_BDAY_CHANNEL = 993905203084529865 #OGOLNY
@@ -93,6 +95,17 @@ def runDiscordBot():
 
         await asyncio.sleep((target_datetime - now).total_seconds())
 
+    #theatre section
+    @tasks.loop(time=target_stock_time)
+    async def theatreCheck():
+        print("ZROBIL SIE TEST TEATROW")
+        channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
+        parsedTheatres = theatres.checkNewEvents()
+        if parsedTheatres:
+            for theatre in parsedTheatres:
+                for event in theatre[1]:
+                    await channel.send(embed = embedgen.generateTheatreEventList(theatre[0], event[0], event[1]))
+
     @tasks.loop(hours = 4)
     async def manageHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
@@ -127,11 +140,11 @@ def runDiscordBot():
         if bankrupts:
             channel = bot.get_channel(GAMBA_CHANNEL_ID)
             for bankrupt in bankrupts:
-                user = db.retrieveUser('name',bankrupt['ceo'])
+                user = db.retrieveUser('name',bankrupt[0]['ceo'])
                 if user:
                     bankruptUser = await bot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
-                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL))
+                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt[0], bankruptAvatarURL, bankrupt[1]))
     
     @tasks.loop(time=target_stock_time)
     async def generateStocks():
@@ -256,6 +269,14 @@ def runDiscordBot():
                 updateStockPrices.stop()
                 print("[INFO] Stock investment is disabled..")
 
+        if db.isTaskEnabled("theatres"):
+            if not theatreCheck.is_running():
+                theatreCheck.start()
+                print("[INFO] Theatre check is enabled!")
+        else:
+            if theatreCheck.is_running():
+                theatreCheck.stop()
+                print("[INFO] Theatre check is disabled..")
     @bot.event
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())

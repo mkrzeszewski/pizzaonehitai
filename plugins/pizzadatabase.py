@@ -23,6 +23,8 @@ rewardCollection = db['rewards']
 achievementCollection = db['achievements']
 stocksCollection = db['stocks']
 tasksCollection = db['tasks']
+theatreCollection = db['theatres']
+eventsCollection = db['events']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -318,3 +320,42 @@ def removeStocksFromUser(username, symbol, amount):
         {"name": username},
         {"$pull": {"stocksOwned": {"symbol": symbol, "amount": {"$lte": 0}}}}
     )
+
+def insertTheatre(name, url, system):
+    return theatreCollection.insert_one({'name': name, 
+                                        'url': url,
+                                        'system' : system})
+
+def retrieveAllTheatres():
+    return theatreCollection.find({})
+
+def retrieveTheatre(key, value):
+    return theatreCollection.find_one({key: value})
+
+def retrieveAllEvents():
+    return eventsCollection.find({})
+
+def addEvent(name, theatre):
+    return eventsCollection.insert_one({'title': name, 
+                                        'theatre': theatre})
+
+def retrieveEvent(key, value):
+    return eventsCollection.find_one({key: value})
+
+def removeEvent(key, value):
+    return eventsCollection.delete_one({key: value})
+
+def retrieveEvent(key, value):
+    return eventsCollection.find_one({key: value})
+
+def retrieveEvents(key, value):
+    return eventsCollection.find({key: value})
+
+def retrieveEventFromTheatre(theatre, title):
+    return eventsCollection.find_one({"theatre": theatre, "title": title}, {"_id": 0, "name":1})
+
+def retrieveEventsFromTheatre(theatre, title):
+    return list(eventsCollection.find({"title":title,"teatr":theatre}))
+
+def updateEvent(theatre, title, event):
+    return eventsCollection.update_one({"teatr":theatre,"title":title},{"$set": event},upsert=True)
