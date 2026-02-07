@@ -70,6 +70,10 @@ def retrieveRandomUser():
 def retrieveAllUsers():
     return userCollection.find({})
 
+#temporary fix
+def retrieveAllusers():
+    return userCollection.find({})
+
 def retrieveAllUsersSorted(key):
     return userCollection.find({}).sort({key: 1})
 
