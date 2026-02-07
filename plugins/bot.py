@@ -66,6 +66,10 @@ async def sendMessage(message, user_message, is_private):
     except Exception as e:
         print(e)
 
+async def enabletTasks():
+
+    return ""
+
 def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
@@ -157,32 +161,41 @@ def runDiscordBot():
     async def dailyBirthday8AM():
         await waitUntil(time(11, 0))
 
+    @tasks.loop(minutes = 5.0)
+    async def tasksHandling():
+
+        if db.isTaskEnabled("tft"):
+            if not analyzeMatchHistoryTFT.is_running():
+               analyzeMatchHistoryTFT.start() 
+        
+        if db.isTaskEnabled("birthday"):
+            if not sendBirthdayInfo.is_running():
+                sendBirthdayInfo.start() 
+
+        if db.isTaskEnabled("heist"):
+            if not freePeopleFromPrison.is_running():
+               freePeopleFromPrison.start()
+            if not manageHeist.is_running():
+               manageHeist.start()
+
+        if db.isTaskEnabled("dailywinner"):
+            if not generateWinnerAndLoser.is_running():
+                generateWinnerAndLoser.start() 
+
+        if db.isTaskEnabled("channelpoints"):
+            if not checkChannelActivityAndAwardPoints.is_running():
+                checkChannelActivityAndAwardPoints.start() 
+
     @bot.event
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=os.environ["PROD_STATUS"]))
         print("[INFO] " + f'{bot.user} is now running!')
         if os.environ["PROD_STATUS"] == "PRODUCTION":
-            #if not analyzeMatchHistoryTFT.is_running():
-            #    analyzeMatchHistoryTFT.start() 
+            #in this function we'll enable / disable tasks based on what we have in DB
+            if not tasksHandling.is_running():
+                tasksHandling.start()
             
-            if not sendBirthdayInfo.is_running():
-                sendBirthdayInfo.start() 
-
-            #if not rouletteTask.is_running():
-            #    rouletteTask.start() 
-
-            #if not freePeopleFromPrison.is_running():
-            #    freePeopleFromPrison.start()
-
-            #if not manageHeist.is_running():
-            #    manageHeist.start()
-
-            if not generateWinnerAndLoser.is_running():
-                generateWinnerAndLoser.start() 
-
-            if not checkChannelActivityAndAwardPoints.is_running():
-                checkChannelActivityAndAwardPoints.start() 
         
     @bot.event
     async def on_message(message):
