@@ -205,7 +205,7 @@ def runDiscordBot():
         if db.isTaskEnabled("dailywinner"):
             if not generateWinnerAndLoser.is_running():
                 generateWinnerAndLoser.start()
-                print("[INFO] Daily winner has been disabled!")
+                print("[INFO] Daily winner has been enabled!")
         else:
             if generateWinnerAndLoser.is_running():
                 generateWinnerAndLoser.stop()
