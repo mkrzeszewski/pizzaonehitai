@@ -326,7 +326,7 @@ def handleResponse(userMessage, author) -> str:
 
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
-        returnText = "User o ID: " + str(author) + "nie znajduje sie w bazie danych. Uderz do roLab."
+        returnText = "User o ID: " + str(author) + " nie znajduje sie w bazie danych. Uderz do roLab."
         return returnEmbed, returnText, returnView, returnFile   
     
     if user['arrested'] and commands[0] in escapeKeyword:
@@ -583,6 +583,32 @@ def handleResponse(userMessage, author) -> str:
                 returnText = "Losujemy: 1 - " + commands[1] + " -> " + str(random.randint(1,int(commands[1])))
             elif len(commands) == 3:
                 returnText = "Losujemy: " + commands[1] + " - " + commands[2] + " -> " + str(random.randint(int(commands[1]),int(commands[2])))
+
+        elif commands[0] == "enabletask" or commands[0] == "enable":
+            if int(author) == 326259887007072257:
+                if len(commands) > 1:
+                    taskName = str(commands[1])
+                    task = db.retrieveTask('name', taskName)
+                    if task:
+                        db.enableTask(str(commands[1]))
+                        returnText = "Enabled task " + taskName + "."
+                    else:
+                        returnText = "No task found = \"" + taskName + "\"."
+            else:
+                returnText = securityResponse
+        
+        elif commands[0] == "disabletask" or commands[0] == "disable":
+            if int(author) == 326259887007072257:
+                if len(commands) > 1:
+                    taskName = str(commands[1])
+                    task = db.retrieveTask('name', taskName)
+                    if task:
+                        db.disableTask(str(commands[1]))
+                        returnText = "Disabled task " + taskName + "."
+                    else:
+                        returnText = "No task found = \"" + taskName + "\"."
+            else:
+                returnText = securityResponse
     else:
 
         #if its a singular commmand - transform message to lower.

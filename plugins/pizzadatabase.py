@@ -233,17 +233,34 @@ def retrieveRewards():
 def retrieveAchievements():
     return achievementCollection.find({})
 
+def retrieveAllTasks():
+    return tasksCollection.find({})
+
+def retrieveTask(key, value):
+    return tasksCollection.find_one({key: value})
+
+def isTaskEnabled(name):
+    return tasksCollection.find_one({"name": name},{"enabled": 1})
+
+def disableTask(name):
+    return tasksCollection.update_one({"name": name},{"$set": {"enabled": False}}).matched_count
+
+def enableTask(name):
+    return tasksCollection.update_one({"name": name},{"$set": {"enabled": True}}).matched_count
+
 def retrieveAllStocks():
     return stocksCollection.find({})
 
 def removeAllStocks():
     return stocksCollection.delete_many({}) #ostroznie!
 
-def insertStock(name, ticker, shares, price):
+def insertStock(name, symbol, shares, price):
     return stocksCollection.insert_one({'name': name, 
-                                        'ticker' : ticker,
+                                        'symbol' : symbol,
                                         'shares' : shares,
-                                        'price': price})
+                                        'price': price,
+                                        'trend': 0,
+                                        'priceHistory': []})
 
 def updateStock(querykey, queryvalue, key, value):
     stock = stocksCollection.find_one({querykey: queryvalue})
@@ -254,3 +271,10 @@ def updateStock(querykey, queryvalue, key, value):
         )
     else:
         return False
+    
+def updateStockTrend(name, trend):
+    return stocksCollection.update_one({'name': name},{"$set": {"trend": trend}}).matched_count
+
+def updateStockPrice(name, price):
+    return stocksCollection.update_one({'name': name},{"$set": {"price": price}, "priceHistory": { "$concatArrays": ["$priceHistory", ["$price"]] }}).matched_count
+
