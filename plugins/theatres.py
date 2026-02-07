@@ -30,10 +30,10 @@ def checkNewEvents():
         newEvents = []
         if theatre['system'] == "iksoris":
             eventsOnSite = getAllEventsIksoris(theatre['url'])
-        elif theatre['system'] == "roma":
-            print("ROMA")
-        elif theatre['system'] == "xxx":
-            print("xxx")
+        # elif theatre['system'] == "roma":
+        #     x = 1
+        # elif theatre['system'] == "xxx":
+        #     x = 1
 
         eventsInDb = db.retrieveEventsFromTheatre(theatre['name'])
         for event in eventsInDb:
