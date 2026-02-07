@@ -17,6 +17,7 @@ def getAllEventsIkoris(url):
         for h2_tag in soup.find_all('h2', ["h5","text-primary"]):
            events.append(h2_tag.get_text())
         
+        print(events)
         return events
 
     except requests.exceptions.RequestException as e:
@@ -30,6 +31,7 @@ def checkNewEvents():
         eventsOnSite = []
         if theatre['system'] == "ikoris":
             eventsOnSite = getAllEventsIkoris(theatre['url'])
+            print("ikoris")
         elif theatre['system'] == "roma":
             print("ROMA")
         elif theatre['system'] == "xxx":
