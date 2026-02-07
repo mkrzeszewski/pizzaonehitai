@@ -26,7 +26,7 @@ class Variete(Scraper):
             response.raise_for_status()
 
             
-            print(f"Scraping {self.url + path}...")
+            
 
             data = response.json()
 

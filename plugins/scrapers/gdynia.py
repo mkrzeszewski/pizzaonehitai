@@ -19,7 +19,6 @@ class Gdynia(Scraper):
             response = self.session.get(self.url + self.EVENT_DATES_PATH, headers=self.HEADERS, verify=False)
             response.raise_for_status()
 
-            print(f"Scraping {self.url + self.EVENT_DATES_PATH}...")
 
             soup = BeautifulSoup(response.text, "html.parser")
             rows = soup.find_all("div", class_="row spektakl_row kalendarium_row")

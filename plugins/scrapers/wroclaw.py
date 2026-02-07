@@ -51,7 +51,7 @@ class Wroclaw(Scraper):
             response = self.session.get(self.url + path, headers=self.HEADERS, verify=False)
             response.raise_for_status()
             
-            print(f"Scraping {self.url + path}...")
+            
 
             soup = BeautifulSoup(response.text, "html.parser")
 
