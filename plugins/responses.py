@@ -504,12 +504,10 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         elif commands[0] in freeKeyword:
             if int(author) == 326259887007072257:
                 if len(commands) == 2:
-                    if str(commands[1]).isdigit():
-                        arrested_user = db.retrieveUser('discord_id', str(commands[1]))
-                    else:
-                        arrested_user = db.retrieveUser('name', str(commands[1]))
-                    if db.freeUser('discord_id', str(arrested_user['discord_id'])):
-                        returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
+                    arrested_user = userFromPattern(commands[1])
+                    if arrested_user:
+                        if db.freeUser('discord_id', str(arrested_user['discord_id'])):
+                            returnText = "Pomyslnie wypuszczono " + str(commands[1]) + "."
                     else:
                         returnText = "Nieznany user : " + str(commands[1]) + "."
                 else:
@@ -521,10 +519,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if len(commands) == 3:
                 if str(commands[2]).isdigit():
                     if(int(commands[2]) <= int(user['points'])):
-                        if str(commands[1]).isdigit():
-                            dest_user = db.retrieveUser('discord_id', commands[1])
-                        else:
-                            dest_user = db.retrieveUser('name', commands[1])
+                        dest_user = userFromPattern(commands[1])
                         if dest_user:
                             if dest_user != user:
                                 points.transferPoints(str(author), dest_user['discord_id'], int(commands[2]))
@@ -544,10 +539,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if int(author) == 326259887007072257:
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
-                        if str(commands[1]).isdigit():
-                            dest_user = db.retrieveUser('discord_id', commands[1])
-                        else:
-                            dest_user = db.retrieveUser('name', commands[1])
+                        dest_user = userFromPattern(commands[1])
                         if dest_user:
                             points.addPoints(dest_user['discord_id'], int(commands[2]))
                             returnText = "Pomyslnie dodano " + str(commands[2]) + " pizzopunktow do uzytkownika " + dest_user['name'] + "."
@@ -583,7 +575,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
-                user = db.retrieveUser('discord_id', str(commands[1]))
+                user = userFromPattern(commands[1])
                 if user:
                     returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
                 else:
