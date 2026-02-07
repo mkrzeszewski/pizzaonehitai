@@ -16,7 +16,10 @@
             "text": "symbol - symbol na gieldzie, skrot od nazwy - upewnij sie, ze symbole sie nie powtarzaja!"
         },
         {
-            "text": "ceo - imie z tabeli users ktore odpowiada danej firmie"
+            "text": "ceo - imie z tabeli users dla ktorego wygenerowales dana nazwe firmy"
+        },
+        {
+            "text": "zapamietaj - ma byc tyle firm ile uzytkownikow, nie myl uzytkownikow miedzy firmami."
         },
         {
             "text": "zwracasz JSONa, ktory zawiera tabele w formacie - [ {name, symbol, ceo}, {name, symbol, ceo} ] w zaleznosci od ilosci uzytkownikow."
