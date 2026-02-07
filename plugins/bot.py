@@ -12,6 +12,7 @@ import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
+import plugins.theatres as theatres
 
 target_stock_time = time(hour=10, minute=0)
 user_cooldowns = {}
@@ -32,6 +33,7 @@ GAMBA_CHANNEL_ID = 1172911430601822238
 DEFAULT_TFT_CHANNEL = 1172911430601822238 #GRUBY-TEST
 DEFAULT_BDAY_CHANNEL = 1172911430601822238
 DEFAULT_HEIST_CHANNEL = 1172911430601822238
+DEFAULT_THEATRES_CHANNEL = 1422322104237297754
 if os.environ["PROD_STATUS"] == "PRODUCTION":
     DEFAULT_TFT_CHANNEL = 1032698616910983168 #LEAGUEOFDEBILS
     DEFAULT_BDAY_CHANNEL = 993905203084529865 #OGOLNY
@@ -92,6 +94,14 @@ def runDiscordBot():
             target_datetime += timedelta(days = 1)
 
         await asyncio.sleep((target_datetime - now).total_seconds())
+
+    #theatre section
+    @tasks.loop(hours = 1.0)
+    async def theatreCheck():
+        channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
+        msg = theatres.checkNewEvents()
+        if msg != "":
+            await channel.send(msg)
 
     @tasks.loop(hours = 4)
     async def manageHeist():
@@ -256,6 +266,14 @@ def runDiscordBot():
                 updateStockPrices.stop()
                 print("[INFO] Stock investment is disabled..")
 
+        if db.isTaskEnabled("theatres"):
+            if not theatreCheck.is_running():
+                theatreCheck.start()
+                print("[INFO] Theatre check is enabled!")
+        else:
+            if theatreCheck.is_running():
+                theatreCheck.stop()
+                print("[INFO] Theatre check is disabled..")
     @bot.event
     async def on_ready():
         #bot.add_view(embedgen.ruletaView())
