@@ -608,7 +608,7 @@ def generateUserStockSale(user, stock, msg = ""):
     description = msg
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title=str(user['name']) + " sprzedaje akcje " + str(stock['name']) + "!", description=str(description), color = color)
-    embed.set_thumbnail(url = PURCHASE_STOCK_ICON_URL)
+    embed.set_thumbnail(url = SELL_STOCK_ICON_URL)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
