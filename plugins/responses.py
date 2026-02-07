@@ -315,7 +315,7 @@ def getBirthdayStuff(user):
     return returnEmbed, returnText
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
-def handleResponse(userMessage, author, dcbot = None) -> str:
+async def handleResponse(userMessage, author, dcbot = None) -> str:
     random.seed(datetime.now().timestamp())
     #message = userMessage.lower()
     returnEmbed = None
@@ -663,7 +663,7 @@ def handleResponse(userMessage, author, dcbot = None) -> str:
             if match:
                 user = db.retrieveUser('discord_id',match.group(1))
                 if user:
-                    flexUser = dcbot.fetch_user(int(user['discord_id']))
+                    flexUser = await dcbot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
                     returnEmbed = embedgen.generateUserPortfolioEmbed(user, bankruptAvatarURL)
                 else:

@@ -64,7 +64,7 @@ async def triggerHeist(channel):
 async def sendMessage(message, user_message, is_private):
     try:
         response = ""
-        embed, response, view, file = responses.handleResponse(user_message, message.author.id, bot)
+        embed, response, view, file = await responses.handleResponse(user_message, message.author.id, bot)
         if embed == None:
             await message.author.send(response) if is_private else await message.channel.send(response)
         else:
