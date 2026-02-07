@@ -271,14 +271,14 @@ def removeAllStocks():
 def removeStock(name):
     return stocksCollection.delete_one({'name': name})
 
-def insertStock(name, ceo, symbol, shares, price):
+def insertStock(name, ceo, symbol, shares = 100, price = 1000):
     return stocksCollection.insert_one({'name': name, 
                                         'ceo': ceo,
                                         'symbol' : symbol,
                                         'shares' : shares,
                                         'price': price,
                                         'trend': 0.0,
-                                        'priceHistory': [1000]})
+                                        'priceHistory': [price]})
 
 def updateStock(querykey, queryvalue, key, value):
     stock = stocksCollection.find_one({querykey: queryvalue})

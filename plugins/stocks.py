@@ -38,7 +38,7 @@ def initiateStocksDB(json_stocks):
     if json_stocks:
         json_stocks = json.loads(json_stocks)
         for stock in json_stocks:
-            db.insertStock(stock['name'], stock['symbol'], 100, 1000)
+            db.insertStock(stock['name'], stock['ceo'], stock['symbol'])
     simulateTrends()
 
 #we do it once per month
