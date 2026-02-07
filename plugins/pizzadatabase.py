@@ -336,7 +336,7 @@ def retrieveAllEvents():
     return eventsCollection.find({})
 
 def addEvent(name, theatre):
-    return eventsCollection.insert_one({'name': name, 
+    return eventsCollection.insert_one({'title': name, 
                                         'theatre': theatre})
 
 def retrieveEvent(key, value):
@@ -351,8 +351,11 @@ def retrieveEvent(key, value):
 def retrieveEvents(key, value):
     return eventsCollection.find({key: value})
 
-def retrieveEventFromTheatre(theatre, name):
-    return eventsCollection.find_one({"theatre": theatre, "name": name}, {"_id": 0, "name":1})
+def retrieveEventFromTheatre(theatre, title):
+    return eventsCollection.find_one({"theatre": theatre, "title": title}, {"_id": 0, "name":1})
 
-def retrieveEventsFromTheatre(theatre):
-    return list(eventsCollection.find({"theatre": theatre}, {"_id": 0, "name":1}))
+def retrieveEventsFromTheatre(theatre, title):
+    return list(eventsCollection.find({"title":title,"teatr":theatre}))
+
+def updateEvent(theatre, title, event):
+    return eventsCollection.update_one({"teatr":theatre,"title":title},{"$set": event},upsert=True)
