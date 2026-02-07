@@ -256,6 +256,9 @@ def disableTask(name):
 def enableTask(name):
     return tasksCollection.update_one({"name": name},{"$set": {"enabled": True}}).matched_count
 
+def retrieveStock(key, value):
+    return stocksCollection.find_one({key: value})
+
 def retrieveAllStocks():
     return stocksCollection.find({})
 
