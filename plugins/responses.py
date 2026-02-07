@@ -633,6 +633,14 @@ def handleResponse(userMessage, author) -> str:
                         returnText = "No task found = \"" + taskName + "\"."
             else:
                 returnText = securityResponse
+
+        elif commands[0] == "purchasestock" or commands[0] == "buystock":
+            if len(commands) > 2:
+                stockSymbol = str(commands[1])
+                amount = int(commands[2])
+                returnText = stocks.purchaseStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
+            else:
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5"
     else:
 
         #if its a singular commmand - transform message to lower.

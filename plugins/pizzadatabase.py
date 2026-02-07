@@ -298,3 +298,14 @@ def updateStockTrend(name, trend):
 
 def updateStockPrice(name, price):
     return stocksCollection.update_one({'name': name},[{"$set": {"price": price,"priceHistory": { "$concatArrays": [{"$ifNull": ["$priceHistory", []]}, [price] ] }}}]).matched_count
+
+def updateStockShares(name, shares):
+    return stocksCollection.update_one({'name': name},{"$set": {"shares": shares}}).matched_count
+
+def updateStocksForUser(userkey, uservalue, symbol, amount):
+    query = {userkey: uservalue, "stocksOwned.symbol": symbol}
+    update = {"$inc": {"stocksOwned.$.amount": amount}}
+    result = userCollection.update_one(query, update)
+    if result.modified_count == 0:
+        return userCollection.update_one({userkey: uservalue},{"$push": {"stocksOwned": {"symbol": symbol, "amount": amount}}})
+    return False

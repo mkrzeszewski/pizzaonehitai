@@ -1,5 +1,6 @@
 import plugins.pizzadatabase as db
 import plugins.ai as ai
+import plugins.points as points
 import json
 import random
 import numpy as np
@@ -69,6 +70,30 @@ def updatePrices():
             else:
                 db.updateStockPrice(stock['name'], newPrice)
     return bankrupts
+
+def purchaseStocks(username, stocksymbol, amount):
+    user = db.retrieveUser('name', username)
+    stock = db.retrieveStock('symbol', stocksymbol)
+    if user and stock:
+        userPoints = int(user['points'])
+        if int(stock['shares']) >= amount:
+            if userPoints >= int(stock['price'] * amount):
+                db.updateStockShares(stock['name'], int(stock['shares']) - amount)
+                points.modifyPoints('name',user['name'], userPoints - int(int(stock['shares']) * int(amount)))
+                info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(int(int(stock['shares']) * int(amount)))
+                print(info)
+                if db.updateStocksForUser('name',user['name'],stock['symbol'], amount):
+                    return "info"
+                else:
+                    return "Something went wrong when purchasing " + str(stock['name']) + "."
+            else:
+                return "User " + str(username) + " doesnt have funds to purchase that many stock.\n" + str(userPoints) + "/" + str(int(stock['price'] * amount))
+        else: 
+            return "Stock " + str(stock['name']) + " doesnt have enough shares on the market.\n" + str(amount) + "/" + str(int(stock['shares']))
+    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+
+def sellStocks(username, stocksymbol, amount):
+    return ""
 
 def generateGraph():
     return ""
