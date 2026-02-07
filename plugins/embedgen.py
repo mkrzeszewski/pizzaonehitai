@@ -577,7 +577,7 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
             totalAmount += int(stock['price'] * share['amount'])
         description += "Obecna wartosc akcji uzytkownika = " + str(totalAmount) + " pizzopuntkow."
     else:
-        description += "Uzytkownik" + str(user['name']) + " nie posiada obecnie zadnych akcji."
+        description += "Uzytkownik " + str(user['name']) + " nie posiada obecnie zadnych akcji."
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Aktualne akcje - " + str(user['name']), description=str(description), color = color)
     if userAvatarURL:
