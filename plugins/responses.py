@@ -316,6 +316,21 @@ def getBirthdayStuff(user):
         points.addPoints(str(user['discord_id']), 5000)
     return returnEmbed, returnText
 
+def userFromPattern(pattern):
+    match = TAG_PATTERN.search(pattern)
+    if match:
+        user = db.retrieveUser('discord_id',match.group(1))
+        if user:
+            return user
+    user = db.retrieveUser('discord_id',str(pattern))
+    if user:
+        return user
+    
+    user = db.retrieveUser('name',str(pattern))
+    if user:
+        return user
+    return None
+
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
     random.seed(datetime.now().timestamp())
@@ -661,17 +676,13 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
         elif commands[0] == "portfolio" or commands[0] == "flex":
-            match = TAG_PATTERN.search(commands[1])
-            if match:
-                user = db.retrieveUser('discord_id',match.group(1))
-                if user:
-                    flexUser = await dcbot.fetch_user(int(user['discord_id']))
-                    flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
-                    returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
-                else:
-                    returnText = "User " + str(commands[1]) + "not found."
+            user = userFromPattern(commands[1])
+            if user:
+                flexUser = await dcbot.fetch_user(int(user['discord_id']))
+                flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
+                returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
             else:
-                returnText = "Prosze otagowac usera ktorego portfolio akcji chcesz zobaczyc! \nnp. !portfolio @roLab"
+                returnText = "User " + str(commands[1]) + "not found."
     else:
 
         #if its a singular commmand - transform message to lower.
