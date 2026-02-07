@@ -38,7 +38,8 @@ def checkNewEvents():
         elif theatre['system'] == "xxx":
             print("xxx")
 
-        eventsInDb = db.retrieveAllEvents()
+        eventsInDb = db.retrieveEventsFromTheatre(theatre['name'])
+        print(eventsInDb)
         newEvents = []
         
         for event in eventsInDb:
@@ -46,15 +47,14 @@ def checkNewEvents():
                 db.removeEvent('name',event['name'])
         
         for event in eventsOnSite:
-            eventsInDb = list(db.retrieveEventFromTheatre(theatre['name'], event))
-            if len(eventsInDb) == 0:
+            if not db.retrieveEventFromTheatre(theatre['name'], event):
                 newEvents.append(event)
                 db.addEvent(event, theatre['name'])
 
         if len(newEvents) > 0:
             returnText += "Nowe wydarzenie na stronie " + str(theatre['name']) + ".\n"
             returnText += "\n - ".join(newEvents)
-            theatreEvents.append([theatre,newEvents])
+            theatreEvents.append([theatre, newEvents])
 
     print(theatreEvents)
     return theatreEvents
