@@ -30,6 +30,8 @@ def checkNewEvents():
     theatres = db.retrieveAllTheatres()
     for theatre in theatres:
         eventsOnSite = []
+        newEvents = []
+        
         if theatre['system'] == "iksoris":
             eventsOnSite = getAllEventsIksoris(theatre['url'])
             print("iksoris")
@@ -39,25 +41,19 @@ def checkNewEvents():
             print("xxx")
 
         eventsInDb = db.retrieveEventsFromTheatre(theatre['name'])
-        print(eventsInDb)
-        newEvents = []
+        
         
         for event in eventsInDb:
             if event['name'] not in eventsOnSite:
                 db.removeEvent('name',event['name'])
         
         for event in eventsOnSite:
-            print('1')
-            if not list(db.retrieveEventFromTheatre(theatre['name'], event)):
+            if not db.retrieveEventFromTheatre(theatre['name'], event):
                 newEvents.append(event)
-                print('2')
                 db.addEvent(event, theatre['name'])
 
-        print('3')
         if len(newEvents) > 0:
             returnText += "Nowe wydarzenie na stronie " + str(theatre['name']) + ".\n"
             returnText += "\n - ".join(newEvents)
             theatreEvents.append([theatre, newEvents])
-
-    print(theatreEvents)
     return theatreEvents
