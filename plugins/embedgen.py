@@ -521,7 +521,7 @@ def generateFullStonks(stocks):
     for stock in stocks:
         sym = stock['symbol']
         prc = f"{stock['price']} PP"
-        shr = f"{stock['share']}"
+        shr = f"{stock['shares']}"
         description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
     description += "```"
     embed = Embed(title="Gielda Pizza One Hit - kompiutor overview", description=str(description), color = color)
