@@ -100,7 +100,6 @@ def runDiscordBot():
     async def theatreCheck():
         channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
         parsedTheatres = theatres.checkNewEvents()
-        print(parsedTheatres)
         if parsedTheatres:
             for theatre in parsedTheatres:
                 for event in theatre[1]:
