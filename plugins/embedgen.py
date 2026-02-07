@@ -512,9 +512,28 @@ def generateStocksOverview(stocks):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateBottomStocks():
+def generateFullStonks(stocks):
+    color = Colour.dark_green()
+    description = "```py\n"
+    description += f"{'SYM':<5} | {'PRICE':<9} | {'SHARES':<6}\n"
+    description += "—" * 28 + "\n"
+    for stock in stocks:
+        sym = stock['symbol']
+        prc = f"{stock['price']} PP"
+        shr = f"{stock['share']}"
+        description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
+    description += "```"
+    embed = Embed(title="Gielda Pizza One Hit - kompiutor overview", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = STONKS_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBottomStocks(stocks):
     color = Colour.dark_red()
     description = ""
+    for stock in stocks:
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
     embed = Embed(title="Gielda Pizza One Hit - bottom 5", description=str(description), color = color)
     embed.set_thumbnail(url = BOGDANOFF_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)

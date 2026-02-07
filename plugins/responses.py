@@ -748,4 +748,9 @@ def handleResponse(userMessage, author) -> str:
         if message == "testmarkdown":
             returnEmbed = embedgen.testMarkdown()
 
+        if message == "fullstonks":
+            _stocks = db.retrieveBottomStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateFullStonks()
+
     return returnEmbed, returnText, returnView, returnFile
