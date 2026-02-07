@@ -64,6 +64,13 @@ def updatePrices():
             trend = trend * noiseMultiplier
             newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
             if newPrice < 50:
+                users = db.retrieveAllUsers()
+                for user in users:
+                    if user['stocksOwned']:
+                        for share in user['stocksOwned']:
+                            if share['symbol'] == stock['symbol']:
+                                db.removeStocksFromUser('name',user['name'],share['symbol'], share['amount'])
+                                break
                 db.removeStock(stock['name'])
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
                 bankrupts.append(stock)
@@ -99,7 +106,7 @@ def sellStocks(username, stocksymbol, amount):
     taxRate = 0.10
     userShares = 0
     if user and stock:
-        for s in user['stockOwned']:
+        for s in user['stocksOwned']:
             if s['symbol'] == stocksymbol:
                 userShares = s['amount']
                 break
