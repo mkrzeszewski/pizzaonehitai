@@ -751,14 +751,14 @@ def handleResponse(userMessage, author) -> str:
         if message == "fullstonks":
             _stocks = db.retrieveBottomStocks()
             if _stocks:
-                returnEmbed = embedgen.generateFullStonks()
+                returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "testbankrupcy":
             user = db.retrieveUser('discord_id', str(author))
             if user:
                 _stock = db.retrieveStock('ceo',user['name'])
                 if _stock:
-                    returnEmbed = embedgen.generateBankrupcy(_stock, author.avatar.url)
+                    returnEmbed = embedgen.generateBankrupcy(_stock)
             else:
                 returnText = "xx"
 
