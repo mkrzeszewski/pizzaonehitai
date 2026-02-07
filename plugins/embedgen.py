@@ -289,7 +289,7 @@ def generateBirthdayEmbed(user, facts, wrozba):
 def generateWinnerEmbed(user, userAvatarURL):
     embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow w sposob "+random.choice(GRATULACJE)+"."), color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
-    embed.add_field(name = "Do twojego konta przypisalismy 500 ppkt + 10% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
+    embed.add_field(name = "Do twojego konta przypisalismy 500 ppkt + 15% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
@@ -427,6 +427,7 @@ def generateHeistCanceled(heist_name):
     embed.add_field(name = "Sprobujcie szczescia w nastepnym napadzie..", value="Punkty zostaly zwrocone.", inline = False)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
+
 def generatePrisonRelease(users):
     color = Colour.dark_orange()
     description = ""
