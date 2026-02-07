@@ -14,7 +14,7 @@ import plugins.stocks as stocks
 import asyncio
 from datetime import datetime
 import re
-from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
+from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound, File, Member, User
 
 MAX_SLOT_AMOUNT = 5000
 
@@ -315,7 +315,7 @@ def getBirthdayStuff(user):
     return returnEmbed, returnText
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
-def handleResponse(userMessage, author) -> str:
+def handleResponse(userMessage, author, dcbot = None) -> str:
     random.seed(datetime.now().timestamp())
     #message = userMessage.lower()
     returnEmbed = None
