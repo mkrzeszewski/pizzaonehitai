@@ -37,6 +37,10 @@ def generateStocks():
     return str(response)
 
 def initiateStocksDB(json_stocks):
+    users = db.retrieveAllUsers()
+    if users:
+        for user in users:
+            cashout(user['name'])
     db.removeAllStocks()
     if json_stocks:
         json_stocks = json.loads(json_stocks)
