@@ -8,8 +8,9 @@ def generateStocks():
     userList = []
     for user in users:
         userList.append(user['name'])
-    print(ai.generateStocks(userList))
-    return "generated stocks"
+    response = ai.generateStocks(userList)
+    print(str(response))
+    return str(response)
 
 #we do it once per month
 def removeAllStocks():
