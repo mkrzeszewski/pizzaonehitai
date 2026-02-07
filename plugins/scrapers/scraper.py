@@ -3,6 +3,14 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from abc import ABC, abstractmethod
+from plugins.scrapers.gdynia import Gdynia
+from plugins.scrapers.iksoris import Iksoris
+from plugins.scrapers.poznan import Poznan
+from plugins.scrapers.roma import Roma
+from plugins.scrapers.scraper import Scraper
+from plugins.scrapers.variete import Variete
+from plugins.scrapers.wroclaw import Wroclaw
+
 
 class Scraper(ABC):
     HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'}
