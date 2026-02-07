@@ -721,4 +721,10 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 returnText = str(stocks.generateStocks())
 
+        if message == 'generatetrends':
+            returnText = securityResponse
+            if int(author) == 326259887007072257:
+                stocks.simulateTrends()
+                returnText = "Przeprowadzono generacje trendow dla stockow."
+
     return returnEmbed, returnText, returnView, returnFile
