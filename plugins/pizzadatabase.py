@@ -350,3 +350,6 @@ def retrieveEvent(key, value):
 
 def retrieveEvents(key, value):
     return eventsCollection.find({key: value})
+
+def retrieveEventFromTheatre(theatre, name):
+    return eventsCollection.find({"theatre": theatre, "name": name}, {"_id": 0, "name":1, "theatre": 0})

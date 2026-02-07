@@ -47,7 +47,7 @@ def checkNewEvents():
                 db.removeEvent('name',event['name'])
         
         for event in eventsOnSite:
-            eventsInDb = list(db.retrieveEvents('name',event))
+            eventsInDb = list(db.retrieveEventNamesFromTheatre(theatre['name'], event))
             if len(eventsInDb) == 0:
                 newEvents.append(event)
                 db.addEvent(event, theatre['name'])
