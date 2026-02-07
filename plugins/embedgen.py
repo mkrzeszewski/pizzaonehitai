@@ -556,7 +556,7 @@ def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
     if badInvestors:
-        description += "Nieudacznicy, ktorzy probowali zainwestowac w te firme: \n"
+        description += "\nNieudacznicy, ktorzy probowali zainwestowac w te firme: \n"
         for investor in badInvestors:
             description += " - " + str(investor)
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
