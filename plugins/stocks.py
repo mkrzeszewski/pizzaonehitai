@@ -4,11 +4,12 @@ import plugins.ai as ai
 #we do it once per month
 def generateStocks():
     db.removeAllStocks()
-    users = db.retrieveAllUsers()
+    users = db.retrieveUsers()
     userList = []
     for user in users:
         userList.append(user['name'])
-    return(ai.generateStocks(userList))
+    print(ai.generateStocks(userList))
+    return "generated stocks"
 
 #we do it once per month
 def removeAllStocks():
