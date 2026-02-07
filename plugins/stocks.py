@@ -94,7 +94,28 @@ def purchaseStocks(username, stocksymbol, amount):
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
 def sellStocks(username, stocksymbol, amount):
-    return ""
+    user = db.retrieveUser('name', username)
+    stock = db.retrieveStock('symbol', stocksymbol)
+    taxRate = 0.10
+    userShares = 0
+    if user and stock:
+        for s in user['stockOwned']:
+            if s['symbol'] == stocksymbol:
+                userShares = s['amount']
+                break
+        if userShares >= amount:
+            db.updateStockShares(stock['name'], int(stock['shares']) + amount)
+            returnMoney = int(int(int(stock['price']) * int(amount)) * taxRate)
+            points.modifyPoints('name',user['name'], int(returnMoney))
+            info = "[Stocks] User " + str(user['name']) + " has sold " + str(amount) + " shares of " + str(stock['name']) + " for " + str(returnMoney) + " (10% tax was applied)."
+            print(info)
+            if db.removeStocksFromUser('name',user['name'],stock['symbol'], amount):
+                return info
+            else:
+                return "Something went wrong when purchasing " + str(stock['name']) + "."
+        else: 
+            return "User " + str(username) + " doesnt have enough shares.\n" + str(amount) + "/" + str(userShares)
+    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
 def generateGraph():
     return ""

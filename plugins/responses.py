@@ -556,6 +556,12 @@ def handleResponse(userMessage, author) -> str:
                 tftapi.setAPIKey(commands[1])
                 returnText = "API Key successfuly replaced"
 
+        elif commands[0] == "test tagging":
+            if int(author) == 326259887007072257:
+                print(commands)
+                print(message)
+                returnText = message
+
         elif commands[0] == "birthdaytest":
             if int(author) == 326259887007072257 and len(commands) == 2:
                 user = db.retrieveUser('discord_id', str(commands[1]))

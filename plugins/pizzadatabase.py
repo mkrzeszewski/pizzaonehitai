@@ -309,3 +309,12 @@ def updateStocksForUser(userkey, uservalue, symbol, amount):
     if result.modified_count == 0:
         return userCollection.update_one({userkey: uservalue},{"$push": {"stocksOwned": {"symbol": symbol, "amount": amount}}})
     return False
+
+def removeStocksFromUser(username, symbol, amount):
+    query = {"name": username, "stocksOwned.symbol": symbol}
+    update = {"$inc": {"stocksOwned.$.amount": -amount}}
+    userCollection.update_one(query, update)
+    userCollection.update_one(
+        {"name": username},
+        {"$pull": {"stocksOwned": {"symbol": symbol, "amount": {"$lte": 0}}}}
+    )
