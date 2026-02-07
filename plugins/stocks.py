@@ -4,7 +4,7 @@ import plugins.points as points
 import json
 import random
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import io
 
 TAX_RATE = 0.10
@@ -140,5 +140,49 @@ def cashout(username):
         return "User " + str(user['name']) + " doesn't have any shares."
 
 def generateGraph():
-    return ""
+    stocksData = db.retrieveAllStocks()
+    width, height = 1000, 500
+    margin = 40
+    img = Image.new("RGB", (width, height), (30, 30, 30)) # Dark background
+    draw = ImageDraw.Draw(img)
 
+    # 1. Find Global Min/Max to scale the Y-axis
+    allPrices = []
+    for stock in stocksData:
+        for price in stocksData['priceHistory']:
+            allPrices.append(price)
+    if not allPrices: return None
+    
+    g_min, g_max = 0, max(allPrices) + 50
+    price_range = g_max - g_min if g_max != g_min else 1
+
+    # 2. Find Max History Length to scale the X-axis
+    max_points = max(len(s['priceHistory']) for s in stocksData)
+    x_step = (width - 2 * margin) / (max_points - 1) if max_points > 1 else 0
+
+    # 3. Draw each stock line
+    for stock in stocksData:
+        history = stock['priceHistory']
+        if len(history) < 2: continue
+        line_points = []
+        for i, price in enumerate(history):
+            # Calculate X (horizontal)
+            x = margin + (i * x_step)
+            
+            # Calculate Y (vertical) - Inverse because 0,0 is Top-Left in PIL
+            # We map price to 0-1 range, then scale to height
+            normalized_y = (price - g_min) / price_range
+            y = (height - margin) - (normalized_y * (height - 2 * margin))
+            
+            line_points.append((x, y))
+
+        # Draw the line
+        color = stock.get('color', (random.randint(100, 255), 
+                                    random.randint(100, 255), 
+                                    random.randint(100, 255)))
+        draw.line(line_points, fill=color, width=3, joint="curve")
+
+    # 4. (Optional) Draw a border or grid
+    draw.rectangle([margin, margin, width-margin, height-margin], outline=(100, 100, 100))
+    
+    return img
