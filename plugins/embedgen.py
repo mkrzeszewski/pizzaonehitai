@@ -556,12 +556,11 @@ def generateBankrupcy(stock, userAvatarURL = 0):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
-
+    embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     if userAvatarURL:
         embed.set_thumbnail(url = userAvatarURL)
     else:
         embed.set_thumbnail(url = STINKS_ICON_URL)
-    embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
