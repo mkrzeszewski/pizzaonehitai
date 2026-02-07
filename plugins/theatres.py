@@ -1,6 +1,8 @@
 import plugins.pizzadatabase as db
 import requests
 from bs4 import BeautifulSoup
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def getAllEventsIksoris(url):
     try:
@@ -32,7 +34,7 @@ def checkNewEvents():
             print("ROMA")
         elif theatre['system'] == "xxx":
             print("xxx")
-            
+
         eventsInDb = db.retrieveEventsFromTheatre(theatre['name'])
         for event in eventsInDb:
             if event['name'] not in eventsOnSite:
