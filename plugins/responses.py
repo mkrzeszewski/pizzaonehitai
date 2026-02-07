@@ -826,7 +826,5 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     bankruptUser = await dcbot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
                     returnEmbed = embedgen.generateBankrupcy(_stock, bankruptAvatarURL)
-            else:
-                returnText = "xx"
 
     return returnEmbed, returnText, returnView, returnFile

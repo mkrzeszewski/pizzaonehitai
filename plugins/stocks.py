@@ -92,10 +92,8 @@ def purchaseStocks(username, stocksymbol, amount):
                 points.modifyPoints('name',user['name'], -1 * int(cost))
                 info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
                 print(info)
-                if db.updateStocksForUser('name',user['name'],stock['symbol'], amount):
-                    return info
-                else:
-                    return "Something went wrong when purchasing " + str(stock['name']) + "."
+                db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
+                return info
             else:
                 return "User " + str(username) + " doesnt have funds to purchase that many stock.\n" + str(userPoints) + "/" + str(int(stock['price'] * amount))
         else: 
@@ -105,7 +103,6 @@ def purchaseStocks(username, stocksymbol, amount):
 def sellStocks(username, stocksymbol, amount):
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
-    
     userShares = 0
     if user and stock:
         for s in user['stocksOwned']:
@@ -129,7 +126,7 @@ def cashout(username):
     if user['stocksOwned']:
         for share in user['stocksOwned']:
             stock = db.retrieveStock('symbol',share['symbol'])
-            totalAmount += int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            returnMoney += int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
             db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
         points.modifyPoints('name',user['name'], int(returnMoney))
         info = "[Stocks] User " + str(user['name']) + " has sold all their shares for " + str(returnMoney) + " (10% tax was applied)."
