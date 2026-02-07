@@ -1,12 +1,5 @@
 import plugins.pizzadatabase as db
 import plugins.scrapers.scraper as scrapers
-from plugins.scrapers.gdynia import Gdynia
-from plugins.scrapers.iksoris import Iksoris
-from plugins.scrapers.poznan import Poznan
-from plugins.scrapers.roma import Roma
-from plugins.scrapers.scraper import Scraper
-from plugins.scrapers.variete import Variete
-from plugins.scrapers.wroclaw import Wroclaw
 from bs4 import BeautifulSoup
 import urllib3
 
