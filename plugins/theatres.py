@@ -1,5 +1,5 @@
 import plugins.pizzadatabase as db
-import scrapers
+import plugins.scrapers as scrapers
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
