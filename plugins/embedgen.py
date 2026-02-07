@@ -507,6 +507,7 @@ def generateStocksOverview(stocks):
     description = ""
     for stock in stocks:
         description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = STONKS_ICON_URL)
@@ -524,6 +525,7 @@ def generateFullStonks(stocks):
         shr = f"{stock['shares']}"
         description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
     description += "```"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="WallStreet - Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = STONKS_ICON_URL)
@@ -535,6 +537,7 @@ def generateBottomStocks(stocks):
     description = ""
     for stock in stocks:
         description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Gielda Pizza One Hit - bottom 5", description=str(description), color = color)
     embed.set_thumbnail(url = BOGDANOFF_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -543,6 +546,7 @@ def generateBottomStocks(stocks):
 def testMarkdown():
     color = Colour.dark_green()
     description = "```py\ntest\n```"
+    
     embed = Embed(title="Test backticks.", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
@@ -552,7 +556,7 @@ def generateBankrupcy(stock, userAvatarURL = ""):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
 
-    description += "\n\n Aby zweryfikowac sytuacje na gieldzie - !stonks"
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
