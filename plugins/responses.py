@@ -663,7 +663,9 @@ def handleResponse(userMessage, author, dcbot = None) -> str:
             if match:
                 user = db.retrieveUser('discord_id',match.group(1))
                 if user:
-                    returnEmbed = embedgen.generateUserPortfolioEmbed(user)
+                    flexUser = dcbot.fetch_user(int(user['discord_id']))
+                    bankruptAvatarURL = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
+                    returnEmbed = embedgen.generateUserPortfolioEmbed(user, bankruptAvatarURL)
                 else:
                     returnText = "User " + str(commands[1]) + "not found."
             else:

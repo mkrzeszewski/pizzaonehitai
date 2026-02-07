@@ -69,7 +69,7 @@ def updatePrices():
                     if user['stocksOwned']:
                         for share in user['stocksOwned']:
                             if share['symbol'] == stock['symbol']:
-                                db.removeStocksFromUser('name',user['name'],share['symbol'], share['amount'])
+                                db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
                                 break
                 db.removeStock(stock['name'])
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
@@ -116,7 +116,7 @@ def sellStocks(username, stocksymbol, amount):
             points.modifyPoints('name',user['name'], int(returnMoney))
             info = "[Stocks] User " + str(user['name']) + " has sold " + str(amount) + " shares of " + str(stock['name']) + " for " + str(returnMoney) + " (10% tax was applied)."
             print(info)
-            if db.removeStocksFromUser('name',user['name'],stock['symbol'], amount):
+            if db.removeStocksFromUser(user['name'],stock['symbol'], amount):
                 return info
             else:
                 return "Something went wrong when purchasing " + str(stock['name']) + "."

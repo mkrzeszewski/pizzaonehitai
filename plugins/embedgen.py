@@ -562,7 +562,7 @@ def generateBankrupcy(stock, userAvatarURL = ""):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateUserPortfolioEmbed(user):
+def generateUserPortfolioEmbed(user, bankruptAvatarURL = 0):
     color = Colour.dark_orange()
     description = ""
     totalAmount = 0
@@ -576,6 +576,10 @@ def generateUserPortfolioEmbed(user):
         description += "Uzytkownik" + str(user['name']) + " nie posiada obecnie zadnych akcji."
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Aktualne akcje - " + str(user['name']), description=str(description), color = color)
+    if bankruptAvatarURL:
+        embed.set_thumbnail(url = bankruptAvatarURL)
+    else:
+        embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
