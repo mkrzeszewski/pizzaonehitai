@@ -578,7 +578,7 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
     if user['stocksOwned']:
         for share in user['stocksOwned']:
             stock = db.retrieveStock('symbol',share['symbol'])
-            description += "* [" + str(stock['symbol']) + "]" + str(stock['name']) + " - " + str(share['amount']) + " udzialow.\n"
+            description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + " - " + str(share['amount']) + " udzialow.\n"
             totalAmount += int(stock['price'] * share['amount'])
         description += "Obecna wartosc akcji uzytkownika = " + str(totalAmount) + " pizzopuntkow."
     else:
