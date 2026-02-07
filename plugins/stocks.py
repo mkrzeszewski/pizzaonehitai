@@ -6,13 +6,17 @@ import numpy as np
 
 def generateTrend():
     roll = random.random() * 100 
-    if roll <= 1:    return random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
-    if roll <= 5:    return random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
-    if roll <= 20:   return random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
-    if roll <= 80:   return random.uniform(-0.02, 0.03)  # 60% - STABLE (The "Normal" Day)
-    if roll <= 95:   return random.uniform(0.05, 0.12)  # 15% - BULLISH (Good news!) 
-    if roll <= 99:   return random.uniform(0.20, 0.35)   # 4% - TO THE MOON (Huge hype)
-    else:            return random.uniform(0.45, 0.60)# 1% - THE BIG SQUEEZE (God-tier gains)
+    trend = 0
+    
+    if roll <= 1:    trend = random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
+    elif roll <= 5:  trend = random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
+    elif roll <= 20: trend = random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
+    elif roll <= 80: trend = random.uniform(-0.02, 0.03) # 60% - STABLE (The "Normal" Day) 
+    elif roll <= 95: trend = random.uniform(0.05, 0.12) # 15% - BULLISH (Good news!)   
+    elif roll <= 99: trend = random.uniform(0.20, 0.35) # 4% - TO THE MOON (Huge hype)  
+    else:            trend = random.uniform(0.45, 0.60) # 1% - THE BIG SQUEEZE (God-tier gains)
+
+    return round(trend, 3)
 
 #we do it once per month
 def generateStocks():
@@ -33,7 +37,7 @@ def initiateStocksDB(json_stocks):
     if json_stocks:
         json_stocks = json.loads(json_stocks)
         for stock in json_stocks:
-            db.insertStock(stock['name'], stock['symbol'], 100, 10000)
+            db.insertStock(stock['name'], stock['symbol'], 100, 1000)
     simulateTrends()
 
 #we do it once per month
@@ -52,7 +56,10 @@ def updatePrices():
     allStocks = db.retrieveAllStocks()
     if allStocks:
         for stock in allStocks:
-            newPrice = int(float(stock['trend'])*float(int(stock['price']))) + int(stock['price'])
+            trend = float(stock['trend'])
+            noiseMultiplier = random.uniform(0.5,1.5)
+            trend = trend * noiseMultiplier
+            newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
             if newPrice < 50:
                 db.removeStock(stock['name'])
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))

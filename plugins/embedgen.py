@@ -498,3 +498,15 @@ def generateAchievements(achievements):
     embed.set_thumbnail(url = PEPE_PUCHAR_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
+
+def generateStocksOverview(stocks):
+    color = Colour.dark_green()
+    description = ""
+    for stock in stocks:
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\ndostepne akcje:" + str(stocks['share']) + "\naktualna cena" + str(stocks['price']) + "\n"
+    embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = PEPE_PUCHAR_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+

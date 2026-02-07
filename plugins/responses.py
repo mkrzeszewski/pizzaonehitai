@@ -715,6 +715,10 @@ def handleResponse(userMessage, author) -> str:
 
         if message in stocksKeyword:
             allStocks = db.retrieveAllStocks()
+            if allStocks:
+                returnEmbed = embedgen.generateStocksOverview(allStocks)
+            else:
+                returnText = "Currently there's no stock value"
         
         if message == 'generatestocks':
             returnText = securityResponse

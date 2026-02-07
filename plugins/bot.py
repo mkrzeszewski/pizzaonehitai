@@ -124,7 +124,7 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 10.0)
     async def updateStockPrices():
-        stocks.updateAllStocks()
+        stocks.updatePrices()
 
     @freePeopleFromPrison.before_loop
     async def dailyPrisonEscape7AM():
