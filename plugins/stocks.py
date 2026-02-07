@@ -7,6 +7,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 import io
 
+TAX_RATE = 0.10
+
 def generateTrend():
     roll = random.random() * 100 
     trend = 0
@@ -103,7 +105,7 @@ def purchaseStocks(username, stocksymbol, amount):
 def sellStocks(username, stocksymbol, amount):
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
-    taxRate = 0.10
+    
     userShares = 0
     if user and stock:
         for s in user['stocksOwned']:
@@ -112,20 +114,29 @@ def sellStocks(username, stocksymbol, amount):
                 break
         if userShares >= amount:
             db.updateStockShares(stock['name'], int(stock['shares']) + amount)
-            returnMoney = int(int(int(stock['price']) * int(amount)) * taxRate)
+            returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
             info = "[Stocks] User " + str(user['name']) + " has sold " + str(amount) + " shares of " + str(stock['name']) + " for " + str(returnMoney) + " (10% tax was applied)."
             print(info)
-            if db.removeStocksFromUser(user['name'],stock['symbol'], amount):
-                return info
-            else:
-                return "Something went wrong when purchasing " + str(stock['name']) + "."
+            db.removeStocksFromUser(user['name'],stock['symbol'], amount)
         else: 
             return "User " + str(username) + " doesnt have enough shares.\n" + str(amount) + "/" + str(userShares)
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
 def cashout(username):
-    return ""
+    user = db.retrieveUser('name', username)
+    returnMoney = 0
+    if user['stocksOwned']:
+        for share in user['stocksOwned']:
+            stock = db.retrieveStock('symbol',share['symbol'])
+            totalAmount += int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+        points.modifyPoints('name',user['name'], int(returnMoney))
+        info = "[Stocks] User " + str(user['name']) + " has sold all their shares for " + str(returnMoney) + " (10% tax was applied)."
+        print(info)
+        return info
+    else:
+        return "User " + str(user['name']) + " doesn't have any shares."
 
 def generateGraph():
     return ""

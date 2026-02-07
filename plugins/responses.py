@@ -36,6 +36,7 @@ escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata
 freeKeyword = ["wypusc", "uwolnij", "lethimout"]
 arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
 stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykres"]
+sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -650,13 +651,13 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             else:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
 
-        elif commands[0] == "sellstock":
+        elif commands[0] in sellStockKeyword:
             if len(commands) > 2:
                 stockSymbol = str(commands[1])
                 amount = int(commands[2])
                 returnText = stocks.sellStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
             else:
-                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
         elif commands[0] == "portfolio" or commands[0] == "flex":
             match = TAG_PATTERN.search(commands[1])
@@ -813,7 +814,9 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "cashout" or message == "imout":
-            user = db.retrieveUser('discord_id', str(author))['name']
+            user = db.retrieveUser('discord_id', str(author))
+            if user:
+                returnText = stocks.cashout(user['name'])
 
         if message == "testbankrupcy":
             user = db.retrieveUser('discord_id', str(author))
