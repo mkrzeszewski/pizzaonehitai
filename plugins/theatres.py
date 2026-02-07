@@ -68,7 +68,7 @@ def checkNewEvents():
                         msg += f"- {d["text"]}\n"
                     print(msg)
             if eventArray:
-                returnArray.append(t['name'], eventArray)
+                returnArray.append([t['name'], eventArray])
         return returnArray
     except Exception as e:
         print(e)
