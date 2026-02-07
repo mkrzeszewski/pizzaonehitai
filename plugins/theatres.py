@@ -33,7 +33,12 @@ SYSTEMS = [
 def checkNewEvents():
     try:
         TEATRS = db.retrieveAllTheatres()
+        returnArray = []
+        
+
+        #events = [{"teatr", [{"event", [data1, data2]}, {"event", [data1,data2]}]}, {teatr2 ...}]
         for t in TEATRS:
+            eventArray = []
             system = [e for e in SYSTEMS if e["name"] == t["system"]][0]["handler"]
 
             i = system(t["url"])
@@ -41,6 +46,7 @@ def checkNewEvents():
             i.filter_events()
 
             for w in wydarzenia_on_site:
+                dateArray = []
                 if len(w["dates"]) == 0:
                     continue
 
@@ -57,8 +63,12 @@ def checkNewEvents():
                     db.updateEvent(w['title'], w['teatr'], w)
                     
                     msg = f"Nowe terminy na **{w["title"]}** w {w["teatr"]}:\n"
+                    eventArray.append(w["title"], new_dates)
                     for d in new_dates:
                         msg += f"- {d["text"]}\n"
                     print(msg)
+            if eventArray:
+                returnArray.append(t['name'], eventArray)
+        return returnArray
     except Exception as e:
         print(e)
