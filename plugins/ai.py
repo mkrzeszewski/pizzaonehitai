@@ -29,7 +29,7 @@ heistModel = genai.GenerativeModel(
 heistChat = heistModel.start_chat()
 
 #ai for stock generation
-with open("config/stock-instructions.json", "r", encoding="utf-8") as file:
+with open("config/stocks-instructions.json", "r", encoding="utf-8") as file:
     stockInstruction = json.load(file)
 stockModel = genai.GenerativeModel(
     "models/gemini-2.0-flash", system_instruction = stockInstruction
