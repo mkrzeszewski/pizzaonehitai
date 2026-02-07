@@ -21,6 +21,8 @@ heistCollection = db['heist_history']
 currHeistCollection = db['current_heist']
 rewardCollection = db['rewards']
 achievementCollection = db['achievements']
+stocksCollection = db['stocks']
+tasksCollection = db['tasks']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -230,3 +232,25 @@ def retrieveRewards():
 
 def retrieveAchievements():
     return achievementCollection.find({})
+
+def retrieveAllStocks():
+    return stocksCollection.find({})
+
+def removeAllStocks():
+    return stocksCollection.delete_many({}) #ostroznie!
+
+def insertStock(name, ticker, shares, price):
+    return stocksCollection.insert_one({'name': name, 
+                                        'ticker' : ticker,
+                                        'shares' : shares,
+                                        'price': price})
+
+def updateStock(querykey, queryvalue, key, value):
+    stock = stocksCollection.find_one({querykey: queryvalue})
+    if stock:
+        return stocksCollection.update_one(
+        {querykey: queryvalue},
+        {"$set": {key: value}}
+        )
+    else:
+        return False
