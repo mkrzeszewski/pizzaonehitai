@@ -117,6 +117,9 @@ def sellStocks(username, stocksymbol, amount):
             return "User " + str(username) + " doesnt have enough shares.\n" + str(amount) + "/" + str(userShares)
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
+def cashout(username):
+    return ""
+
 def generateGraph():
     return ""
 

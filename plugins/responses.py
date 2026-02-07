@@ -18,6 +18,8 @@ from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound
 
 MAX_SLOT_AMOUNT = 5000
 
+TAG_PATTERN = re.compile(r'<@!?(\d+)>')
+
 securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
@@ -647,6 +649,25 @@ def handleResponse(userMessage, author) -> str:
                 returnText = stocks.purchaseStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
             else:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+        elif commands[0] == "sellstock":
+            if len(commands) > 2:
+                stockSymbol = str(commands[1])
+                amount = int(commands[2])
+                returnText = stocks.sellStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
+            else:
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+        elif commands[0] == "portfolio" or commands[0] == "flex":
+            match = TAG_PATTERN.search(commands[1])
+            if match:
+                user = db.retrieveUser('discord_id',match.group(1))
+                if user:
+                    returnEmbed = embedgen.generateUserPortfolioEmbed(user)
+                else:
+                    returnText = "User " + str(commands[1]) + "not found."
+            else:
+                returnText = "Prosze otagowac usera ktorego portfolio akcji chcesz zobaczyc! \nnp. !portfolio @roLab"
     else:
 
         #if its a singular commmand - transform message to lower.
@@ -788,6 +809,9 @@ def handleResponse(userMessage, author) -> str:
             _stocks = db.retrieveTopStocks(100)
             if _stocks:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
+
+        if message == "cashout" or message == "imout":
+            user = db.retrieveUser('discord_id', str(author))['name']
 
         if message == "testbankrupcy":
             user = db.retrieveUser('discord_id', str(author))
