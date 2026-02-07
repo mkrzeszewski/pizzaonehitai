@@ -714,7 +714,11 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateHelpEmbed()
 
         if message in stocksKeyword:
-            stocks = db.retrieveAllStocks()
-
-
+            allStocks = db.retrieveAllStocks()
+        
+        if message == 'generatestocks':
+            returnText = securityResponse
+            if int(author) == 326259887007072257:
+                returnText = str(stocks.generateStocks())
+                
     return returnEmbed, returnText, returnView, returnFile
