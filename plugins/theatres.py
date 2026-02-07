@@ -53,8 +53,9 @@ def checkNewEvents():
                 db.addEvent(event, theatre['name'])
 
         if len(newEvents) > 0:
-            returnText += "Nowe wydarzenie na stronie " + str(theatre['name']) + "."
+            returnText += "Nowe wydarzenie na stronie " + str(theatre['name']) + ".\n"
             returnText += "\n - ".join(newEvents)
-            theatreEvents.append([theatre['name'],newEvents])
+            theatreEvents.append([theatre,newEvents])
     print(returnText)
+    print(theatreEvents)
     return theatreEvents
