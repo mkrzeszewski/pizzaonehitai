@@ -657,11 +657,14 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 amount = int(commands[2])
                 user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
-                if user and stock:
-                    msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
-                    returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                if amount > 0:
+                    if user and stock:
+                        msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
+                        returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                    else:
+                        returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
-                    returnText = "Stock " + str(stockSymbol) + " not found."
+                    returnText = "Nie mozesz sprzedac negatywnych ilosci akcji"
             else:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
 
@@ -671,11 +674,14 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 amount = int(commands[2])
                 user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
-                if user and stock:
-                    msg = stocks.sellStocks(user['name'], stockSymbol, amount)
-                    returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                if amount > 0:
+                    if user and stock:
+                        msg = stocks.sellStocks(user['name'], stockSymbol, amount)
+                        returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                    else:
+                        returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
-                    returnText = "Stock " + str(stockSymbol) + " not found."
+                    returnText = "Nie mozesz sprzedac negatywnych ilosci akcji"
             else:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
