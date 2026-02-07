@@ -14,7 +14,7 @@ import plugins.pizzadatabase as db
 import plugins.stocks as stocks
 import plugins.theatres as theatres
 
-target_stock_time = time(hour=10, minute=0)
+target_stock_time = time(hour=7, minute=0)
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
@@ -96,7 +96,7 @@ def runDiscordBot():
         await asyncio.sleep((target_datetime - now).total_seconds())
 
     #theatre section
-    @tasks.loop(hours = 1.0)
+    @tasks.loop(time=target_stock_time)
     async def theatreCheck():
         channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
         parsedTheatres = theatres.checkNewEvents()
