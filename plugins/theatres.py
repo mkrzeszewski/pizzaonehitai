@@ -2,7 +2,7 @@ import plugins.pizzadatabase as db
 import requests
 from bs4 import BeautifulSoup
 
-def getAllEventsIkoris(url):
+def getAllEventsIksoris(url):
     try:
         # Fetch the web content
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'}  # Some sites require user-agent
@@ -29,9 +29,9 @@ def checkNewEvents():
     theatres = db.retrieveAllTheatres()
     for theatre in theatres:
         eventsOnSite = []
-        if theatre['system'] == "ikoris":
-            eventsOnSite = getAllEventsIkoris(theatre['url'])
-            print("ikoris")
+        if theatre['system'] == "iksoris":
+            eventsOnSite = getAllEventsIksoris(theatre['url'])
+            print("iksoris")
         elif theatre['system'] == "roma":
             print("ROMA")
         elif theatre['system'] == "xxx":
