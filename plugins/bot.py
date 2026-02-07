@@ -142,7 +142,7 @@ def runDiscordBot():
                 if user:
                     bankruptUser = await bot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
-                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL, bankrupt[1]))
+                    await channel.send(embed = embedgen.generateBankrupcy(bankrupt[0], bankruptAvatarURL, bankrupt[1]))
     
     @tasks.loop(time=target_stock_time)
     async def generateStocks():
