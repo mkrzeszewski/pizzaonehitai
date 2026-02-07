@@ -37,6 +37,7 @@ freeKeyword = ["wypusc", "uwolnij", "lethimout"]
 arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
 stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykres"]
 sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
+buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -643,7 +644,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             else:
                 returnText = securityResponse
 
-        elif commands[0] == "purchasestock" or commands[0] == "buystock":
+        elif commands[0] in buyStockKeyword:
             if len(commands) > 2:
                 stockSymbol = str(commands[1])
                 amount = int(commands[2])

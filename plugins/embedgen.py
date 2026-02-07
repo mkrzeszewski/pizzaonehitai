@@ -504,10 +504,10 @@ def generateAchievements(achievements):
 
 def generateStocksOverview(stocks):
     color = Colour.dark_green()
-    description = ""
+    description = "Oto obecnie dostepne akcje na gieldzie P1H:\n"
     for stock in stocks:
         description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
-    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    description += "\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = STONKS_ICON_URL)
