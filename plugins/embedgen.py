@@ -516,7 +516,7 @@ def generateStocksOverview(stocks):
 def generateFullStonks(stocks):
     color = Colour.dark_green()
     description = "```py\n"
-    description += f"{'SYM':<5} | {'PRICE':<9} | {'SHARES':<6}\n"
+    description += f"{'SYM':<5} | {'PRICE':<9} | {'AVAILABLE SHARES':<6}\n"
     description += "—" * 28 + "\n"
     for stock in stocks:
         sym = stock['symbol']
@@ -524,7 +524,7 @@ def generateFullStonks(stocks):
         shr = f"{stock['shares']}"
         description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
     description += "```"
-    embed = Embed(title="Gielda Pizza One Hit - kompiutor overview", description=str(description), color = color)
+    embed = Embed(title="WallStreet - Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_thumbnail(url = STONKS_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)

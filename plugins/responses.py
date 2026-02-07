@@ -640,7 +640,7 @@ def handleResponse(userMessage, author) -> str:
                 amount = int(commands[2])
                 returnText = stocks.purchaseStocks(db.retrieveUser('discord_id', str(author))['name'], stockSymbol, amount)
             else:
-                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5"
+                returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !purchasestock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
     else:
 
         #if its a singular commmand - transform message to lower.

@@ -79,11 +79,12 @@ def purchaseStocks(username, stocksymbol, amount):
         if int(stock['shares']) >= amount:
             if userPoints >= int(stock['price'] * amount):
                 db.updateStockShares(stock['name'], int(stock['shares']) - amount)
-                points.modifyPoints('name',user['name'], userPoints - int(int(stock['shares']) * int(amount)))
-                info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(int(int(stock['shares']) * int(amount)))
+                cost = int(int(stock['price']) * int(amount))
+                points.modifyPoints('name',user['name'], -1 * int(cost))
+                info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
                 print(info)
                 if db.updateStocksForUser('name',user['name'],stock['symbol'], amount):
-                    return "info"
+                    return info
                 else:
                     return "Something went wrong when purchasing " + str(stock['name']) + "."
             else:
