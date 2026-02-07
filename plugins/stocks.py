@@ -99,11 +99,11 @@ def purchaseStocks(username, stocksymbol, amount):
                 info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
                 print(info)
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
-                return info
+                return str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
             else:
-                return "User " + str(username) + " doesnt have funds to purchase that many stock.\n" + str(userPoints) + "/" + str(int(stock['price'] * amount))
+                return str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
         else: 
-            return "Stock " + str(stock['name']) + " doesnt have enough shares on the market.\n" + str(amount) + "/" + str(int(stock['shares']))
+            return str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['shares']))
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
 def sellStocks(username, stocksymbol, amount):
@@ -119,11 +119,11 @@ def sellStocks(username, stocksymbol, amount):
             db.updateStockShares(stock['name'], int(stock['shares']) + amount)
             returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
-            info = "[Stocks] User " + str(user['name']) + " has sold " + str(amount) + " shares of " + str(stock['name']) + " for " + str(returnMoney) + " (10% tax was applied)."
+            info = str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
             print(info)
             db.removeStocksFromUser(user['name'],stock['symbol'], amount)
         else: 
-            return "User " + str(username) + " doesnt have enough shares.\n" + str(amount) + "/" + str(userShares)
+            return str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
     return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
 
 def cashout(username):
