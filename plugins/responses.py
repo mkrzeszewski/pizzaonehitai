@@ -714,9 +714,23 @@ def handleResponse(userMessage, author) -> str:
             returnEmbed = embedgen.generateHelpEmbed()
 
         if message in stocksKeyword:
-            allStocks = db.retrieveAllStocks()
-            if allStocks:
-                returnEmbed = embedgen.generateStocksOverview(allStocks)
+            _stocks = db.retrieveAllStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateStocksOverview(_stocks)
+            else:
+                returnText = "Currently there's no stock value"
+
+        if message == "topstocks":
+            _stocks = db.retrieveTopStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateStocksOverview(_stocks)
+            else:
+                returnText = "Currently there's no stock value"
+
+        if message == "bottomstocks":
+            _stocks = db.retrieveBottomStocks()
+            if _stocks:
+                returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
         
@@ -730,7 +744,7 @@ def handleResponse(userMessage, author) -> str:
             if int(author) == 326259887007072257:
                 stocks.simulateTrends()
                 returnText = "Przeprowadzono generacje trendow dla stockow."
-                
+
         if message == "testmarkdown":
             returnEmbed = embedgen.testMarkdown()
 

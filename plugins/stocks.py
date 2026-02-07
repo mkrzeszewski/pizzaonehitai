@@ -3,11 +3,12 @@ import plugins.ai as ai
 import json
 import random
 import numpy as np
+from PIL import Image, ImageDraw
+import io
 
 def generateTrend():
     roll = random.random() * 100 
     trend = 0
-    
     if roll <= 1:    trend = random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
     elif roll <= 5:  trend = random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
     elif roll <= 20: trend = random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
@@ -65,4 +66,7 @@ def updatePrices():
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
             else:
                 db.updateStockPrice(stock['name'], newPrice)
+
+def generateGraph():
+    return ""
 

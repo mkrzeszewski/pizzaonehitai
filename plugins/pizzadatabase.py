@@ -259,6 +259,12 @@ def enableTask(name):
 def retrieveAllStocks():
     return stocksCollection.find({})
 
+def retrieveTopStocks(amount = 5):
+    return stocksCollection.find({}).sort("price", -1).limit(amount)
+
+def retrieveBottomStocks(amount = 5):
+    return stocksCollection.find({}).sort("price", 1).limit(amount)
+
 def removeAllStocks():
     return stocksCollection.delete_many({}) #ostroznie!
 
@@ -271,7 +277,7 @@ def insertStock(name, symbol, shares, price):
                                         'shares' : shares,
                                         'price': price,
                                         'trend': 0.0,
-                                        'priceHistory': []})
+                                        'priceHistory': [1000]})
 
 def updateStock(querykey, queryvalue, key, value):
     stock = stocksCollection.find_one({querykey: queryvalue})
