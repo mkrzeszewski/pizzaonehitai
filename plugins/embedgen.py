@@ -33,6 +33,7 @@ ICON_ARRAY = ["https://cdn.metatft.com/file/metatft/traits/rebel.png",
               "https://cdn.metatft.com/file/metatft/traits/crime.png"]
 PIZZA_ICON_URL = "https://cdn3.emoji.gg/emojis/16965-cutepizza.png"
 STONKS_ICON_URL = "https://cdn3.emoji.gg/emojis/6552-stonks.png"
+STINKS_ICON_URL = "https://cdn3.emoji.gg/emojis/5858-stinks.png"
 BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-95b5dae95553.PNG"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
@@ -551,6 +552,6 @@ def generateBankrupcy(stock, userAvatarURL = ""):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
     embed = Embed(title="Gielda Pizza One Hit - ouch.", description=str(description), color = color)
-    embed.set_thumbnail(url = BOGDANOFF_ICON_URL)
+    embed.set_thumbnail(url = STINKS_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
