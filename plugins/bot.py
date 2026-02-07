@@ -13,6 +13,7 @@ import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
 
+target_stock_time = datetime.time(hour=10, minute=0)
 user_cooldowns = {}
 manual_triggered = False
 VOICE_CHANNEL_IDS = [
@@ -118,6 +119,7 @@ def runDiscordBot():
 
 
     #stock section
+    
     @tasks.loop(hours = 1.0)
     async def simulateStockTrends():
         stocks.simulateTrends()
@@ -133,7 +135,11 @@ def runDiscordBot():
                     bankruptUser = await bot.fetch_user(int(user['discord_id']))
                     bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
                     await channel.send(embed = embedgen.generateBankrupcy(bankrupt, bankruptAvatarURL))
-
+    
+    @tasks.loop(time=target_stock_time)
+    async def generateStocks():
+        if datetime.datetime.now().weekday() == 0: #monday 10 am
+            stocks.generateStocks()
 
 
     @freePeopleFromPrison.before_loop
@@ -182,12 +188,12 @@ def runDiscordBot():
     async def tasksHandling():
         if db.isTaskEnabled("tft"):
             if not analyzeMatchHistoryTFT.is_running():
-               analyzeMatchHistoryTFT.start()
-               print("[INFO] TFT match history analysis has been enabled!")
+                analyzeMatchHistoryTFT.start()
+                print("[INFO] TFT match history analysis has been enabled!")
         else:
             if analyzeMatchHistoryTFT.is_running():
-               analyzeMatchHistoryTFT.stop()
-               print("[INFO] TFT match history analysis has been disabled..")
+                analyzeMatchHistoryTFT.stop()
+                print("[INFO] TFT match history analysis has been disabled..")
         
         if db.isTaskEnabled("birthday"):
             if not sendBirthdayInfo.is_running():
@@ -200,17 +206,17 @@ def runDiscordBot():
 
         if db.isTaskEnabled("heist"):
             if not freePeopleFromPrison.is_running():
-               freePeopleFromPrison.start()
+                freePeopleFromPrison.start()
             if not manageHeist.is_running():
-               manageHeist.start()
-               print("[INFO] Heist has been enabled!")
+                manageHeist.start()
+                print("[INFO] Heist has been enabled!")
         else:
             if freePeopleFromPrison.is_running():
-               freePeopleFromPrison.stop()
+                freePeopleFromPrison.stop()
 
             if manageHeist.is_running():
-               manageHeist.stop()
-               print("[INFO] Heist has been disabled..")    
+                manageHeist.stop()
+                print("[INFO] Heist has been disabled..")    
 
         if db.isTaskEnabled("dailywinner"):
             if not generateWinnerAndLoser.is_running():
@@ -231,19 +237,25 @@ def runDiscordBot():
                 print("[INFO] Channel activity check has been disabled..")
 
         if db.isTaskEnabled("stocks"):
+            if not generateStocks.is_running():
+                generateStocks.start()
+
             if not simulateStockTrends.is_running():
-               simulateStockTrends.start()
+                simulateStockTrends.start()
 
             if not updateStockPrices.is_running():
-               updateStockPrices.start()
-               print("[INFO] Stock investment is enabled!")
+                updateStockPrices.start()
+                print("[INFO] Stock investment is enabled!")
         else:
+            if generateStocks.is_running():
+                generateStocks.stop()
+
             if simulateStockTrends.is_running():
-               simulateStockTrends.stop()
+                simulateStockTrends.stop()
 
             if updateStockPrices.is_running():
-               updateStockPrices.stop()
-               print("[INFO] Stock investment is disabled..")
+                updateStockPrices.stop()
+                print("[INFO] Stock investment is disabled..")
 
     @bot.event
     async def on_ready():
