@@ -10,6 +10,7 @@ import plugins.birthday as birthday
 import plugins.ai as ai
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
+import plugins.stocks as stocks
 import asyncio
 from datetime import datetime
 import re
@@ -32,6 +33,7 @@ transferKeyword = ["transfer", "masz", "tip", "trzymaj", "maszbiedaku"]
 escapeKeyword = ["wykup", "free", "wypuscmnie", "dzwoniepopapuge", "chceadwokata", "letmeout"]
 freeKeyword = ["wypusc", "uwolnij", "lethimout"]
 arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
+stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykres"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -591,7 +593,7 @@ def handleResponse(userMessage, author) -> str:
                     task = db.retrieveTask('name', taskName)
                     if task:
                         db.enableTask(str(commands[1]))
-                        returnText = "Enabled task " + taskName + "."
+                        returnText = "Enabled task \"" + taskName + "\"."
                     else:
                         returnText = "No task found = \"" + taskName + "\"."
             else:
@@ -604,7 +606,7 @@ def handleResponse(userMessage, author) -> str:
                     task = db.retrieveTask('name', taskName)
                     if task:
                         db.disableTask(str(commands[1]))
-                        returnText = "Disabled task " + taskName + "."
+                        returnText = "Disabled task \"" + taskName + "\"."
                     else:
                         returnText = "No task found = \"" + taskName + "\"."
             else:
@@ -710,5 +712,9 @@ def handleResponse(userMessage, author) -> str:
 
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
+
+        if message in stocksKeyword:
+            stocks = db.retrieveAllStocks()
+
 
     return returnEmbed, returnText, returnView, returnFile

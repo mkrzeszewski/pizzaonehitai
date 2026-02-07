@@ -67,10 +67,6 @@ async def sendMessage(message, user_message, is_private):
     except Exception as e:
         print(e)
 
-async def enabletTasks():
-
-    return ""
-
 def runDiscordBot():
     TOKEN = os.environ["DC_TOKEN"]
     intents_temp = discord.Intents.default()
@@ -120,6 +116,16 @@ def runDiscordBot():
             channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
             await channel.send(embed = embedgen.generatePrisonRelease(freedUsers))
 
+
+    #stock section
+    @tasks.loop(hours = 1.0)
+    async def simulateStockTrends():
+        stocks.simulateTrends()
+
+    @tasks.loop(minutes = 10.0)
+    async def updateStockPrices():
+        stocks.updateAllStocks()
+
     @freePeopleFromPrison.before_loop
     async def dailyPrisonEscape7AM():
         await waitUntil(time(7, 0))
@@ -166,25 +172,68 @@ def runDiscordBot():
     async def tasksHandling():
         if db.isTaskEnabled("tft"):
             if not analyzeMatchHistoryTFT.is_running():
-               analyzeMatchHistoryTFT.start() 
+               analyzeMatchHistoryTFT.start()
+               print("[INFO] TFT match history analysis has been enabled!")
+        else:
+            if analyzeMatchHistoryTFT.is_running():
+               analyzeMatchHistoryTFT.stop()
+               print("[INFO] TFT match history analysis has been disabled..")
         
         if db.isTaskEnabled("birthday"):
             if not sendBirthdayInfo.is_running():
-                sendBirthdayInfo.start() 
+                sendBirthdayInfo.start()
+                print("[INFO] Birthday handling has been enabled!")
+        else:
+            if sendBirthdayInfo.is_running():
+                sendBirthdayInfo.stop()
+                print("[INFO] Birthday handling has been disabled..")
 
         if db.isTaskEnabled("heist"):
             if not freePeopleFromPrison.is_running():
                freePeopleFromPrison.start()
             if not manageHeist.is_running():
                manageHeist.start()
+               print("[INFO] Heist has been enabled!")
+        else:
+            if freePeopleFromPrison.is_running():
+               freePeopleFromPrison.stop()
+
+            if manageHeist.is_running():
+               manageHeist.stop()
+               print("[INFO] Heist has been disabled..")    
 
         if db.isTaskEnabled("dailywinner"):
             if not generateWinnerAndLoser.is_running():
-                generateWinnerAndLoser.start() 
+                generateWinnerAndLoser.start()
+                print("[INFO] Daily winner has been disabled!")
+        else:
+            if generateWinnerAndLoser.is_running():
+                generateWinnerAndLoser.stop()
+                print("[INFO] Daily loser has been disabled..")
 
         if db.isTaskEnabled("channelpoints"):
             if not checkChannelActivityAndAwardPoints.is_running():
-                checkChannelActivityAndAwardPoints.start() 
+                checkChannelActivityAndAwardPoints.start()
+                print("[INFO] Channel activity check has been enabled!")
+        else:
+            if checkChannelActivityAndAwardPoints.is_running():
+                checkChannelActivityAndAwardPoints.stop()
+                print("[INFO] Channel activity check has been disabled..")
+
+        if db.isTaskEnabled("stocks"):
+            if not simulateStockTrends.is_running():
+               simulateStockTrends.start()
+
+            if not updateStockPrices.is_running():
+               updateStockPrices.start()
+               print("[INFO] Stock investment is enabled!")
+        else:
+            if simulateStockTrends.is_running():
+               simulateStockTrends.stop()
+
+            if updateStockPrices.is_running():
+               updateStockPrices.stop()
+               print("[INFO] Stock investment is disabled..")
 
     @bot.event
     async def on_ready():
