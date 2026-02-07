@@ -556,7 +556,7 @@ def handleResponse(userMessage, author) -> str:
                 tftapi.setAPIKey(commands[1])
                 returnText = "API Key successfuly replaced"
 
-        elif commands[0] == "test tagging":
+        elif commands[0] == "testmessage":
             if int(author) == 326259887007072257:
                 print(commands)
                 print(message)
