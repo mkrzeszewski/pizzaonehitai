@@ -36,6 +36,8 @@ STONKS_ICON_URL = "https://cdn3.emoji.gg/emojis/6552-stonks.png"
 STINKS_ICON_URL = "https://cdn3.emoji.gg/emojis/5858-stinks.png"
 BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-95b5dae95553.PNG"
 PEPE_CLOWN_ICON_URL = "https://cdn3.emoji.gg/emojis/4825_PepeClown.png"
+PURCHASE_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/6645_Stonks.png"
+SELL_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/8423_NotStonks.png"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -570,7 +572,7 @@ def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
     return embed
 
 def generateUserPortfolioEmbed(user, userAvatarURL = 0):
-    color = Colour.dark_orange()
+    color = Colour.dark_gold()
     description = ""
     totalAmount = 0
     if user['stocksOwned']:
@@ -587,6 +589,26 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
         embed.set_thumbnail(url = userAvatarURL)
     else:
         embed.set_thumbnail(url = STINKS_ICON_URL)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateUserStockPurchase(user, stock, msg = ""):
+    color = Colour.dark_green()
+    description = msg
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title=str(user['name']) + " kupuje akcje " + str(stock['name']) + "!", description=str(description), color = color)
+    embed.set_thumbnail(url = PURCHASE_STOCK_ICON_URL)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateUserStockSale(user, stock, msg = ""):
+    color = Colour.dark_red()
+    description = msg
+    description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
+    embed = Embed(title=str(user['name']) + " sprzedaje akcje " + str(stock['name']) + "!", description=str(description), color = color)
+    embed.set_thumbnail(url = PURCHASE_STOCK_ICON_URL)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
