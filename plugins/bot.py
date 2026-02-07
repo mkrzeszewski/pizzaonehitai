@@ -11,6 +11,7 @@ import plugins.birthday as birthday
 import plugins.points as points
 import plugins.heist as heist
 import plugins.pizzadatabase as db
+import plugins.stocks as stocks
 
 user_cooldowns = {}
 manual_triggered = False
@@ -163,7 +164,6 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 5.0)
     async def tasksHandling():
-
         if db.isTaskEnabled("tft"):
             if not analyzeMatchHistoryTFT.is_running():
                analyzeMatchHistoryTFT.start() 

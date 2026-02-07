@@ -278,3 +278,4 @@ def updateStockTrend(name, trend):
 def updateStockPrice(name, price):
     return stocksCollection.update_one({'name': name},{"$set": {"price": price}, "priceHistory": { "$concatArrays": ["$priceHistory", ["$price"]] }}).matched_count
 
+

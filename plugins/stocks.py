@@ -1,4 +1,5 @@
 import plugins.pizzadatabase as db
+import plugins.ai as ai
 
 #we do it once per month
 def generateStocks():
@@ -8,6 +9,10 @@ def generateStocks():
 def removeAllStocks():
     return ""
 
-#simulate if stocks go down / low
+#simulate trends
 def simulateStocksBehavior():
+    return ""
+
+#update according to trends
+def updateAllStocks():
     return ""
