@@ -16,7 +16,10 @@
             "text": "symbol - symbol na gieldzie, skrot od nazwy - upewnij sie, ze symbole sie nie powtarzaja!"
         },
         {
-            "text": "zwracasz JSONa, ktory zawiera tabele w formacie - [ {name, symbol}, {name, symbol} ] w zaleznosci od ilosci uzytkownikow."
+            "text": "ceo - imie z tabeli users ktore odpowiada danej firmie"
+        },
+        {
+            "text": "zwracasz JSONa, ktory zawiera tabele w formacie - [ {name, symbol, ceo}, {name, symbol, ceo} ] w zaleznosci od ilosci uzytkownikow."
         },
         {
             "text": "zwracasz tylko JSON, nie piszesz nic wiecej."

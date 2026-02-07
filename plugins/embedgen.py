@@ -512,12 +512,6 @@ def generateStocksOverview(stocks):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 
-def generateTopStocks():
-    color = Colour.dark_green()
-    description = ""
-    embed = Embed(title="Gielda Pizza One Hit - top 5", description=str(description), color = color)
-    return embed
-
 def generateBottomStocks():
     color = Colour.dark_red()
     description = ""

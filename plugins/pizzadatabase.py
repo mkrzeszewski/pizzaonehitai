@@ -271,8 +271,9 @@ def removeAllStocks():
 def removeStock(name):
     return stocksCollection.delete_one({'name': name})
 
-def insertStock(name, symbol, shares, price):
+def insertStock(name, ceo, symbol, shares, price):
     return stocksCollection.insert_one({'name': name, 
+                                        'ceo': ceo,
                                         'symbol' : symbol,
                                         'shares' : shares,
                                         'price': price,

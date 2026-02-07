@@ -730,7 +730,7 @@ def handleResponse(userMessage, author) -> str:
         if message == "bottomstocks":
             _stocks = db.retrieveBottomStocks()
             if _stocks:
-                returnEmbed = embedgen.generateStocksOverview(_stocks)
+                returnEmbed = embedgen.generateBottomStocks(_stocks)
             else:
                 returnText = "Currently there's no stock value"
         

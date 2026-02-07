@@ -55,10 +55,11 @@ def simulateTrends():
 #update according to price
 def updatePrices():
     allStocks = db.retrieveAllStocks()
+    bankrupts = []
     if allStocks:
         for stock in allStocks:
             trend = float(stock['trend'])
-            noiseMultiplier = random.uniform(0.5,1.5)
+            noiseMultiplier = random.uniform(0.85, 1.15)
             trend = trend * noiseMultiplier
             newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
             if newPrice < 50:
