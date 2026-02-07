@@ -102,8 +102,7 @@ def runDiscordBot():
         parsedTheatres = theatres.checkNewEvents()
         for theatre in parsedTheatres:
             if theatre[1]:
-                await channel.send(embed = embedgen.generateTheatreEventList(theatre[0],theatre[1]))
-                print("yolo")
+                await channel.send(embed = embedgen.generateTheatreEventList(theatre[0], theatre[1]))
 
     @tasks.loop(hours = 4)
     async def manageHeist():
