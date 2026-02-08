@@ -511,7 +511,7 @@ def generateStocksOverview(stocks):
     color = Colour.dark_green()
     description = "Oto obecnie dostepne akcje na gieldzie P1H:"
     for stock in stocks:
-        description += "\n - [" + str(stock['symbol']) + "] " + str(stock['name']) + " - current price: [" + str(stock['price']) + "]"
+        description += "\n - [" + str(stock['symbol']) + "] " + str(stock['name']) + "\ncurrent price: " + str(stock['price']) + " ppkt."
     description += "\n!stonks, !fullstonks, !buy, !sell - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
@@ -532,7 +532,7 @@ def generateStocksRundown(msg):
 def generateFullStonks(stocks):
     color = Colour.dark_green()
     description = "```py\n"
-    description += f"{'SYM':<5} | {'PRICE':<9} | {'AVAILABLE SHARES':<6}\n"
+    description += f"{'SYM':<5} | {'PRICE':<10} | {'AVAILABLE SHARES':<7}\n"
     description += "—" * 28 + "\n"
     for stock in stocks:
         sym = stock['symbol']

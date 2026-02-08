@@ -9,16 +9,38 @@ import io
 
 TAX_RATE = 0.10
 
-def generateTrend(current_price = 0, initial_price = 1000):
+def generateTrend(current_price, initial_price=1000):
+    # 1. Start with the base random roll
     roll = random.random() * 100 
-    trend = 0
-    if roll <= 1.5:    trend = random.uniform(-0.40, -0.30) # Crash
-    elif roll <= 7:    trend = random.uniform(-0.20, -0.10) # Hard Dip
-    elif roll <= 25:   trend = random.uniform(-0.08, -0.03) # Bear
-    elif roll <= 75:   trend = random.uniform(-0.04, 0.04)  # STABLE (Balanced 0.0)
-    elif roll <= 93:   trend = random.uniform(0.03, 0.08)  # Bull
-    elif roll <= 98.5: trend = random.uniform(0.12, 0.20)  # Hype
-    else:              trend = random.uniform(0.25, 0.40)  # Squeeze (Nerfed from 0.60)
+    
+    # 2. Calculate the "Growth Ratio" (e.g., 2.0 means it doubled)
+    ratio = current_price / initial_price if initial_price > 0 else 1
+    
+    # 3. Apply Bias
+    # Low Price Protection (If price is near 50)
+    if current_price < 150:
+        roll += 4.0 #help for the wicked
+    
+    # High Price Resistance (If price is > 20x)
+    elif ratio > 15:
+        # If it's 20x, we subtract heavily from the roll
+        # This drags the stock toward the 'Bear' and 'Stable' categories
+        high_bias = (ratio - 15) * 4 
+        roll -= high_bias
+
+    # trend logic
+    if roll <= 1.5:    trend = random.uniform(-0.40, -0.30)
+    elif roll <= 7:    trend = random.uniform(-0.20, -0.10)
+    elif roll <= 25:   trend = random.uniform(-0.08, -0.03)
+    elif roll <= 75:   trend = random.uniform(-0.04, 0.04)
+    elif roll <= 93:   trend = random.uniform(0.03, 0.08)
+    elif roll <= 98.5: trend = random.uniform(0.12, 0.20)
+    else:              trend = random.uniform(0.25, 0.40)
+
+    # 5. The "Safety Net" Hard Cap
+    # If it's already at 50x, we force a small increase if it happens to somehow stil lrise trend to prevent 100x+
+    if ratio > 50 and trend > 0:
+        return round(random.uniform(0.01, 0.04), 3)
 
     return round(trend, 3)
 
@@ -69,7 +91,7 @@ def simulateTrends():
     allStocks = db.retrieveAllStocks()
     if allStocks:
         for stock in allStocks:
-            db.updateStockTrend(stock['name'],generateTrend())
+            db.updateStockTrend(stock['name'],generateTrend(int(stock['price'])))
 
 #to check how much stock has changed in last X time
 def informOnStocksUpdate():
@@ -81,13 +103,29 @@ def informOnStocksUpdate():
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
             abs_change = round(abs(change), 2)
             if int(stock['lastPrice']) < int(stock['price']):
-                msg += "wzrost o " + str(abs_change) + "%! <:stonks:1470032691750637722>"
+                msg += "\n<:stonks:1470032691750637722> [" + str(stock['symbol']) + "] - wzrost o " + str(abs_change) + "%"
             elif int(stock['lastPrice']) > int(stock['price']):
-                msg += "spadek o " + str(abs_change) + "%..<:notstonks:1470032747920756880>"
+                msg += "\n<:notstonks:1470032747920756880> [" + str(stock['symbol']) + "] - spadek o " + str(abs_change) + "%"
             else:
-                msg += "bez zmian!"
+                msg += "\n [" + str(stock['symbol']) + "] - bez zmian!"
             db.updateStocksLastPrice(stock['name'], stock['price'])
     return msg
+
+#dillude stock
+def stockSplit(stock):
+    users = db.retrieveAllUsers()
+    newPrice = stock['price'] // 10
+    newShares = stock['shares'] * 10
+    newLastPrice = stock['lastPrice'] // 10
+    db.updateStock('name',stock['name'],'shares', int(newShares))
+    db.updateStock('name',stock['name'],'price', int(newPrice))
+    db.updateStock('name',stock['name'],'lastPrice', int(newLastPrice))
+    for user in users:
+            if user['stocksOwned']:
+                for share in user['stocksOwned']:
+                    if share['symbol'] == stock['symbol']:
+                        db.updateStocksForUser('name',user['name'],stock['symbol'], int(share['amount'] * 9))
+                        break
 
 #update according to price
 def updatePrices():
@@ -113,6 +151,8 @@ def updatePrices():
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
                 bankrupts.append([stock, badInvestors])
             else:
+                if newPrice >= 100000:
+                    stockSplit() #we add more shares to market but lower the price
                 db.updateStockPrice(stock['name'], newPrice)
     return bankrupts
 
@@ -127,10 +167,9 @@ def purchaseStocks(username, stocksymbol, amount):
                 db.updateStockShares(stock['name'], int(stock['shares']) - amount)
                 cost = int(int(stock['price']) * int(amount))
                 points.modifyPoints('name',user['name'], -1 * int(cost))
-                info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
-                print(info)
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
                 msg = str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
+                print(msg)
                 success = True
             else:
                 msg = str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
