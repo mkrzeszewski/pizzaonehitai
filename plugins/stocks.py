@@ -153,21 +153,10 @@ def updatePrices():
             db.updateStockPrice(stock['name'], newPrice)
             if newPrice < 50:
                 if stock['totalShares'] == 100:
-                    users = db.retrieveAllUsers()
-                    badInvestors = []
-                    for user in users:
-                        if user['stocksOwned']:
-                            for share in user['stocksOwned']:
-                                if share['symbol'] == stock['symbol']:
-                                    badInvestors.append(user['name'])
-                                    db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-                                    break
-                    db.insertStockHistory(stock)
-                    db.removeStock(stock['name'])
                     print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
-                    bankrupts.append([stock, badInvestors])
+                    bankrupts.append([stock, removeStock(stock)])
                 else:
-                    stockConsolidation(stock)
+                    stockConsolidation(stock) #we decrease shares but increase market price
                     print("[STOCKS] " + str(stock['name']) + " has been consolidated!")
             else:
                 if newPrice >= 100000:
@@ -235,7 +224,6 @@ def removeStock(stock):
                     break
     db.insertStockHistory(stock)
     db.removeStock(stock['name'])
-
     return badInvestors
 
 #sell all at once
