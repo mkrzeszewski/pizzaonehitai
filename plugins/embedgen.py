@@ -353,7 +353,37 @@ class UtilityEmbedGen(BaseEmbedGen):
             thumbnail=db.icon("BEGGAR_ICON")
         )
 
+    def admin_add_points(self, target_user, amount, admin_name):
+        title = "🏦 Interwencja Banku Centralnego"
+        description = (
+            f"Wielki Admin **{admin_name}** wyczarował punkty z niebytu!\n\n"
+            f"👤 **Odbiorca:** {target_user['name']}\n"
+            f"💰 **Kwota:** `{amount:,}` pkt\n"
+            f"✨ *Saldo zostało zaktualizowane pomyślnie.*"
+        )
+
+        return self._create_base(
+            title=title,
+            description=description,
+            color=self.SUCCESS_COLOR,
+            thumbnail=db.icon("ADMIN_CASH")
+        )
     
+    def admin_set_points(self, target_user, new_amount, admin_name):
+        title = "⚖️ Korekta Salda przez Admina"
+        description = (
+            f"Admin **{admin_name}** dokonał ręcznej korekty portfela.\n\n"
+            f"👤 **Użytkownik:** {target_user['name']}\n"
+            f"🎯 **Nowe saldo:** `{new_amount:,}` pkt\n"
+            f"📢 *Poprzednie punkty zostały zastąpione nową wartością.*"
+        )
+
+        return self._create_base(
+            title=title,
+            description=description,
+            color=self.ERROR_COLOR, # Używamy czerwonego/pomarańczowego, bo to drastyczna zmiana
+            thumbnail=db.icon("ADMIN_CASH")
+        )
 ##################################################################
 
 class GambleEmbedGen(BaseEmbedGen):

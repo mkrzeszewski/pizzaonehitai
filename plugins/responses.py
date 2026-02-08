@@ -747,6 +747,65 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         returnEmbed = _utilityEmbedGen.main_help()
     elif action == "quote":
         returnText = "Funkcja cytatu poki co nie dziala."
+    elif action == "setpoints":
+        if user.get('role') != "owner":
+            return None, securityResponse, None, None
+
+        if len(args) < 2:
+            return None, "Użycie: `!set [user] [nowa_kwota]`", None, None
+
+        target_name = args[0]
+        amount_str = args[1]
+
+        if not amount_str.isdigit():
+            return None, "Nowa wartość musi być liczbą dodatnią.", None, None
+
+        new_amount = int(amount_str)
+        dest_user = userFromPattern(target_name)
+        if not dest_user:
+            return None, f"Nie znaleziono użytkownika `{target_name}`.", None, None
+        db.updateUser('discord_id', dest_user['discord_id'], 'points', new_amount)
+        
+        returnEmbed = _utilityEmbedGen.admin_set_points(dest_user, new_amount, user['name'])
+
+    elif action == "addpoints":
+        if user.get('role') != "owner":
+            return None, securityResponse, None, None
+
+        if len(args) < 2:
+            return None, "Błędne użycie. Spróbuj: `!add [user] [ilość]`", None, None
+
+        target_name = args[0]
+        amount_str = args[1]
+
+        if not amount_str.isdigit():
+            return None, f"ERROR: `{amount_str}` to nie jest poprawna liczba całkowita!", None, None
+
+        amount = int(amount_str)
+        
+        dest_user = userFromPattern(target_name)
+        if not dest_user:
+            returnText = f"Nieznany użytkownik: `{target_name}`."
+            return None, returnText, None, None
+        
+        points.addPoints(dest_user['discord_id'], amount)
+        returnEmbed = _utilityEmbedGen.admin_add_points(dest_user, amount, user['name'])
+    elif action in ["enable", "disable"]:
+        if user.get('role') != "owner":
+            return None, securityResponse, None, None
+        if not args:
+            return None, f"Podaj nazwę zadania: `!{action} [nazwa_zadania]`", None, None
+
+        task_name = args[0]
+        task = db.retrieveTask('name', task_name)
+        if not task:
+            return None, f"🔍 Nie znaleziono zadania o nazwie: `{task_name}`.", None, None
+        if action == "enable":
+            db.enableTask(task_name)
+            returnText = f"✅ Zadanie `{task_name}` zostało **włączone**."
+        else:
+            db.disableTask(task_name)
+            returnText = f"🛑 Zadanie `{task_name}` zostało **wyłączone**."
     elif action == "whoami":
         returnEmbed = _defaultEmbedGen.neutral_msg("Dane o Tobie:", ai.askAI("Przesyłam Ci dane o użytkowniku, powiedz mu coś o nim i zarzuć mu jakąś ciekawostką." + str(user)))
     elif action == "roll":
