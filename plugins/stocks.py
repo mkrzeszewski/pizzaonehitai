@@ -244,7 +244,8 @@ def cashout(username):
         points.modifyPoints('name',user['name'], int(returnMoney))
         print("[STOCKS] " + msg)
         success = True
-    msg = "User " + str(user['name']) + " doesn't have any shares."
+    else:
+        msg = "User " + str(user['name']) + " doesn't have any shares."
     return success, msg
 
 def generateGraph():
