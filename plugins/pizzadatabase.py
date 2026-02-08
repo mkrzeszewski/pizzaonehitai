@@ -22,6 +22,7 @@ currHeistCollection = db['current_heist']
 rewardCollection = db['rewards']
 achievementCollection = db['achievements']
 stocksCollection = db['stocks']
+stockHistoryCollection = db['stock_history']
 tasksCollection = db['tasks']
 theatreCollection = db['theatres']
 eventsCollection = db['events']
@@ -281,6 +282,7 @@ def insertStock(name, ceo, symbol, shares = 100, price = 1000):
                                         'ceo': ceo,
                                         'symbol' : symbol,
                                         'shares' : shares,
+                                        'lastPrice': price,
                                         'price': price,
                                         'trend': 0.0,
                                         'priceHistory': [price]})
@@ -301,6 +303,9 @@ def updateStockTrend(name, trend):
 def updateStockPrice(name, price):
     return stocksCollection.update_one({'name': name},[{"$set": {"price": price,"priceHistory": { "$concatArrays": [{"$ifNull": ["$priceHistory", []]}, [price] ] }}}]).matched_count
 
+def updateStocksLastPrice(name, price):
+    return stocksCollection.update_one({'name': name},{"$set": {"lastPrice": price}}).matched_count
+
 def updateStockShares(name, shares):
     return stocksCollection.update_one({'name': name},{"$set": {"shares": shares}}).matched_count
 
@@ -320,6 +325,15 @@ def removeStocksFromUser(username, symbol, amount):
         {"name": username},
         {"$pull": {"stocksOwned": {"symbol": symbol, "amount": {"$lte": 0}}}}
     )
+
+def retrieveStockHistory():
+    return stockHistoryCollection.find()
+
+def insertStockHistory(stock):
+    return stocksCollection.insert_one({'name': stock['name'], 
+                                        'ceo': stock['ceo'],
+                                        'symbol' : stock['symbol'],
+                                        'priceHistory':  stock['priceHistory']})
 
 def insertTheatre(name, url, system):
     return theatreCollection.insert_one({'name': name, 

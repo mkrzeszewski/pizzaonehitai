@@ -339,6 +339,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     returnView = None
     returnFile = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
+    userAvatarURL = ""
     message = userMessage[1:]
     commands = message.split(" ")
 
@@ -348,7 +349,10 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
         returnText = "User o ID: " + str(author) + " nie znajduje sie w bazie danych. Uderz do roLab."
-        return returnEmbed, returnText, returnView, returnFile   
+        return returnEmbed, returnText, returnView, returnFile
+    else:
+        tempUser = await dcbot.fetch_user(int(user['discord_id']))
+        userAvatarURL = tempUser.avatar.url if tempUser.avatar else tempUser.default_avatar.url
     
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) < 300:
@@ -672,10 +676,9 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if len(commands) > 2:
                 stockSymbol = str(commands[1])
                 amount = int(commands[2])
-                user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
-                    if user and stock:
+                    if stock:
                         msg = stocks.sellStocks(user['name'], stockSymbol, amount)
                         returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
                     else:
@@ -795,23 +798,23 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
 
-        if message in stocksKeyword:
+        if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
             _stocks = db.retrieveAllStocks()
-            if _stocks:
+            if len(list(_stocks)) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "topstocks":
             _stocks = db.retrieveTopStocks()
-            if _stocks:
+            if len(list(_stocks)) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "bottomstocks":
             _stocks = db.retrieveBottomStocks()
-            if _stocks:
+            if len(list(_stocks)) > 0:
                 returnEmbed = embedgen.generateBottomStocks(_stocks)
             else:
                 returnText = "Currently there's no stock value"
@@ -830,32 +833,25 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         if message == "testmarkdown":
             returnEmbed = embedgen.testMarkdown()
 
-        if message == "fullstonks":
+        if message in stocksKeyword:
             _stocks = db.retrieveTopStocks(100)
             if _stocks:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "cashout" or message == "imout":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                returnText = stocks.cashout(user['name'])
+            msg = stocks.cashout(user['name'])
+            returnEmbed = embedgen.generateUserStockCashout(user, msg)
 
-        if message == "portfolio" or message == "flex":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                flexUser = await dcbot.fetch_user(int(user['discord_id']))
-                flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
-                returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
-            else:
-                returnText = "User " + str(commands[1]) + "not found."
+        if message == "portfolio" or message == "flex" or message == "mystocks" or message == "mystonks":
+            returnEmbed = embedgen.generateUserPortfolioEmbed(user, userAvatarURL)
 
         if message == "testbankrupcy":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                _stock = db.retrieveStock('ceo',user['name'])
-                if _stock:
-                    bankruptUser = await dcbot.fetch_user(int(user['discord_id']))
-                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
-                    returnEmbed = embedgen.generateBankrupcy(_stock, bankruptAvatarURL)
+            _stock = db.retrieveStock('ceo',user['name'])
+            if _stock:
+                returnEmbed = embedgen.generateBankrupcy(_stock, userAvatarURL)
+        
+        if message == "stockupdate" or message == "stockrundown":
+            msg = stocks.informOnStocksUpdate()
+            returnEmbed = embedgen.generateStocksRundown(msg)
 
     return returnEmbed, returnText, returnView, returnFile

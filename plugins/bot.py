@@ -98,7 +98,6 @@ def runDiscordBot():
     #theatre section
     @tasks.loop(time=target_stock_time)
     async def theatreCheck():
-        print("ZROBIL SIE TEST TEATROW")
         channel = bot.get_channel(DEFAULT_THEATRES_CHANNEL)
         parsedTheatres = theatres.checkNewEvents()
         if parsedTheatres:
@@ -133,6 +132,12 @@ def runDiscordBot():
     @tasks.loop(hours = 1.0)
     async def simulateStockTrends():
         stocks.simulateTrends()
+
+    @tasks.loop(hours = 3.0)
+    async def sendStocksRundown():
+        msg = stocks.informOnStocksUpdate()
+        channel = bot.get_channel(GAMBA_CHANNEL_ID)
+        await channel.send(embedgen.generateStocksRundown(msg))
 
     @tasks.loop(minutes = 10.0)
     async def updateStockPrices():
@@ -198,6 +203,15 @@ def runDiscordBot():
 
     @tasks.loop(minutes = 5.0)
     async def tasksHandling():
+        if db.isTaskEnabled("stockinform"):
+            if not sendStocksRundown.is_running():
+                sendStocksRundown.start()
+                print("[INFO] Stock rundown has been enabled!")
+        else:
+            if sendStocksRundown.is_running():
+                sendStocksRundown.stop()
+                print("[INFO] Stock rundown has been disabled..")
+
         if db.isTaskEnabled("tft"):
             if not analyzeMatchHistoryTFT.is_running():
                 analyzeMatchHistoryTFT.start()

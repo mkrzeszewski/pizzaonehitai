@@ -9,16 +9,16 @@ import io
 
 TAX_RATE = 0.10
 
-def generateTrend():
+def generateTrend(current_price = 0, initial_price = 1000):
     roll = random.random() * 100 
     trend = 0
-    if roll <= 1:    trend = random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
-    elif roll <= 5:  trend = random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
-    elif roll <= 20: trend = random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
-    elif roll <= 80: trend = random.uniform(-0.02, 0.03) # 60% - STABLE (The "Normal" Day) 
-    elif roll <= 95: trend = random.uniform(0.05, 0.12) # 15% - BULLISH (Good news!)   
-    elif roll <= 99: trend = random.uniform(0.20, 0.35) # 4% - TO THE MOON (Huge hype)  
-    else:            trend = random.uniform(0.45, 0.60) # 1% - THE BIG SQUEEZE (God-tier gains)
+    if roll <= 1.5:    trend = random.uniform(-0.40, -0.30) # Crash
+    elif roll <= 7:    trend = random.uniform(-0.20, -0.10) # Hard Dip
+    elif roll <= 25:   trend = random.uniform(-0.08, -0.03) # Bear
+    elif roll <= 75:   trend = random.uniform(-0.04, 0.04)  # STABLE (Balanced 0.0)
+    elif roll <= 93:   trend = random.uniform(0.03, 0.08)  # Bull
+    elif roll <= 98.5: trend = random.uniform(0.12, 0.20)  # Hype
+    else:              trend = random.uniform(0.25, 0.40)  # Squeeze (Nerfed from 0.60)
 
     return round(trend, 3)
 
@@ -38,9 +38,15 @@ def generateStocks():
 
 def initiateStocksDB(json_stocks):
     users = db.retrieveAllUsers()
+    currentShares = db.retrieveAllStocks()
     if users:
         for user in users:
             cashout(user['name'])
+
+    if(len(list(currentShares))> 0):
+        for share in currentShares:
+            db.insertStockHistory(share)
+
     db.removeAllStocks()
     if json_stocks:
         json_stocks = json.loads(json_stocks)
@@ -50,6 +56,12 @@ def initiateStocksDB(json_stocks):
 
 #we do it once per month
 def removeAllStocks():
+    currentShares = db.retrieveAllStocks()
+    if(len(list(currentShares))> 0):
+        for share in currentShares:
+            db.insertStockHistory(share)
+            
+    db.removeAllStocks()
     return ""
 
 #simulate trends
@@ -58,6 +70,24 @@ def simulateTrends():
     if allStocks:
         for stock in allStocks:
             db.updateStockTrend(stock['name'],generateTrend())
+
+#to check how much stock has changed in last X time
+def informOnStocksUpdate():
+    allStocks = db.retrieveAllStocks()
+    msg = "W przeciagu ostatniego okresu czasu: "
+    if len(list(allStocks)) > 0:
+        for stock in allStocks:
+            msg += "\n [" + str(stock['symbol']) + "] " + str(stock['name']) + " - "
+            change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
+            abs_change = round(abs(change), 2)
+            if int(stock['lastPrice']) < int(stock['price']):
+                msg += "wzrost o " + str(abs_change) + "%! <:stonks:1470032691750637722>"
+            elif int(stock['lastPrice']) > int(stock['price']):
+                msg += "spadek o " + str(abs_change) + "%..<:notstonks:1470032747920756880>"
+            else:
+                msg += "bez zmian!"
+            db.updateStocksLastPrice(stock['name'], stock['price'])
+    return msg
 
 #update according to price
 def updatePrices():
@@ -128,17 +158,20 @@ def sellStocks(username, stocksymbol, amount):
 def cashout(username):
     user = db.retrieveUser('name', username)
     returnMoney = 0
+    info = ""
     if user['stocksOwned']:
+        info = str(user['name']) + " sprzedaje: "
         for share in user['stocksOwned']:
             stock = db.retrieveStock('symbol',share['symbol'])
-            returnMoney += int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            stockPrice = int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            returnMoney += stockPrice
             db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+            info += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
+        info += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
         points.modifyPoints('name',user['name'], int(returnMoney))
-        info = "[Stocks] User " + str(user['name']) + " has sold all their shares for " + str(returnMoney) + " (10% tax was applied)."
         print(info)
         return info
-    else:
-        return "User " + str(user['name']) + " doesn't have any shares."
+    return "User " + str(user['name']) + " doesn't have any shares."
 
 def generateGraph():
     stocksData = db.retrieveAllStocks()
