@@ -53,7 +53,7 @@ class BaseEmbedGen:
         self.DEFAULT_FOOT_TEXT = "Sztuczna inteligencja na twoim discordzie!"
         self.DEFAULT_AUTHOR = "Pizza One Hit AI"
         self.NEUTRAL_COLOR = Colour.light_grey()
-        self.help_hint = "\n\n💡 !help - sprawdz komendy"
+        self.help_hint = ""
 
     def _create_base(self, title, description, color=None, thumbnail=None):
         embed_color = color if color else self.NEUTRAL_COLOR
@@ -300,6 +300,43 @@ class UtilityEmbedGen(BaseEmbedGen):
         if points >= 1000000:
             embed.add_field(name="Status", value="✨ Ten użytkownik jest nietykalny!", inline=False)
             
+        return embed
+    
+    def leaderboards(self, users, amount, board_type="top"):
+        # 1. Setup specific board details
+        if board_type == "top":
+            title_prefix = "📈 Najbogatsi"
+            field_name = f"__Top {amount}:__"
+            thumb = db.icon("POINTS_ICON")
+            start_rank = 1
+            step = 1
+        else:
+            title_prefix = "📉 Najbiedniejsi"
+            field_name = f"__Bottom {amount}:__"
+            thumb = db.icon("POINTS_ICON_URL")
+            # For bottom, we calculate the starting rank based on total users
+            total_users = len(list(db.retrieveAllUsers()))
+            start_rank = total_users
+            step = -1
+
+        # 2. Build the list string
+        string_list = ""
+        current_rank = start_rank
+        for user in users:
+            points = f"{user['points']:,}" # 1,000,000 instead of 1000000
+            string_list += f"**{current_rank})** {user['name']} — `{points}` pkt\n"
+            current_rank += step
+
+        # 3. Create the base
+        embed = self._create_base(
+            title=f"{title_prefix} na DC Pizza One Hit!",
+            description="Ranking użytkowników według posiadanych punktów.",
+            color=self.INFO_COLOR,
+            thumbnail=thumb
+        )
+        
+        embed.add_field(name=field_name, value=string_list if string_list else "Brak danych.", inline=False)
+        
         return embed
 
     

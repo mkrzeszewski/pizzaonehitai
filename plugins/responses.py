@@ -771,6 +771,21 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
             else:
                 returnText = f"Użytkownik {args[0]} nie został znaleziony w bazie."
         returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
+    elif action in ["top", "bottom"]:
+        amount = 10
+        if args and args[0].isdigit():
+            amount = int(args[0])
+            amount = min(amount, 20)
+
+        if action == "top":
+            leader_data = points.getTop(amount)
+        else:
+            leader_data = points.getBottom(amount)
+
+        if leader_data:
+            returnEmbed = _utilityEmbedGen.leaderboards(leader_data, amount, action)
+        else:
+            returnText = "Nie udało się pobrać danych rankingu."
     elif action == "achievements":
         returnEmbed = _utilityEmbedGen.achievements(db.retrieveAchievements())
     elif action == "horoscope":
