@@ -161,13 +161,19 @@ class StocksGen(BaseEmbedGen):
         return self._create_base(f"Portfel - {user['name']}", description, self.GOLD, avatar or db.icon("STINKS_ICON"))
 
     def stock_event(self, user, stock, msg, event_type="buy"):
-        """Handles Purchase, Sale, and Cashout in one method."""
-        titles = {
-            "buy": (f"{user['name']} kupuje akcje {stock['name']}!", db.icon("PURCHASE_STOCK_ICON"), self.GREEN),
-            "sell": (f"{user['name']} sprzedaje akcje {stock['name']}!", db.icon("SELL_STOCK_ICON"), self.RED),
-            "cashout": (f"{user['name']} ma dość! Sprzedaje wszystko!", db.icon("SELL_STOCK_ICON"), self.RED)
-        }
-        title, icon, color = titles.get(event_type)
+        if event_type == "buy":
+            title = f"{user['name']} kupuje akcje {stock['name']}!"
+            icon = db.icon("PURCHASE_STOCK_ICON")
+            color = self.GREEN
+        elif event_type == "sell":
+            title = f"{user['name']} sprzedaje akcje {stock['name']}!"
+            icon = db.icon("SELL_STOCK_ICON")
+            color = self.RED
+        else: # "cashout"
+            title = f"{user['name']} ma dość! Sprzedaje wszystko!"
+            icon = db.icon("SELL_STOCK_ICON")
+            color = self.RED
+
         return self._create_base(title, msg, color, icon)
 
 ##################################################################
