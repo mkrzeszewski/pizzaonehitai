@@ -100,11 +100,11 @@ def informOnStocksUpdate():
     if len(allStocks) > 0:
         for stock in allStocks:
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
-            abs_change = round(abs(change), 2) * 100
+            abs_change = round(abs(change) * 100, 2) 
             if int(stock['lastPrice']) < int(stock['price']):
-                msg += "\n<:stonks:1470032691750637722> [" + str(stock['symbol']) + "] - wzrost o " + str(abs_change) + "%"
+                msg += "\n<:stonks:1470032691750637722> [" + str(stock['symbol']) + "] - wzrost o " + str(int(abs_change)) + "%"
             elif int(stock['lastPrice']) > int(stock['price']):
-                msg += "\n<:notstonks:1470032747920756880> [" + str(stock['symbol']) + "] - spadek o " + str(abs_change) + "%"
+                msg += "\n<:notstonks:1470032747920756880> [" + str(stock['symbol']) + "] - spadek o " + str(int(abs_change)) + "%"
             else:
                 msg += "\n [" + str(stock['symbol']) + "] - bez zmian!"
             db.updateStocksLastPrice(stock['name'], stock['price'])
