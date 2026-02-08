@@ -74,10 +74,10 @@ def simulateTrends():
 #to check how much stock has changed in last X time
 def informOnStocksUpdate():
     allStocks = list(db.retrieveAllStocks())
-    msg = "W przeciagu ostatniego okresu czasu: "
+    msg = "Od ostatniego sprawdzenia: "
     if len(allStocks) > 0:
         for stock in allStocks:
-            msg += "\n [" + str(stock['symbol']) + "] " + str(stock['name']) + " - "
+            msg += "\n [" + str(stock['symbol']) + "] - "
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
             abs_change = round(abs(change), 2)
             if int(stock['lastPrice']) < int(stock['price']):
