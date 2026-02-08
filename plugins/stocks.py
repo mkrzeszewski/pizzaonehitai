@@ -55,7 +55,7 @@ def generateStocks():
     initiateStocksDB(json_response)
 
     #debug
-    print(str(response))
+    print("[STOCKS] " + str(response))
     return str(response)
 
 def initiateStocksDB(json_stocks):
@@ -172,11 +172,11 @@ def updatePrices():
                     bankrupts.append([stock, badInvestors])
                 else:
                     stockConsolidation(stock)
-                    print("[Stocks] " + str(stock['name']) + " has been consolidated!")
+                    print("[STOCKS] " + str(stock['name']) + " has been consolidated!")
             else:
                 if newPrice >= 100000:
                     stockSplit(stock) #we add more shares to market but lower the price
-                    print("[Stocks] " + str(stock['name']) + " has been dilluded!")
+                    print("[STOCKS] " + str(stock['name']) + " has been dilluded!")
     return bankrupts
 
 def purchaseStocks(username, stocksymbol, amount):
@@ -193,7 +193,7 @@ def purchaseStocks(username, stocksymbol, amount):
                 points.modifyPoints('name',user['name'], -1 * int(cost))
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
                 msg = str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
-                print(msg)
+                print("[STOCKS] " + str(msg))
                 success = True
             else:
                 msg = str(username) + " - nie masz funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
@@ -241,7 +241,7 @@ def cashout(username):
             msg += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
         msg += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
         points.modifyPoints('name',user['name'], int(returnMoney))
-        print(msg)
+        print("[STOCKS] " + msg)
         success = True
     msg = "User " + str(user['name']) + " doesn't have any shares."
     return success, msg
