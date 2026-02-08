@@ -468,7 +468,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
         elif commands[0] == "setpoints" or commands[0] == "set":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
                         returnText = db.updateUser('discord_id', str(commands[1]), 'points', int(commands[2]))
@@ -480,7 +480,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = securityResponse
 
         elif commands[0] in arrestKeyword:
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin":
                 if len(commands) == 2:
                     if str(commands[1]).isdigit():
                         if db.arrestUser('discord_id', str(commands[1])):
@@ -498,7 +498,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = securityResponse
 
         elif commands[0] in freeKeyword:
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) == 2:
                     arrested_user = userFromPattern(commands[1])
                     if arrested_user:
@@ -532,7 +532,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = "Niepoprawnie uzyta komenda. Uzyj np !tip Mati 20"
 
         elif commands[0] == "add":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) == 3:
                     if str(commands[2]).isdigit():
                         dest_user = userFromPattern(commands[1])
@@ -549,7 +549,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = securityResponse
 
         elif commands[0] == "instructai":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) > 1:
                     db.insertAIInstruction(message[12:])
                     ai.resetModel()
@@ -558,18 +558,18 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
 
         elif commands[0] == "setriotkey":
-            if int(author) == 326259887007072257 and len(commands) == 2:
+            if user['role'] == "owner":# or user['role'] == "admin": and len(commands) == 2:
                 tftapi.setAPIKey(commands[1])
                 returnText = "API Key successfuly replaced"
 
         elif commands[0] == "testmessage":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 print(commands)
                 print(message)
                 returnText = message
 
         elif commands[0] == "birthdaytest":
-            if int(author) == 326259887007072257 and len(commands) == 2:
+            if user['role'] == "owner":# or user['role'] == "admin": and len(commands) == 2:
                 user = userFromPattern(commands[1])
                 if user:
                     returnEmbed, returnText = getBirthdayStuff(str(commands[1]))
@@ -621,7 +621,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = "Losujemy: " + commands[1] + " - " + commands[2] + " -> " + str(random.randint(int(commands[1]),int(commands[2])))
 
         elif commands[0] == "enabletask" or commands[0] == "enable":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) > 1:
                     taskName = str(commands[1])
                     task = db.retrieveTask('name', taskName)
@@ -634,7 +634,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnText = securityResponse
         
         elif commands[0] == "disabletask" or commands[0] == "disable":
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 if len(commands) > 1:
                     taskName = str(commands[1])
                     task = db.retrieveTask('name', taskName)
@@ -738,7 +738,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         if message == 'resetai':
             returnText = securityResponse
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 ai.resetModel()
                 returnText =  "AI zostal przywrocony do stanu pierwotnego."
 
@@ -813,12 +813,12 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         
         if message == 'generatestocks':
             returnText = securityResponse
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 returnText = str(stocks.generateStocks())
 
         if message == 'generatetrends':
             returnText = securityResponse
-            if int(author) == 326259887007072257:
+            if user['role'] == "owner":# or user['role'] == "admin"::
                 stocks.simulateTrends()
                 returnText = "Przeprowadzono generacje trendow dla stockow."
 
