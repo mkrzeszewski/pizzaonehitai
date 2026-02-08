@@ -99,7 +99,6 @@ def informOnStocksUpdate():
     msg = "Od ostatniego sprawdzenia: "
     if len(allStocks) > 0:
         for stock in allStocks:
-            msg += "\n [" + str(stock['symbol']) + "] - "
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
             abs_change = round(abs(change), 2)
             if int(stock['lastPrice']) < int(stock['price']):
@@ -115,17 +114,36 @@ def informOnStocksUpdate():
 def stockSplit(stock):
     users = db.retrieveAllUsers()
     newPrice = stock['price'] // 10
-    newShares = stock['shares'] * 10
+    newShares = stock['availableShares'] * 10
     newLastPrice = stock['lastPrice'] // 10
-    db.updateStock('name',stock['name'],'shares', int(newShares))
+    db.updateStock('name',stock['name'],'availableShares', int(newShares))
     db.updateStock('name',stock['name'],'price', int(newPrice))
     db.updateStock('name',stock['name'],'lastPrice', int(newLastPrice))
+    db.updateStock('name',stock['name'],'totalShares', (int(stock['totalShares']) * 10))
     for user in users:
             if user['stocksOwned']:
                 for share in user['stocksOwned']:
                     if share['symbol'] == stock['symbol']:
                         db.updateStocksForUser('name',user['name'],stock['symbol'], int(share['amount'] * 9))
                         break
+#consolidate stock
+def stockConsolidation(stock):
+    users = db.retrieveAllUsers()
+    newPrice = stock['price'] * 10
+    newShares = stock['availableShares'] // 10
+    newLastPrice = stock['lastPrice'] * 10
+    db.updateStock('name',stock['name'],'availableShares', int(newShares))
+    db.updateStock('name',stock['name'],'price', int(newPrice))
+    db.updateStock('name',stock['name'],'lastPrice', int(newLastPrice))
+    db.updateStock('name',stock['name'],'totalShares', (int(stock['totalShares']) / 10))
+    for user in users:
+            if user['stocksOwned']:
+                for share in user['stocksOwned']:
+                    if share['symbol'] == stock['symbol']:
+                        reduction = -(int(share['amount'] * 0.9))
+                        db.updateStocksForUser('name',user['name'],stock['symbol'], reduction)
+                        break
+
 
 #update according to price
 def updatePrices():
@@ -137,21 +155,25 @@ def updatePrices():
             noiseMultiplier = random.uniform(0.85, 1.15)
             trend = trend * noiseMultiplier
             newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
+            db.updateStockPrice(stock['name'], newPrice)
             if newPrice < 50:
-                users = db.retrieveAllUsers()
-                badInvestors = []
-                for user in users:
-                    if user['stocksOwned']:
-                        for share in user['stocksOwned']:
-                            if share['symbol'] == stock['symbol']:
-                                badInvestors.append(user['name'])
-                                db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-                                break
-                db.removeStock(stock['name'])
-                print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
-                bankrupts.append([stock, badInvestors])
+                if stock['totalShares'] == 100:
+                    users = db.retrieveAllUsers()
+                    badInvestors = []
+                    for user in users:
+                        if user['stocksOwned']:
+                            for share in user['stocksOwned']:
+                                if share['symbol'] == stock['symbol']:
+                                    badInvestors.append(user['name'])
+                                    db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+                                    break
+                    db.removeStock(stock['name'])
+                    print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
+                    bankrupts.append([stock, badInvestors])
+                else:
+                    stockConsolidation(stock)
+                    print("[Stocks] " + str(stock['name']) + " has been consolidated!")
             else:
-                db.updateStockPrice(stock['name'], newPrice)
                 if newPrice >= 100000:
                     stockSplit(stock) #we add more shares to market but lower the price
                     print("[Stocks] " + str(stock['name']) + " has been dilluded!")
@@ -163,9 +185,9 @@ def purchaseStocks(username, stocksymbol, amount):
     stock = db.retrieveStock('symbol', stocksymbol)
     if user and stock:
         userPoints = int(user['points'])
-        if int(stock['shares']) >= amount:
+        if int(stock['availableShares']) >= amount:
             if userPoints >= int(stock['price'] * amount):
-                db.updateStockShares(stock['name'], int(stock['shares']) - amount)
+                db.updateStockShares(stock['name'], int(stock['availableShares']) - amount)
                 cost = int(int(stock['price']) * int(amount))
                 points.modifyPoints('name',user['name'], -1 * int(cost))
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
@@ -175,7 +197,7 @@ def purchaseStocks(username, stocksymbol, amount):
             else:
                 msg = str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
         else: 
-            msg = str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['shares']))
+            msg = str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['availableShares']))
     msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
     return success, msg
 
@@ -191,7 +213,7 @@ def sellStocks(username, stocksymbol, amount):
                 userShares = s['amount']
                 break
         if userShares >= amount:
-            db.updateStockShares(stock['name'], int(stock['shares']) + amount)
+            db.updateStockShares(stock['name'], int(stock['availableShares']) + amount)
             returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
             db.removeStocksFromUser(user['name'],stock['symbol'], amount)

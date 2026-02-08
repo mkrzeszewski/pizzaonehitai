@@ -537,7 +537,7 @@ def generateFullStonks(stocks):
     for stock in stocks:
         sym = stock['symbol']
         prc = f"{stock['price']} PP"
-        shr = f"{stock['shares']}"
+        shr = f"{stock['availableShares']}"
         description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
     description += "```"
     description += "!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
@@ -551,7 +551,7 @@ def generateBottomStocks(stocks):
     color = Colour.dark_red()
     description = ""
     for stock in stocks:
-        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['shares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
+        description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['availableShares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="Gielda Pizza One Hit - bottom 5", description=str(description), color = color)
     embed.set_thumbnail(url = BOGDANOFF_ICON_URL)
