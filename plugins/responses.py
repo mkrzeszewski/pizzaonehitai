@@ -757,10 +757,19 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
                 returnText = "Losujemy liczbe pomiedzy " + args[1] + " - " + args[2] + " -> " + str(random.randint(int(args[0]), int(args[1])))
         return ""
     elif action == "points":
+        target_avatar = avatarUrl
+        target_user = user
         if args:
-            target_user, target_avatar = targetUser(dcbot, args[0])
-            if target_user:
-                returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
+            temp_user = userFromPattern(args[0])
+            if temp_user:
+                target_user = temp_user
+                try:
+                    flex_user = await dcbot.fetch_user(int(target_user['discord_id']))
+                    target_avatar = flex_user.avatar.url if flex_user.avatar else flex_user.default_avatar.url
+                except Exception:
+                    target_avatar = ""
+            else:
+                returnText = f"Użytkownik {args[0]} nie został znaleziony w bazie."
         else:
             returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
     elif action == "achievements":
@@ -806,7 +815,7 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
                     target_avatar = ""
             else:
                 returnText = f"Użytkownik {args[0]} nie został znaleziony w bazie."
-        returnEmbed = _stockEmbedGen.user_portfolio(user, target_avatar)
+        returnEmbed = _stockEmbedGen.user_portfolio(target_user, target_avatar)
     elif action == "fullview":
         returnEmbed = _stockEmbedGen.full_stonks(_stocks)
     elif action == "cashout":
