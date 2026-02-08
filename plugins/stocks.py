@@ -9,16 +9,38 @@ import io
 
 TAX_RATE = 0.10
 
-def generateTrend():
+def generateTrend(current_price, initial_price=1000):
+    # 1. Start with the base random roll
     roll = random.random() * 100 
-    trend = 0
-    if roll <= 1:    trend = random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
-    elif roll <= 5:  trend = random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
-    elif roll <= 20: trend = random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
-    elif roll <= 80: trend = random.uniform(-0.02, 0.03) # 60% - STABLE (The "Normal" Day) 
-    elif roll <= 95: trend = random.uniform(0.05, 0.12) # 15% - BULLISH (Good news!)   
-    elif roll <= 99: trend = random.uniform(0.20, 0.35) # 4% - TO THE MOON (Huge hype)  
-    else:            trend = random.uniform(0.45, 0.60) # 1% - THE BIG SQUEEZE (God-tier gains)
+    
+    # 2. Calculate the "Growth Ratio" (e.g., 2.0 means it doubled)
+    ratio = current_price / initial_price if initial_price > 0 else 1
+    
+    # 3. Apply Bias
+    # Low Price Protection (If price is near 50)
+    if current_price < 150:
+        roll += 4.0 #help for the wicked
+    
+    # High Price Resistance (If price is > 20x)
+    elif ratio > 15:
+        # If it's 20x, we subtract heavily from the roll
+        # This drags the stock toward the 'Bear' and 'Stable' categories
+        high_bias = (ratio - 15) * 4 
+        roll -= high_bias
+
+    # trend logic
+    if roll <= 1.5:    trend = random.uniform(-0.40, -0.30)
+    elif roll <= 7:    trend = random.uniform(-0.20, -0.10)
+    elif roll <= 25:   trend = random.uniform(-0.08, -0.03)
+    elif roll <= 75:   trend = random.uniform(-0.04, 0.04)
+    elif roll <= 93:   trend = random.uniform(0.03, 0.08)
+    elif roll <= 98.5: trend = random.uniform(0.12, 0.20)
+    else:              trend = random.uniform(0.25, 0.40)
+
+    # 5. The "Safety Net" Hard Cap
+    # If it's already at 50x, we force a small increase if it happens to somehow stil lrise trend to prevent 100x+
+    if ratio > 50 and trend > 0:
+        return round(random.uniform(0.01, 0.04), 3)
 
     return round(trend, 3)
 
@@ -33,14 +55,20 @@ def generateStocks():
     initiateStocksDB(json_response)
 
     #debug
-    print(str(response))
+    print("[STOCKS] " + str(response))
     return str(response)
 
 def initiateStocksDB(json_stocks):
     users = db.retrieveAllUsers()
+    currentShares = list(db.retrieveAllStocks())
     if users:
         for user in users:
             cashout(user['name'])
+
+    if(len(currentShares) > 0):
+        for share in currentShares:
+            db.insertStockHistory(share)
+
     db.removeAllStocks()
     if json_stocks:
         json_stocks = json.loads(json_stocks)
@@ -50,6 +78,12 @@ def initiateStocksDB(json_stocks):
 
 #we do it once per month
 def removeAllStocks():
+    currentShares = list(db.retrieveAllStocks())
+    if(len(currentShares)> 0):
+        for share in currentShares:
+            db.insertStockHistory(share)
+            
+    db.removeAllStocks()
     return ""
 
 #simulate trends
@@ -57,7 +91,59 @@ def simulateTrends():
     allStocks = db.retrieveAllStocks()
     if allStocks:
         for stock in allStocks:
-            db.updateStockTrend(stock['name'],generateTrend())
+            db.updateStockTrend(stock['name'],generateTrend(int(stock['price'])))
+
+#to check how much stock has changed in last X time
+def informOnStocksUpdate():
+    allStocks = list(db.retrieveAllStocks())
+    msg = "Od ostatniego sprawdzenia: "
+    if len(allStocks) > 0:
+        for stock in allStocks:
+            change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
+            abs_change = round(abs(change), 2)
+            if int(stock['lastPrice']) < int(stock['price']):
+                msg += "\n<:stonks:1470032691750637722> [" + str(stock['symbol']) + "] - wzrost o " + str(abs_change) + "%"
+            elif int(stock['lastPrice']) > int(stock['price']):
+                msg += "\n<:notstonks:1470032747920756880> [" + str(stock['symbol']) + "] - spadek o " + str(abs_change) + "%"
+            else:
+                msg += "\n [" + str(stock['symbol']) + "] - bez zmian!"
+            db.updateStocksLastPrice(stock['name'], stock['price'])
+    return msg
+
+#dillude stock
+def stockSplit(stock):
+    users = db.retrieveAllUsers()
+    newPrice = stock['price'] // 10
+    newShares = stock['availableShares'] * 10
+    newLastPrice = stock['lastPrice'] // 10
+    db.updateStock('name',stock['name'],'availableShares', int(newShares))
+    db.updateStock('name',stock['name'],'price', int(newPrice))
+    db.updateStock('name',stock['name'],'lastPrice', int(newLastPrice))
+    db.updateStock('name',stock['name'],'totalShares', (int(stock['totalShares']) * 10))
+    for user in users:
+            if user['stocksOwned']:
+                for share in user['stocksOwned']:
+                    if share['symbol'] == stock['symbol']:
+                        db.updateStocksForUser('name',user['name'],stock['symbol'], int(share['amount'] * 9))
+                        break
+#consolidate stock
+def stockConsolidation(stock):
+    users = db.retrieveAllUsers()
+    newPrice = stock['price'] * 10
+    newShares = stock['availableShares'] // 10
+    newLastPrice = stock['lastPrice'] * 10
+    db.updateStock('name',stock['name'],'availableShares', int(newShares))
+    db.updateStock('name',stock['name'],'price', int(newPrice))
+    db.updateStock('name',stock['name'],'lastPrice', int(newLastPrice))
+    db.updateStock('name',stock['name'],'totalShares', (int(stock['totalShares']) / 10))
+    for user in users:
+            if user['stocksOwned']:
+                for share in user['stocksOwned']:
+                    if share['symbol'] == stock['symbol']:
+                        reduction = -(int(share['amount'] * 0.9))
+                        db.updateStocksForUser('name',user['name'],stock['symbol'], reduction)
+                        break
+
 
 #update according to price
 def updatePrices():
@@ -69,44 +155,57 @@ def updatePrices():
             noiseMultiplier = random.uniform(0.85, 1.15)
             trend = trend * noiseMultiplier
             newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
+            db.updateStockPrice(stock['name'], newPrice)
             if newPrice < 50:
-                users = db.retrieveAllUsers()
-                badInvestors = []
-                for user in users:
-                    if user['stocksOwned']:
-                        for share in user['stocksOwned']:
-                            if share['symbol'] == stock['symbol']:
-                                badInvestors.append(user['name'])
-                                db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-                                break
-                db.removeStock(stock['name'])
-                print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
-                bankrupts.append([stock, badInvestors])
+                if stock['totalShares'] == 100:
+                    users = db.retrieveAllUsers()
+                    badInvestors = []
+                    for user in users:
+                        if user['stocksOwned']:
+                            for share in user['stocksOwned']:
+                                if share['symbol'] == stock['symbol']:
+                                    badInvestors.append(user['name'])
+                                    db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+                                    break
+                    db.removeStock(stock['name'])
+                    print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
+                    bankrupts.append([stock, badInvestors])
+                else:
+                    stockConsolidation(stock)
+                    print("[STOCKS] " + str(stock['name']) + " has been consolidated!")
             else:
-                db.updateStockPrice(stock['name'], newPrice)
+                if newPrice >= 100000:
+                    stockSplit(stock) #we add more shares to market but lower the price
+                    print("[STOCKS] " + str(stock['name']) + " has been dilluded!")
     return bankrupts
 
 def purchaseStocks(username, stocksymbol, amount):
+    success = False
+    msg = ""
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
     if user and stock:
         userPoints = int(user['points'])
-        if int(stock['shares']) >= amount:
+        if int(stock['availableShares']) >= amount:
             if userPoints >= int(stock['price'] * amount):
-                db.updateStockShares(stock['name'], int(stock['shares']) - amount)
+                db.updateStockShares(stock['name'], int(stock['availableShares']) - amount)
                 cost = int(int(stock['price']) * int(amount))
                 points.modifyPoints('name',user['name'], -1 * int(cost))
-                info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
-                print(info)
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
-                return str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
+                msg = str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
+                print("[STOCKS] " + str(msg))
+                success = True
             else:
-                return str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
+                msg = str(username) + " - nie masz funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
         else: 
-            return str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['shares']))
-    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+            msg = str(stock['name']) + " - nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['availableShares']))
+        return success, msg
+    msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+    return success, msg
 
 def sellStocks(username, stocksymbol, amount):
+    success = False
+    msg = ""
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
     userShares = 0
@@ -116,29 +215,36 @@ def sellStocks(username, stocksymbol, amount):
                 userShares = s['amount']
                 break
         if userShares >= amount:
-            db.updateStockShares(stock['name'], int(stock['shares']) + amount)
+            db.updateStockShares(stock['name'], int(stock['availableShares']) + amount)
             returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
             db.removeStocksFromUser(user['name'],stock['symbol'], amount)
-            return str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
+            msg = str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
+            success = True
         else: 
-            return str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
-    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+            msg = str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
+    msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+    return success, msg
 
 def cashout(username):
+    success = False
     user = db.retrieveUser('name', username)
     returnMoney = 0
+    msg = ""
     if user['stocksOwned']:
+        msg = str(user['name']) + " sprzedaje: "
         for share in user['stocksOwned']:
             stock = db.retrieveStock('symbol',share['symbol'])
-            returnMoney += int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            stockPrice = int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
+            returnMoney += stockPrice
             db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+            msg += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
+        msg += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
         points.modifyPoints('name',user['name'], int(returnMoney))
-        info = "[Stocks] User " + str(user['name']) + " has sold all their shares for " + str(returnMoney) + " (10% tax was applied)."
-        print(info)
-        return info
-    else:
-        return "User " + str(user['name']) + " doesn't have any shares."
+        print("[STOCKS] " + msg)
+        success = True
+    msg = "User " + str(user['name']) + " doesn't have any shares."
+    return success, msg
 
 def generateGraph():
     stocksData = db.retrieveAllStocks()

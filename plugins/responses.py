@@ -339,6 +339,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     returnView = None
     returnFile = None
     returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
+    userAvatarURL = ""
     message = userMessage[1:]
     commands = message.split(" ")
 
@@ -348,7 +349,10 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
         returnText = "User o ID: " + str(author) + " nie znajduje sie w bazie danych. Uderz do roLab."
-        return returnEmbed, returnText, returnView, returnFile   
+        return returnEmbed, returnText, returnView, returnFile
+    else:
+        tempUser = await dcbot.fetch_user(int(user['discord_id']))
+        userAvatarURL = tempUser.avatar.url if tempUser.avatar else tempUser.default_avatar.url
     
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) < 300:
@@ -399,30 +403,26 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
         elif commands[0] in aiKeyword:
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                query = message[3:]
-                db.insertAIHistory(str(author), query)
-                text = ""
-                returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+            query = message[3:]
+            db.insertAIHistory(str(author), query)
+            text = ""
+            returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
 
         elif commands[0] in heistKeyword:
             if len(commands) == 2:
                 if db.isHeistAvailable():
                     if str(commands[1]).isdigit():
-                        user = db.retrieveUser('discord_id', str(author))
-                        if user:
-                            curr = int(user['points'])
-                            amount = int(str(commands[1]))
-                            if curr >= amount and amount >= 200:
-                                if (db.isUserPartOfCurrentHeist(user['name'])):
-                                    returnText = "Jestes juz czlonkiem aktualnego napadu!"
-                                else:
-                                    db.appendHeistMember(user['name'], amount)
-                                    points.addPoints(str(author), -1 * amount)
-                                    returnText = "Pomyslnie dolaczyles do napadu!"
+                        curr = int(user['points'])
+                        amount = int(str(commands[1]))
+                        if curr >= amount and amount >= 200:
+                            if (db.isUserPartOfCurrentHeist(user['name'])):
+                                returnText = "Jestes juz czlonkiem aktualnego napadu!"
                             else:
-                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
+                                db.appendHeistMember(user['name'], amount)
+                                points.addPoints(str(author), -1 * amount)
+                                returnText = "Pomyslnie dolaczyles do napadu!"
+                        else:
+                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
                     else:
                         returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
                 else:
@@ -431,17 +431,15 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
-                    user = db.retrieveUser('discord_id', str(author))
-                    if user:
-                        curr = int(user['points'])
-                        amount = int(str(commands[1]))
-                        if amount > 5000:
-                            returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
+                    curr = int(user['points'])
+                    amount = int(str(commands[1]))
+                    if amount > 5000:
+                        returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
+                    else:
+                        if curr >= amount and amount >= 5:
+                            returnEmbed, returnFile = generateSlots(amount, user)
                         else:
-                            if curr >= amount and amount >= 5:
-                                returnEmbed, returnFile = generateSlots(amount, user)
-                            else:
-                                returnText = "Za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            returnText = "Za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -451,23 +449,21 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     amount = 0
                     if str(commands[1]).isdigit():
                         amount = int(str(commands[1]))
-                    user = db.retrieveUser('discord_id', str(author))
-                    if user:
-                        curr = int(user['points'])
-                        if str(commands[1]) == "all":
-                            amount = curr
-                        min = int(curr * 0.1)
-                        if curr >= amount and amount >= int(curr * 0.1) and amount >= 25:
-                            result = random.randint(1,2)
-                            if result == 1:
-                                curr = curr + amount
-                                returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:ez:1343529006162772028>"
-                            else:
-                                curr = curr - amount
-                                returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
-                            db.updateUser('discord_id', str(author), 'points', curr)
+                    curr = int(user['points'])
+                    if str(commands[1]) == "all":
+                        amount = curr
+                    min = int(curr * 0.1)
+                    if curr >= amount and amount >= int(curr * 0.1) and amount >= 25:
+                        result = random.randint(1,2)
+                        if result == 1:
+                            curr = curr + amount
+                            returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:ez:1343529006162772028>"
                         else:
-                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% (lub 25 gdy jestes biedakiem) pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            curr = curr - amount
+                            returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
+                        db.updateUser('discord_id', str(author), 'points', curr)
+                    else:
+                        returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% (lub 25 gdy jestes biedakiem) pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -555,7 +551,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         elif commands[0] == "instructai":
             if int(author) == 326259887007072257:
                 if len(commands) > 1:
-                    user = db.retrieveUser('discord_id', str(author))
                     db.insertAIInstruction(message[12:])
                     ai.resetModel()
             else:
@@ -653,14 +648,16 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         elif commands[0] in buyStockKeyword:
             if len(commands) > 2:
-                stockSymbol = str(commands[1])
+                stockSymbol = str(commands[1]).upper()
                 amount = int(commands[2])
-                user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
                     if user and stock:
-                        msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                        success, msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
+                        if success:
+                            returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                        else:
+                            returnText = msg
                     else:
                         returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
@@ -670,14 +667,16 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         elif commands[0] in sellStockKeyword:
             if len(commands) > 2:
-                stockSymbol = str(commands[1])
+                stockSymbol = str(commands[1]).upper()
                 amount = int(commands[2])
-                user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
-                    if user and stock:
-                        msg = stocks.sellStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                    if stock:
+                        success, msg = stocks.sellStocks(user['name'], stockSymbol, amount)
+                        if success:
+                            returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                        else:
+                            returnText = msg
                     else:
                         returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
@@ -701,7 +700,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnText =  db.retrieveUser('discord_id', str(author))['name']
 
         if message == "points":
-            user = db.retrieveUser('discord_id', str(author))
             if user:
                 returnText = user['name'] + " - masz: " + str(user['points']) + " pizzapoints."
 
@@ -721,7 +719,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnEmbed = embedgen.generateArrestedUsersInfo(db.retrieveArrestedUsers())
 
         if message in slotsKeyword:
-            user = db.retrieveUser('discord_id', str(author))
             if user:
                 curr = int(user['points'])
                 amount = 5
@@ -749,21 +746,19 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnText =  weather.getLodzWeather()
 
         if message in begKeyword:
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                curr = int(user['points'])
-                if curr < 100:
-                    if db.isBegAvailable():
-                        db.updateUser('discord_id', str(author), 'points', 100)
-                        db.createBegEntry(str(author))
-                        returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 10 min."
-                        #isBegAvailable = False
-                    else:
-                        begPerson = db.getBegPerson()
-                        if begPerson:
-                            returnText = "Cooldown! Sprobuj ponownie pozniej. Ostatnia szansa wykorzystana przez: " + str(begPerson['name']) + "."
+            curr = int(user['points'])
+            if curr < 100:
+                if db.isBegAvailable():
+                    db.updateUser('discord_id', str(author), 'points', 100)
+                    db.createBegEntry(str(author))
+                    returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 10 min."
+                    #isBegAvailable = False
                 else:
-                    returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
+                    begPerson = db.getBegPerson()
+                    if begPerson:
+                        returnText = "Cooldown! Sprobuj ponownie pozniej. Ostatnia szansa wykorzystana przez: " + str(begPerson['name']) + "."
+            else:
+                returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
         if message == "top5" or message == "top":
             amount = 5
@@ -795,23 +790,23 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         if message in helpKeyword:
             returnEmbed = embedgen.generateHelpEmbed()
 
-        if message in stocksKeyword:
-            _stocks = db.retrieveAllStocks()
-            if _stocks:
+        if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "topstocks":
-            _stocks = db.retrieveTopStocks()
-            if _stocks:
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "bottomstocks":
-            _stocks = db.retrieveBottomStocks()
-            if _stocks:
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateBottomStocks(_stocks)
             else:
                 returnText = "Currently there's no stock value"
@@ -830,32 +825,34 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         if message == "testmarkdown":
             returnEmbed = embedgen.testMarkdown()
 
-        if message == "fullstonks":
-            _stocks = db.retrieveTopStocks(100)
-            if _stocks:
+        if message in stocksKeyword:
+            _stocks = list(db.retrieveTopStocks(100))
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "cashout" or message == "imout":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                returnText = stocks.cashout(user['name'])
-
-        if message == "portfolio" or message == "flex":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                flexUser = await dcbot.fetch_user(int(user['discord_id']))
-                flexAvatar = flexUser.avatar.url if flexUser.avatar else flexUser.default_avatar.url
-                returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
+            success, msg = stocks.cashout(user['name'])
+            if success:
+                returnEmbed = embedgen.generateUserStockCashout(user, msg)
             else:
-                returnText = "User " + str(commands[1]) + "not found."
+                returnText = msg
+
+        if message == "portfolio" or message == "flex" or message == "mystocks" or message == "mystonks":
+            returnEmbed = embedgen.generateUserPortfolioEmbed(user, userAvatarURL)
 
         if message == "testbankrupcy":
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                _stock = db.retrieveStock('ceo',user['name'])
-                if _stock:
-                    bankruptUser = await dcbot.fetch_user(int(user['discord_id']))
-                    bankruptAvatarURL = bankruptUser.avatar.url if bankruptUser.avatar else bankruptUser.default_avatar.url
-                    returnEmbed = embedgen.generateBankrupcy(_stock, bankruptAvatarURL)
+            _stock = db.retrieveStock('ceo',user['name'])
+            if _stock:
+                returnEmbed = embedgen.generateBankrupcy(_stock, userAvatarURL)
+        
+        if message == "stockupdate" or message == "stockrundown":
+            msg = stocks.informOnStocksUpdate()
+            returnEmbed = embedgen.generateStocksRundown(msg)
+
+        if message in buyStockKeyword:
+            returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !buy MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+        if message in sellStockKeyword:
+            returnText = returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sell MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
     return returnEmbed, returnText, returnView, returnFile
