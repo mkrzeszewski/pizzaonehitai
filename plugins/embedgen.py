@@ -40,8 +40,112 @@ SIGN_ICON_ARRAY = {
 
 PEPE_BIRTHDAY_EMOTE = "<:pepebirthday:1127216158974677084>"
 
+#help function to ensure text is <1000 characters
 def split_text(text: str, max_length: int = 1000):
     return [text[i:i + max_length] for i in range(0, len(text), max_length)]
+
+##################################################################
+
+class BaseEmbedGen:
+    def __init__(self):
+        self.DEFAULT_FOOTER_ICON = "https://cdn3.emoji.gg/emojis/16965-cutepizza.png"
+        self.DEFAULT_AUTHOR_ICON = "https://cdn3.emoji.gg/emojis/48134-bmodancing.gif"
+        self.DEFAULT_FOOT_TEXT = "Sztuczna inteligencja na twoim discordzie!"
+        self.DEFAULT_AUTHOR = "Pizza One Hit AI"
+        self.NEUTRAL_COLOR = Colour.light_grey()
+        self.help_hint = "\n\n💡 !help - sprawdz komendy"
+
+    def _create_base(self, title, description, color=None, thumbnail=None):
+        embed_color = color if color else self.NEUTRAL_COLOR
+        full_description = f"{description}{self.help_hint}"
+        embed = Embed(
+            title=title,
+            description=description,
+            color=embed_color,
+            timestamp=datetime.now()
+        )
+        embed.set_author(name=self.DEFAULT_AUTHOR, icon_url=self.DEFAULT_AUTHOR_ICON)
+        embed.set_footer(text=self.DEFAULT_FOOT_TEXT, icon_url=self.DEFAULT_FOOTER_ICON)
+
+        if thumbnail:
+            embed.set_thumbnail(url=thumbnail)
+        return embed
+    
+    def neutral_msg(self, title, message):
+        return self._create_base(title, message)
+    
+##################################################################
+class GambleGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        # Casino specific commands
+        self.help_hint = "\n\n💡 `!slots`, `!ruletka`, `!daily`, `!bal`"
+        self.color = Colour.purple()
+
+class HoroscopeGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        # Simple back button for horoscopes
+        self.help_hint = "\n\n🔮 Sprawdź inny znak: `!horoskop <nazwa>`"
+        self.color = Colour.blue()
+
+##################################################################
+    
+class StocksGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        # Define specific colors for this category
+        self.PORTFOLIO_COLOR = Colour.dark_gold()
+        self.BUY_COLOR = Colour.dark_green()
+        self.SELL_COLOR = Colour.dark_red()
+        self.help_hint = "\n\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
+        
+    def user_portfolio(self, user, userAvatarURL=0):
+        description = ""
+        total_amount = 0
+        
+        if user.get('stocksOwned'):
+            for share in user['stocksOwned']:
+                # Retrieve stock data via your db helper
+                stock = db.retrieveStock('symbol', share['symbol'])
+                line_val = int(stock['price'] * share['amount'])
+                total_amount += line_val
+                description += f"* **[{stock['symbol']}]** {stock['name']} - {share['amount']} udziałów.\n"
+            
+            description += f"\n💰 **Obecna wartość akcji:** `{total_amount} ppkt.`"
+        else:
+            description = f"Użytkownik {user['name']} nie posiada obecnie żadnych akcji."
+
+        # Logic for thumbnail: User avatar or the 'STINKS' icon if they are broke
+        thumb = userAvatarURL if userAvatarURL else "STINKS_ICON"
+        
+        # We call the parent helper - it handles author, footer, help text, and DB lookup
+        return self._create_base(
+            title=f"Aktualne akcje - {user['name']}",
+            description=description,
+            color=self.PORTFOLIO_COLOR,
+            thumbnail_name=thumb if not isinstance(thumb, str) else thumb 
+        )
+
+    def stock_purchase(self, user, stock, msg=""):
+        return self._create_base(
+            title=f"{user['name']} kupuje akcje {stock['name']}!",
+            description=msg,
+            color=self.BUY_COLOR,
+            thumbnail_name="PURCHASE_STOCK_ICON"
+        )
+
+    def stock_sale(self, user, stock, msg=""):
+        return self._create_base(
+            title=f"{user['name']} sprzedaje akcje {stock['name']}!",
+            description=msg,
+            color=self.SELL_COLOR,
+            thumbnail_name="SELL_STOCK_ICON"
+        )
+
+##################################################################
+
+
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
