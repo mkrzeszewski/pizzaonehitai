@@ -60,14 +60,9 @@ def generateStocks():
 
 def initiateStocksDB(json_stocks):
     users = db.retrieveAllUsers()
-    currentShares = list(db.retrieveAllStocks())
     if users:
         for user in users:
             cashout(user['name'])
-
-    if(len(currentShares) > 0):
-        for share in currentShares:
-            db.insertStockHistory(share)
 
     db.removeAllStocks()
     if json_stocks:
@@ -167,6 +162,7 @@ def updatePrices():
                                     badInvestors.append(user['name'])
                                     db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
                                     break
+                    db.insertStockHistory(stock)
                     db.removeStock(stock['name'])
                     print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
                     bankrupts.append([stock, badInvestors])
@@ -227,6 +223,22 @@ def sellStocks(username, stocksymbol, amount):
         msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
     return success, msg
 
+def removeStock(stock):
+    users = db.retrieveAllUsers()
+    badInvestors = []
+    for user in users:
+        if user['stocksOwned']:
+            for share in user['stocksOwned']:
+                if share['symbol'] == stock['symbol']:
+                    badInvestors.append(user['name'])
+                    db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
+                    break
+    db.insertStockHistory(stock)
+    db.removeStock(stock['name'])
+
+    return badInvestors
+
+#sell all at once
 def cashout(username):
     success = False
     user = db.retrieveUser('name', username)
