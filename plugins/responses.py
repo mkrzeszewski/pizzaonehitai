@@ -826,6 +826,8 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
     # --- ROUTING LOGIC ---
     if action == "view":
         returnEmbed = _stockEmbedGen.overview(_stocks)
+    elif action == "rundown":
+        returnEmbed = _stockEmbedGen.rundown(stocks.informOnStocksUpdate())
     elif action == "portfolio":
         target_avatar = avatarUrl
         target_user = user
