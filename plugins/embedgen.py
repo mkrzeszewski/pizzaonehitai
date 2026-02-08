@@ -113,10 +113,10 @@ class StocksGen(BaseEmbedGen):
             mcap = self._format_mcap(int(s['price']) * int(s.get('totalShares', 1)))
             description += f"\n**{s['symbol']}** | {s['name']}\n┗ 💰 *Market Cap:* `{mcap} ppkt.`\n"
             
-        return self._create_base("📈 Giełda Pizza One Hit", description, self.GREEN, "STONKS_ICON")
+        return self._create_base("📈 Giełda Pizza One Hit", description, self.GREEN, db.icon("STONKS_ICON"))
 
     def rundown(self, msg):
-        return self._create_base("Co tam słychać na giełdzie?", msg, self.GREEN, "BOGDANOFF_ICON")
+        return self._create_base("Co tam słychać na giełdzie?", msg, self.GREEN, db.icon("BOGDANOFF_ICON"))
 
     def full_stonks(self, stocks):
         sorted_stocks = sorted(stocks, key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), reverse=True)
@@ -127,13 +127,13 @@ class StocksGen(BaseEmbedGen):
             mcap = self._format_mcap(int(s['price']) * int(s.get('totalShares', 1)))
             table += f"{s['symbol']:<5} | {s['price']:<6} | {s['availableShares']:<10} | {mcap:<8}\n"
             
-        return self._create_base("WallStreet - Pizza One Hit", f"```py\n{table}```", self.GREEN, "STONKS_ICON")
+        return self._create_base("WallStreet - Pizza One Hit", f"```py\n{table}```", self.GREEN, db.icon("STONKS_ICON"))
 
     def bottom_stocks(self, stocks):
         description = ""
         for s in stocks:
             description += f"* **[{s['symbol']}]** {s['name']}:\n   Dostępne: `{s['availableShares']}` | Cena: `{s['price']}`\n\n"
-        return self._create_base("Giełda P1H - Bottom 5", description, self.RED, "BOGDANOFF_ICON")
+        return self._create_base("Giełda P1H - Bottom 5", description, self.RED, db.icon("BOGDANOFF_ICON"))
 
     def bankruptcy(self, stock, bad_investors=None):
         # AI Logic stays here
@@ -163,9 +163,9 @@ class StocksGen(BaseEmbedGen):
     def stock_event(self, user, stock, msg, event_type="buy"):
         """Handles Purchase, Sale, and Cashout in one method."""
         titles = {
-            "buy": (f"{user['name']} kupuje akcje {stock['name']}!", "PURCHASE_STOCK_ICON", self.GREEN),
-            "sell": (f"{user['name']} sprzedaje akcje {stock['name']}!", "SELL_STOCK_ICON", self.RED),
-            "cashout": (f"{user['name']} ma dość! Sprzedaje wszystko!", "SELL_STOCK_ICON", self.RED)
+            "buy": (f"{user['name']} kupuje akcje {stock['name']}!", db.icon("PURCHASE_STOCK_ICON"), self.GREEN),
+            "sell": (f"{user['name']} sprzedaje akcje {stock['name']}!", db.icon("SELL_STOCK_ICON"), self.RED),
+            "cashout": (f"{user['name']} ma dość! Sprzedaje wszystko!", db.icon("SELL_STOCK_ICON"), self.RED)
         }
         title, icon, color = titles.get(event_type)
         return self._create_base(title, msg, color, icon)
