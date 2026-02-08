@@ -840,8 +840,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnEmbed = embedgen.testMarkdown()
 
         if message in stocksKeyword:
-            _stocks = db.retrieveTopStocks(100)
-            if _stocks:
+            _stocks = list(db.retrieveTopStocks(100))
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "cashout" or message == "imout":

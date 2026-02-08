@@ -531,14 +531,29 @@ def generateStocksRundown(msg):
 
 def generateFullStonks(stocks):
     color = Colour.dark_green()
+    sorted_stocks = sorted(
+        stocks, 
+        key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), 
+        reverse=True
+    )
+
     description = "```py\n"
-    description += f"{'SYM':<5} | {'PRICE':<10} | {'AVAILABLE SHARES':<7}\n"
-    description += "—" * 28 + "\n"
-    for stock in stocks:
+    description += f"{'SYM':<5} | {'PRICE':<8} | {'AVAILABLE SHARES':<7} | {'MCAP':<10}\n"
+    description += "—" * 42 + "\n"
+    
+    for stock in sorted_stocks:
         sym = stock['symbol']
-        prc = f"{stock['price']} PP"
+        prc = f"{stock['price']}PP"
         shr = f"{stock['availableShares']}"
-        description += f"{sym:<5} | {prc:<9} | {shr:<6}\n"
+        mcap_val = int(stock['price']) * int(stock.get('totalShares', 1))
+        if mcap_val >= 1000000:
+            mcap_str = f"{mcap_val/1000000:.2f}M"
+        elif mcap_val >= 1000:
+            mcap_str = f"{mcap_val/1000:.2f}k"
+        else:
+            mcap_str = str(mcap_val)
+        description += f"{sym:<5} | {prc:<8} | {shr:<7} | {mcap_str:<10}\n"
+        
     description += "```"
     description += "!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title="WallStreet - Pizza One Hit", description=str(description), color = color)
