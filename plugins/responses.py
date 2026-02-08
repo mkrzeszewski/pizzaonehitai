@@ -99,8 +99,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         module = route['module']
         action = route['action']
         if module == "stocks":
-            return handleStocksModule(action, args, user, dcbot, userAvatarURL)
-        
+            return await handleStocksModule(action, args, user, dcbot, userAvatarURL)
+            
     #komendy wielokomendowe
     if len(commands) > 1:
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
