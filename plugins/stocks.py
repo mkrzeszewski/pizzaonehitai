@@ -100,7 +100,7 @@ def informOnStocksUpdate():
     if len(allStocks) > 0:
         for stock in allStocks:
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))
-            abs_change = round(abs(change), 2)
+            abs_change = round(abs(change), 2) * 100
             if int(stock['lastPrice']) < int(stock['price']):
                 msg += "\n<:stonks:1470032691750637722> [" + str(stock['symbol']) + "] - wzrost o " + str(abs_change) + "%"
             elif int(stock['lastPrice']) > int(stock['price']):
