@@ -538,7 +538,7 @@ def generateFullStonks(stocks):
     )
 
     description = "```py\n"
-    description += f"{'SYM':<5} | {'PRICE':<8} | {'AVAILABLE SHARES':<7} | {'MCAP':<10}\n"
+    description += f"{'SYM':<5} | {'PRICE':<8} | {'AVAILABLE SHARES':<16} | {'MCAP':<10}\n"
     description += "—" * 42 + "\n"
     
     for stock in sorted_stocks:
