@@ -75,6 +75,7 @@ class BaseEmbedGen:
         return self._create_base(title, message)
     
 ##################################################################
+
 class GambleGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
@@ -91,57 +92,87 @@ class HoroscopeGen(BaseEmbedGen):
 
 ##################################################################
     
+from discord import Embed, Colour
+
 class StocksGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        # Define specific colors for this category
-        self.PORTFOLIO_COLOR = Colour.dark_gold()
-        self.BUY_COLOR = Colour.dark_green()
-        self.SELL_COLOR = Colour.dark_red()
+        # Every embed from this class will use this specific hint
         self.help_hint = "\n\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
+        self.GREEN = Colour.dark_green()
+        self.RED = Colour.dark_red()
+        self.GOLD = Colour.dark_gold()
 
-    def user_portfolio(self, user, userAvatarURL=0):
-        description = ""
-        total_amount = 0
+    def _format_mcap(self, val):
+        """Helper to format Market Cap numbers."""
+        if val >= 1000000: return f"{val/1000000:.2f}M"
+        if val >= 1000: return f"{val/1000:.2f}k"
+        return str(val)
+
+    def overview(self, stocks):
+        sorted_stocks = sorted(stocks, key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), reverse=True)
+        description = "🚀 **Oto obecnie dostępne akcje na giełdzie P1H:**\n"
         
+        for s in sorted_stocks:
+            mcap = self._format_mcap(int(s['price']) * int(s.get('totalShares', 1)))
+            description += f"\n**{s['symbol']}** | {s['name']}\n┗ 💰 *Market Cap:* `{mcap} ppkt.`\n"
+            
+        return self._create_base("📈 Giełda Pizza One Hit", description, self.GREEN, "STONKS_ICON")
+
+    def rundown(self, msg):
+        return self._create_base("Co tam słychać na giełdzie?", msg, self.GREEN, "BOGDANOFF_ICON")
+
+    def full_stonks(self, stocks):
+        sorted_stocks = sorted(stocks, key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), reverse=True)
+        table = f"{'SYM':<5} | {'PRICE':<6} | {'AVAILABLE':<10} | {'MCAP':<8}\n"
+        table += "—" * 40 + "\n"
+        
+        for s in sorted_stocks:
+            mcap = self._format_mcap(int(s['price']) * int(s.get('totalShares', 1)))
+            table += f"{s['symbol']:<5} | {s['price']:<6} | {s['availableShares']:<10} | {mcap:<8}\n"
+            
+        return self._create_base("WallStreet - Pizza One Hit", f"```py\n{table}```", self.GREEN, "STONKS_ICON")
+
+    def bottom_stocks(self, stocks):
+        description = ""
+        for s in stocks:
+            description += f"* **[{s['symbol']}]** {s['name']}:\n   Dostępne: `{s['availableShares']}` | Cena: `{s['price']}`\n\n"
+        return self._create_base("Giełda P1H - Bottom 5", description, self.RED, "BOGDANOFF_ICON")
+
+    def bankruptcy(self, stock, bad_investors=None):
+        # AI Logic stays here
+        ai_msg = ai.askAI(f"Poinformuj o bankructwie {stock['name']}. CEO {stock['ceo']} coś odjebał. Zrób to żartobliwie.")
+        description = str(ai_msg)
+        
+        if bad_investors:
+            investors_list = "\n".join([f" - {i}" for i in bad_investors])
+            description += f"\n\n**Nieudacznicy, którzy stracili kasę:**\n{investors_list}"
+            
+        return self._create_base(f"{stock['name']} bankrutuje!", description, self.RED, "STINKS_ICON")
+
+    def user_portfolio(self, user, avatar=None):
+        description = ""
+        total = 0
         if user.get('stocksOwned'):
             for share in user['stocksOwned']:
-                # Retrieve stock data via your db helper
                 stock = db.retrieveStock('symbol', share['symbol'])
-                line_val = int(stock['price'] * share['amount'])
-                total_amount += line_val
-                description += f"* **[{stock['symbol']}]** {stock['name']} - {share['amount']} udziałów.\n"
-            
-            description += f"\n💰 **Obecna wartość akcji:** `{total_amount} ppkt.`"
+                description += f"* **[{stock['symbol']}]** {stock['name']} - {share['amount']} udz.\n"
+                total += int(stock['price'] * share['amount'])
+            description += f"\n💰 **Wartość portfela:** `{total} ppkt.`"
         else:
-            description = f"Użytkownik {user['name']} nie posiada obecnie żadnych akcji."
+            description = f"Użytkownik {user['name']} nie posiada akcji."
+            
+        return self._create_base(f"Portfel - {user['name']}", description, self.GOLD, avatar or "STINKS_ICON")
 
-        # Logic for thumbnail: User avatar or the 'STINKS' icon if they are broke
-        thumb = userAvatarURL if userAvatarURL else "STINKS_ICON"
-        
-        # We call the parent helper - it handles author, footer, help text, and DB lookup
-        return self._create_base(
-            title=f"Aktualne akcje - {user['name']}",
-            description=description,
-            color=self.PORTFOLIO_COLOR,
-            thumbnail_name=thumb if not isinstance(thumb, str) else thumb 
-        )
-
-    def stock_purchase(self, user, stock, msg=""):
-        return self._create_base(
-            title=f"{user['name']} kupuje akcje {stock['name']}!",
-            description=msg,
-            color=self.BUY_COLOR,
-            thumbnail_name="PURCHASE_STOCK_ICON"
-        )
-
-    def stock_sale(self, user, stock, msg=""):
-        return self._create_base(
-            title=f"{user['name']} sprzedaje akcje {stock['name']}!",
-            description=msg,
-            color=self.SELL_COLOR,
-            thumbnail_name="SELL_STOCK_ICON"
-        )
+    def stock_event(self, user, stock, msg, event_type="buy"):
+        """Handles Purchase, Sale, and Cashout in one method."""
+        titles = {
+            "buy": (f"{user['name']} kupuje akcje {stock['name']}!", "PURCHASE_STOCK_ICON", self.GREEN),
+            "sell": (f"{user['name']} sprzedaje akcje {stock['name']}!", "SELL_STOCK_ICON", self.RED),
+            "cashout": (f"{user['name']} ma dość! Sprzedaje wszystko!", "SELL_STOCK_ICON", self.RED)
+        }
+        title, icon, color = titles.get(event_type)
+        return self._create_base(title, msg, color, icon)
 
 ##################################################################
 

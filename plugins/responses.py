@@ -3,6 +3,7 @@ import plugins.weather as weather
 import plugins.horoscope as horoskop
 import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
+from embedgen import StocksGen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
 import plugins.gifgenerator as gif
@@ -16,9 +17,14 @@ from datetime import datetime
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound, File, Member, User
 
+ROUTING_TABLE = {}
+
+
 MAX_SLOT_AMOUNT = 5000
 
+#when user is tagged in dc, i.e. @roLab this is the re to check for that ID
 TAG_PATTERN = re.compile(r'<@!?(\d+)>')
+
 
 securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
@@ -39,312 +45,17 @@ stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykr
 sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
 buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
 
-#view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
-class ruletaView(ui.View):
-    def __init__(self):
-        super().__init__(timeout = 180)
-        self.activeUsers = []
-        self.playingUsers = []
-        self.sent_messages = []
-        self.message = None
-        self.amount = 50
-        self.id = 0
 
-    @ui.button(label="Blue", style=ButtonStyle.primary)
-    async def option1(self, interaction: Interaction, button: ui.Button):
-        author_id = interaction.user.id
-        user = db.retrieveUser('discord_id',str(author_id))
-        msg = ""
-        if user:
-            if int(user['points']) < int(self.amount):
-                msg = "Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!"
-            else:
-                choice = "Blue"
-                if self.playingUsers:
-                    newUser = True
-                    for user in self.playingUsers:
-                        if user[0] == author_id:
-                            user[1] = choice
-                            newUser = False
-                            msg = "Zmieniles zaklad na niebieski!"
-                    if newUser:
-                        msg = "Postawiles pizzopunkty na niebieski (-50 ppkt)!"
-                        self.playingUsers.append([author_id, choice])
-                        points.addPoints(str(author_id), int(-1 * self.amount))
-                else:
-                    msg = "Postawiles pizzopunkty na niebieski (-50 ppkt)!"
-                    self.playingUsers.append([author_id, choice])
-                    points.addPoints(str(author_id), int(-1 * self.amount))
-            msg = msg + " [ruletka #" + str(self.id) + "]"
-            message = await interaction.response.send_message(msg, ephemeral=True)
-            self.sent_messages.append(message)
-
-    @ui.button(label="Red", style=ButtonStyle.danger)
-    async def option2(self, interaction: Interaction, button: ui.Button):
-        author_id = interaction.user.id
-        user = db.retrieveUser('discord_id',str(author_id))
-        msg = ""
-        if user:
-            if int(user['points']) < int(self.amount):
-                msg = "Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!"
-            else:
-                choice = "Red"
-                if self.playingUsers:
-                    newUser = True
-                    for user in self.playingUsers:
-                        if user[0] == author_id:
-                            user[1] = choice
-                            newUser = False
-                            msg = "Zmieniles zaklad na czerwony!"
-                    if newUser:
-                        msg = "Postawiles pizzopunkty na czerwony (-50 ppkt)!"
-                        self.playingUsers.append([author_id, choice])
-                        points.addPoints(str(author_id), int(-1 * self.amount))
-                else:
-                    msg = "Postawiles pizzopunkty na czerwony (-50 ppkt)!"
-                    self.playingUsers.append([author_id, choice])
-                    points.addPoints(str(author_id), int(-1 * self.amount))
-            msg = msg + " [ruletka #" + str(self.id) + "]"
-            message = await interaction.response.send_message(msg, ephemeral=True)
-            self.sent_messages.append(message)
-
-    @ui.button(label="Green", style=ButtonStyle.success)
-    async def option3(self, interaction: Interaction, button: ui.Button):
-        author_id = interaction.user.id
-        user = db.retrieveUser('discord_id',str(author_id))
-        msg = ""
-        if user:
-            if int(user['points']) < int(self.amount):
-                msg = "Masz za malo pizzopunktow. Wymagane - " + str(self.amount) + ", ty masz: " + str(user['points']) + "!"
-            else:
-                choice = "Green"
-                if self.playingUsers:
-                    newUser = True
-                    for user in self.playingUsers:
-                        if user[0] == author_id:
-                            user[1] = choice
-                            newUser = False
-                            msg = "Zmieniles zaklad na zielony!"
-                    if newUser:
-                        msg = "Postawiles pizzopunkty na zielony (-50 ppkt)!"
-                        self.playingUsers.append([author_id, choice])
-                        points.addPoints(str(author_id), int(-1 * self.amount))
-                else:
-                    msg = "Postawiles pizzopunkty na zielony (-50 ppkt)!"
-                    self.playingUsers.append([author_id, choice])
-                    points.addPoints(str(author_id), int(-1 * self.amount))
-            msg = msg + " [ruletka #" + str(self.id) + "]"
-            message = await interaction.response.send_message(msg, ephemeral=True)
-            self.sent_messages.append(message)
-    
-    async def start(self, channel):  
-        self.id = db.addRouletteEntry()
-        self.message = await channel.send(view=self, embed = embedgen.generateRuletaChoices(self.id))
-
-    async def on_timeout(self):
-        if self.sent_messages:
-                for message in self.sent_messages:
-                    if message:
-                        try:
-                            await message.delete() 
-                        except NotFound:
-                            pass
-
-        #delete original message with buttons
-        if self.message:
-            channel = self.message.channel
-            try:
-                await self.message.delete()
-            except NotFound:
-                print("[INFO] wiadomosc juz jest usunieta - ruletaview")
-
-        if self.playingUsers:
-            parsedPeople = []
-            fileName = "assets/gif/ruleta" + str(self.id) + ".gif"
-            winner = gif.generate_spinning_wheel_with_pointer(fileName)
-            msg = ""
-            for pair in self.playingUsers:
-                user = db.retrieveUser('discord_id',str(pair[0]))
-                if user:
-                    msg = msg + str(user['name'] + " postawil na: " + str(pair[1]) + "!\n")
-
-            await channel.send(embed = embedgen.generateRuletaPlayers(msg, self.id))
-            embed, file = embedgen.generateRuletaWheel(self.id, fileName)
-            message = await channel.send(embed = embed, file = file)
-            await asyncio.sleep(15)
-
-            #delete wheel? for now - no
-            #await message.delete()
-            
-            userIds = []
-            msg = ""
-            for pair in self.playingUsers:
-                user = db.retrieveUser('discord_id',str(pair[0]))
-                if user:
-                    earnings = 0
-                    if pair[1] == winner:
-                        if winner == "Green":
-                            earnings = self.amount * 25
-                        else:
-                            earnings = self.amount * 2
-                        points.addPoints(str(user['discord_id']), earnings)
-                        #msg = msg + ""
-                        parsedPeople.append([user['name'], pair[1], str(earnings)])
-                    else:
-                        parsedPeople.append([user['name'], pair[1], "-" + str(self.amount)])
-                    userIds.append(user['discord_id'])
-
-            db.updateRouletteEntry(self.id, winner)
-            db.addRoulettePlayer(self.id, userIds)
-            await channel.send(embed = embedgen.generateRuletaResults(parsedPeople, winner, self.id))               
-        
-#view in discord to choose which users in discord You want to include in query - at the moment used for pubfinder plugin
-class usersChooseView:
-    def __init__(self, users, radius):
-        self.users = users
-        self.selectedUsers = []
-        self.sent_messages = []
-        self.radius = radius
-
-    def generate_embed(self):
-        embed = Embed(title="Wybor uzytkownik", description="Wybierz uzytkownikow, dla ktorych obliczyc mamy do ktorej knajpy sie udac!:", color=Colour.blue())
-        return embed
-
-    def generate_view(self):
-        """Dynamically creates a view with buttons based on users."""
-        view = ui.View()
-        for user in self.users:
-            button = ui.Button(label=user['name'], style=ButtonStyle.primary)
-            button.callback = self.create_callback(user)
-            view.add_item(button)
-
-        button = ui.Button(label="OK", style=ButtonStyle.success)
-        button.callback = self.create_finish_callback()
-        view.add_item(button)
-
-        return view
-
-    def create_callback(self, user):
-        async def callback(interaction: Interaction):
-            await interaction.response.defer()
-            message = await interaction.followup.send(f"You selected {user['name']}.")
-            self.sent_messages.append(message)
-            self.selectedUsers.append(user)
-        return callback
-    
-    def create_finish_callback(self):
-        async def callback(interaction: Interaction):
-            if self.sent_messages:
-                for message in self.sent_messages:
-                    if message:
-                        try:
-                            await message.delete() 
-                        except NotFound:
-                            pass
-            userListString = " ".join([user['name'] for user in self.selectedUsers])
-            await interaction.message.delete()
-            await interaction.channel.send(f"Wybrane osoby: {userListString}.")
-            await interaction.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(self.selectedUsers, radius = self.radius)))
-        return callback
-icons = ["pizza", "skull", "apple", "grill", "juicer", "bike", ""]
-def simulateSlots(amount, tries, user):
-    multiplier = 3
-    earnings = 0
-    for _ in range(tries):
-        spinResult = random.choices(icons, k=3)
-        count = len(set(spinResult))
-        if count > 1:
-            if count == 3:
-                multiplier = 15
-            #remove assets/gif and .png from string
-            winner = winner[11:-4]
-            if list(set(spinResult))[0] == "pizza":
-                multiplier *= 3
-            elif list(set(spinResult))[0] == "skull":
-                multiplier *= -2
-
-            earnings = int(amount * multiplier)
-            points.addPoints(user['discord_id'], earnings)
-            db.updateSlotEntry(id, earnings - amount)
-    #in case of skulls
-    if multiplier < 0:
-        earnings = earnings - amount
-
-def generateSlots(amount, user):
-    multiplier = 3
-    earnings = amount * -1
-    points.addPoints(user['discord_id'], earnings)
-    id = db.insertSlotsEntry(amount, user['discord_id'])
-    output_path = "assets/gif/slot_machine" + str(id) + ".gif"
-    winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
-    if count > 1:
-
-        #remove assets/gif and .png from string
-        winner = winner[11:-4]
-
-        if winner == "pizza":
-            multiplier *= 2
-        elif winner == "skull":
-            multiplier *= -2
-        if count == 3:
-            multiplier *= 5
-            if winner == "skull":
-                #game over
-                multiplier *= 21372137
-                #gg
-        earnings = int(amount * multiplier)
-        points.addPoints(user['discord_id'], earnings)
-        db.updateSlotEntry(id, earnings - amount)
-    #in case of skulls
-    if multiplier < 0:
-        earnings = earnings - amount
-    return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
-
-def getWeather():
-    return weather.getLodzWeather()
-
-#this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
-def getBirthdayStuff(user):
-    returnEmbed = None
-    returnText = ""
-    if user:
-        facts = []
-        facts.append(ai.askAI("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
-        facts.append(ai.askAI("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
-        wrozba = str(ai.askAI("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
-        returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
-        points.addPoints(str(user['discord_id']), 5000)
-    return returnEmbed, returnText
-
-def userFromPattern(pattern):
-    match = TAG_PATTERN.search(pattern)
-    if match:
-        user = db.retrieveUser('discord_id',match.group(1))
-        if user:
-            return user
-    user = db.retrieveUser('discord_id',str(pattern))
-    if user:
-        return user
-    
-    user = db.retrieveUser('name',str(pattern))
-    if user:
-        return user
-    return None
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
-    random.seed(datetime.now().timestamp())
-    #message = userMessage.lower()
     returnEmbed = None
     returnView = None
     returnFile = None
-    returnText = "[!] - Nie znam komendy: \"" + userMessage + "\""
+    returnText = ""
     userAvatarURL = ""
     message = userMessage[1:]
     commands = message.split(" ")
-
-    #esnure it matches the command even if its in lower
-    commands[0] = str(commands[0].lower())
 
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
@@ -353,6 +64,20 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     else:
         tempUser = await dcbot.fetch_user(int(user['discord_id']))
         userAvatarURL = tempUser.avatar.url if tempUser.avatar else tempUser.default_avatar.url
+
+    random.seed(datetime.now().timestamp())
+
+    
+
+    #esnure it matches the command even if its in lower
+    commands[0] = str(commands[0].lower())
+
+    trigger = userMessage[1:].split()[0].lower() # "tip"
+    args = userMessage.split()[1:]               # ["@roLab", "500"]
+    
+    route = ROUTING_TABLE.get(trigger)
+    if not route:
+        return None, f"Nie znam komendy: {trigger}", None, None
     
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) < 300:
@@ -856,3 +581,154 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnText = returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sell MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
     return returnEmbed, returnText, returnView, returnFile
+
+
+
+###################Utility
+
+#view in discord to choose which users in discord You want to include in query - at the moment used for pubfinder plugin
+class usersChooseView:
+    def __init__(self, users, radius):
+        self.users = users
+        self.selectedUsers = []
+        self.sent_messages = []
+        self.radius = radius
+
+    def generate_embed(self):
+        embed = Embed(title="Wybor uzytkownik", description="Wybierz uzytkownikow, dla ktorych obliczyc mamy do ktorej knajpy sie udac!:", color=Colour.blue())
+        return embed
+
+    def generate_view(self):
+        """Dynamically creates a view with buttons based on users."""
+        view = ui.View()
+        for user in self.users:
+            button = ui.Button(label=user['name'], style=ButtonStyle.primary)
+            button.callback = self.create_callback(user)
+            view.add_item(button)
+
+        button = ui.Button(label="OK", style=ButtonStyle.success)
+        button.callback = self.create_finish_callback()
+        view.add_item(button)
+
+        return view
+
+    def create_callback(self, user):
+        async def callback(interaction: Interaction):
+            await interaction.response.defer()
+            message = await interaction.followup.send(f"You selected {user['name']}.")
+            self.sent_messages.append(message)
+            self.selectedUsers.append(user)
+        return callback
+    
+    def create_finish_callback(self):
+        async def callback(interaction: Interaction):
+            if self.sent_messages:
+                for message in self.sent_messages:
+                    if message:
+                        try:
+                            await message.delete() 
+                        except NotFound:
+                            pass
+            userListString = " ".join([user['name'] for user in self.selectedUsers])
+            await interaction.message.delete()
+            await interaction.channel.send(f"Wybrane osoby: {userListString}.")
+            await interaction.channel.send(embed = embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(self.selectedUsers, radius = self.radius)))
+        return callback
+icons = ["pizza", "skull", "apple", "grill", "juicer", "bike", ""]
+
+def simulateSlots(amount, tries, user):
+    multiplier = 3
+    earnings = 0
+    for _ in range(tries):
+        spinResult = random.choices(icons, k=3)
+        count = len(set(spinResult))
+        if count > 1:
+            if count == 3:
+                multiplier = 15
+            #remove assets/gif and .png from string
+            winner = winner[11:-4]
+            if list(set(spinResult))[0] == "pizza":
+                multiplier *= 3
+            elif list(set(spinResult))[0] == "skull":
+                multiplier *= -2
+
+            earnings = int(amount * multiplier)
+            points.addPoints(user['discord_id'], earnings)
+            db.updateSlotEntry(id, earnings - amount)
+    #in case of skulls
+    if multiplier < 0:
+        earnings = earnings - amount
+
+def generateSlots(amount, user):
+    multiplier = 3
+    earnings = amount * -1
+    points.addPoints(user['discord_id'], earnings)
+    id = db.insertSlotsEntry(amount, user['discord_id'])
+    output_path = "assets/gif/slot_machine" + str(id) + ".gif"
+    winner, count = gif.create_slot_machine_gif(frames = 120, output_path = output_path)
+    if count > 1:
+
+        #remove assets/gif and .png from string
+        winner = winner[11:-4]
+
+        if winner == "pizza":
+            multiplier *= 2
+        elif winner == "skull":
+            multiplier *= -2
+        if count == 3:
+            multiplier *= 5
+            if winner == "skull":
+                #game over
+                multiplier *= 21372137
+                #gg
+        earnings = int(amount * multiplier)
+        points.addPoints(user['discord_id'], earnings)
+        db.updateSlotEntry(id, earnings - amount)
+    #in case of skulls
+    if multiplier < 0:
+        earnings = earnings - amount
+    return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
+
+def getWeather():
+    return weather.getLodzWeather()
+
+#this takes a discord_id and generates some info about that persons birthday, also wishes him a happy birthday!
+def getBirthdayStuff(user):
+    returnEmbed = None
+    returnText = ""
+    if user:
+        facts = []
+        facts.append(ai.askAI("Wygeneruj smieszny, interesujacy fakt o tym, co wydarzylo sie w dniu " + birthday.transform_date(user['birthday'])))
+        facts.append(ai.askAI("przetlumacz to na polski : "+birthday.getFloridaMan(user['birthday'])))
+        wrozba = str(ai.askAI("Wylosuj liczbe od 1 do 10 i w zaleznosci od wylosowanej liczby - wygeneruj krotka zartobliwa wrozbe niczym z chinskich ciasteczek jak bedzie wygladal caly nastepny rok dla danej osoby (1 - katastrofalnie, najgorzej jak sie da, 10 - genialnie) Nie informuj jaka liczbe wylosowales, przeslij tylko przepowiednie."))
+        returnEmbed = embedgen.generateBirthdayEmbed(user, facts, wrozba)
+        points.addPoints(str(user['discord_id']), 5000)
+    return returnEmbed, returnText
+
+def userFromPattern(pattern):
+    match = TAG_PATTERN.search(pattern)
+    if match:
+        user = db.retrieveUser('discord_id',match.group(1))
+        if user:
+            return user
+    user = db.retrieveUser('discord_id',str(pattern))
+    if user:
+        return user
+    
+    user = db.retrieveUser('name',str(pattern))
+    if user:
+        return user
+    return None
+
+
+def reloadCommands():
+    global ROUTING_TABLE
+    ROUTING_TABLE = {}
+    docs = db.retrieveAllCommandsKeywords()
+    for doc in docs:
+        for keyword in doc['keywords']:
+            # Map "tip" -> {"module": "economy", "action": "transfer"}
+            ROUTING_TABLE[keyword.lower()] = {
+                "module": doc['module'], 
+                "action": doc['action']
+            }

@@ -29,6 +29,7 @@ eventsCollection = db['events']
 iconsCollection = db['icons']
 bdayPhrasesCollection = db['birthday_phrases']
 aiModesCollection = db['ai_modes']
+responseKeywordsCollection = db['response_keywords']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -411,3 +412,19 @@ def insertAiMode(mode):
 
 def getAllAiModes():
     return aiModesCollection.find({})
+
+def insertKeywordForCommand(module, action, newKeyword):
+    try:
+        result = db.commands_keyword.update_one(
+            {"module": module, "action": action},
+            {"$addToSet": {"keywords": newKeyword.lower()}}
+        )
+        if result.matched_count > 0:
+            return True, f"Dodano '{newKeyword}' do {module}:{action}."
+        else:
+            return False, "Error."
+    except Exception as e:
+        return False, str(e)
+
+def retrieveAllCommandsKeywords():
+    return responseKeywordsCollection.find({})
