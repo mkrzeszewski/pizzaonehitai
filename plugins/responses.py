@@ -748,14 +748,27 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
     elif action == "quote":
         returnText = "Funkcja cytatu poki co nie dziala."
     elif action == "whoami":
-        returnEmbed = _defaultEmbedGen.neutral_msg("Dane o Tobie:", ai.askAI("Przesyłam Ci dane o użytkowniku, powiedz mu coś o nim i zarzuć jakąś ciekawostką." + str(user)))
+        returnEmbed = _defaultEmbedGen.neutral_msg("Dane o Tobie:", ai.askAI("Przesyłam Ci dane o użytkowniku, powiedz mu coś o nim i zarzuć mu jakąś ciekawostką." + str(user)))
     elif action == "roll":
         if args:
             if len(args) == 1:
                 returnText = "Losujemy: 1 - " + args[0] + " -> " + str(random.randint(1, int(args[0])))
             elif len(args) == 2:
                 returnText = "Losujemy liczbe pomiedzy " + args[1] + " - " + args[2] + " -> " + str(random.randint(int(args[0]), int(args[1])))
-        return ""
+        else:
+            returnText = "Losujemy liczbe pomiedzy 1 a 100 - > " + str(random.randint(1, 100))
+    elif action == "beg":
+        if int(user['points']) >= 100:
+            returnText = f"❌ Masz {user['points']} pkt. To za dużo na zasiłek, ty chciwy sępie!"
+            return None, returnText, None, None
+        if db.isBegAvailable():
+            db.updateUser('discord_id', str(user['discord_id']), 'points', 100)
+            db.createBegEntry(str(user['discord_id']))
+            returnEmbed = _utilityEmbedGen.beggar_handout(user)
+        else:
+            begPerson = db.getBegPerson()
+            who = begPerson['name'] if begPerson else "chuj wie"
+            returnText = f"🛑 Kolejka po darmową kasę jest długa! Ostatni zasiłek wyłudził: **{who}**. Wróć za chwilę."
     elif action == "points":
         target_avatar = avatarUrl
         target_user = user
@@ -776,12 +789,10 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         if args and args[0].isdigit():
             amount = int(args[0])
             amount = min(amount, 20)
-
         if action == "top":
             leader_data = points.getTop(amount)
         else:
             leader_data = points.getBottom(amount)
-
         if leader_data:
             returnEmbed = _utilityEmbedGen.leaderboards(leader_data, amount, action)
         else:
@@ -836,6 +847,8 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
         success, msg = stocks.cashout(user['name'])
         if success:
             returnEmbed = _stockEmbedGen.stock_event(user, None, msg, "cashout")
+        else:
+            returnEmbed = _utilityEmbedGen.error_msg(defaultTitle,msg)
     elif action in ["buy", "sell"]:
         if len(args) < 2:
             returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Brak symbolu lub ilości.", f"!{action} [SYMBOL] [ILOŚĆ]")

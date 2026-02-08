@@ -284,7 +284,7 @@ class UtilityEmbedGen(BaseEmbedGen):
         formatted_points = f"{points:,}"
         description = (
             f"**Ranga:** {rank}\n"
-            f"💰 **Saldo:** `{formatted_points}` pkt\n"
+            f"💰 **Saldo:** `{formatted_points}` ppkt\n"
             f"───────────────────"
         )
 
@@ -324,7 +324,7 @@ class UtilityEmbedGen(BaseEmbedGen):
         current_rank = start_rank
         for user in users:
             points = f"{user['points']:,}" # 1,000,000 instead of 1000000
-            string_list += f"**{current_rank})** {user['name']} — `{points}` pkt\n"
+            string_list += f"**{current_rank})** {user['name']} — `{points}` ppkt\n"
             current_rank += step
 
         # 3. Create the base
@@ -334,10 +334,24 @@ class UtilityEmbedGen(BaseEmbedGen):
             color=self.INFO_COLOR,
             thumbnail=thumb
         )
-        
         embed.add_field(name=field_name, value=string_list if string_list else "Brak danych.", inline=False)
-        
         return embed
+    
+    def beggar_handout(self, user):
+        title = "🚮 Zapomoga dla Biedaka"
+        description = (
+            f"Patrzcie na niego! **{user['name']}** jest absolutnie spłukany.. "
+            "Zupełnie nic mu nie zostało, więc rzucamy mu ochłapy, żeby nie płakał.\n\n"
+            "💰 **Jałmużna:** `100` pkt\n"
+            "🐢 *Postaraj się nie stracić tego w 30 sekund...*"
+        )
+
+        return self._create_base(
+            title=title,
+            description=description,
+            color=self.NEUTRAL_COLOR,
+            thumbnail=db.icon("BEGGAR_ICON")
+        )
 
     
 ##################################################################
