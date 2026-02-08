@@ -38,12 +38,12 @@ def generateStocks():
 
 def initiateStocksDB(json_stocks):
     users = db.retrieveAllUsers()
-    currentShares = db.retrieveAllStocks()
+    currentShares = list(db.retrieveAllStocks())
     if users:
         for user in users:
             cashout(user['name'])
 
-    if(len(list(currentShares))> 0):
+    if(len(currentShares) > 0):
         for share in currentShares:
             db.insertStockHistory(share)
 
@@ -56,8 +56,8 @@ def initiateStocksDB(json_stocks):
 
 #we do it once per month
 def removeAllStocks():
-    currentShares = db.retrieveAllStocks()
-    if(len(list(currentShares))> 0):
+    currentShares = list(db.retrieveAllStocks())
+    if(len(currentShares)> 0):
         for share in currentShares:
             db.insertStockHistory(share)
             
@@ -73,9 +73,9 @@ def simulateTrends():
 
 #to check how much stock has changed in last X time
 def informOnStocksUpdate():
-    allStocks = db.retrieveAllStocks()
+    allStocks = list(db.retrieveAllStocks())
     msg = "W przeciagu ostatniego okresu czasu: "
-    if len(list(allStocks)) > 0:
+    if len(allStocks) > 0:
         for stock in allStocks:
             msg += "\n [" + str(stock['symbol']) + "] " + str(stock['name']) + " - "
             change = ((int(stock['lastPrice']) - int(stock['price'])) / int(stock['lastPrice']))

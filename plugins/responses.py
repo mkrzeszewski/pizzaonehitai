@@ -799,22 +799,22 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnEmbed = embedgen.generateHelpEmbed()
 
         if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
-            _stocks = db.retrieveAllStocks()
-            if len(list(_stocks)) > 0:
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "topstocks":
-            _stocks = db.retrieveTopStocks()
-            if len(list(_stocks)) > 0:
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
             else:
                 returnText = "Currently there's no stock value"
 
         if message == "bottomstocks":
-            _stocks = db.retrieveBottomStocks()
-            if len(list(_stocks)) > 0:
+            _stocks = list(db.retrieveAllStocks())
+            if len(_stocks) > 0:
                 returnEmbed = embedgen.generateBottomStocks(_stocks)
             else:
                 returnText = "Currently there's no stock value"
