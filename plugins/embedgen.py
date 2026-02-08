@@ -60,9 +60,8 @@ class BaseEmbedGen:
         full_description = f"{description}{self.help_hint}"
         embed = Embed(
             title=title,
-            description=description,
-            color=embed_color,
-            description = full_description
+            description=full_description,
+            color=embed_color
         )
         embed.set_author(name=self.DEFAULT_AUTHOR, icon_url=self.DEFAULT_AUTHOR_ICON)
         embed.set_footer(text=self.DEFAULT_FOOT_TEXT, icon_url=self.DEFAULT_FOOTER_ICON)
