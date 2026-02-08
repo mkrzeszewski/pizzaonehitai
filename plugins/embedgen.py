@@ -509,14 +509,29 @@ def generateAchievements(achievements):
 
 def generateStocksOverview(stocks):
     color = Colour.dark_green()
-    description = "Oto obecnie dostepne akcje na gieldzie P1H:"
-    for stock in stocks:
-        description += "\n - [" + str(stock['symbol']) + "] " + str(stock['name']) + "\ncurrent price: " + str(stock['price']) + " ppkt."
-    description += "\n!stonks, !fullstonks, !buy, !sell - sprobuj szczescia na gieldzie!"
-    embed = Embed(title="Gielda Pizza One Hit", description=str(description), color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
-    embed.set_thumbnail(url = STONKS_ICON_URL)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    sorted_stocks = sorted(
+        stocks, 
+        key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), 
+        reverse=True
+    )
+    description = "🚀 **Oto obecnie dostępne akcje na gieldzie P1H:**\n"
+    
+    for stock in sorted_stocks:
+        # Calculate Market Cap
+        mcap_val = int(stock['price']) * int(stock.get('totalShares', 1))
+        if mcap_val >= 1000000:
+            mcap_str = f"{mcap_val/1000000:.2f}M"
+        elif mcap_val >= 1000:
+            mcap_str = f"{mcap_val/1000:.1f}k"
+        else:
+            mcap_str = str(mcap_val)
+        description += f"\n**{stock['symbol']}** | {stock['name']}\n┗ 💰 *Market Cap:* `{mcap_str} ppkt.`\n"
+
+    description += "\n\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
+    embed = Embed(title="📈 Giełda Pizza One Hit", description=description, color=color)
+    embed.set_author(name="Pizza One Hit AI", icon_url=BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url=STONKS_ICON_URL)
+    embed.set_footer(text="Sztuczna inteligencja na twoim discordzie!", icon_url=PIZZA_ICON_URL)
     return embed
 
 def generateStocksRundown(msg):
