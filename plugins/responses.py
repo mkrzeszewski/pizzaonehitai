@@ -3,7 +3,7 @@ import plugins.weather as weather
 import plugins.horoscope as horoskop
 import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
-from embedgen import StocksGen
+from plugins.embedgen import StocksGen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
 import plugins.gifgenerator as gif
