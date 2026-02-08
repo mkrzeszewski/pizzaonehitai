@@ -117,6 +117,7 @@ def updatePrices():
     return bankrupts
 
 def purchaseStocks(username, stocksymbol, amount):
+    success = False
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
     if user and stock:
@@ -129,14 +130,18 @@ def purchaseStocks(username, stocksymbol, amount):
                 info = "[Stocks] User " + str(user['name']) + " has purchased " + str(amount) + " shares of " + str(stock['name']) + " for " + str(cost) + "."
                 print(info)
                 db.updateStocksForUser('name',user['name'],stock['symbol'], amount)
-                return str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
+                msg = str(user['name']) + " zakupil " + str(amount) + " akcjii " + str(stock['name']) + " za " + str(cost) + " ppkt."
+                success = True
             else:
-                return str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
+                msg = str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
         else: 
-            return str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['shares']))
-    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+            msg = str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['shares']))
+    msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+    return success, msg
 
 def sellStocks(username, stocksymbol, amount):
+    success = False
+    msg = ""
     user = db.retrieveUser('name', username)
     stock = db.retrieveStock('symbol', stocksymbol)
     userShares = 0
@@ -150,28 +155,32 @@ def sellStocks(username, stocksymbol, amount):
             returnMoney = int(int(int(stock['price']) * int(amount)) * (1 - TAX_RATE))
             points.modifyPoints('name',user['name'], int(returnMoney))
             db.removeStocksFromUser(user['name'],stock['symbol'], amount)
-            return str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
+            msg = str(user['name']) + " sprzedaje " + str(amount) + " akcji " + str(stock['name']) + " za " + str(returnMoney) + " ppkt! (-10% podatku fur Deutschland)."
+            success = True
         else: 
-            return str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
-    return "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+            msg = str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
+    msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+    return success, msg
 
 def cashout(username):
+    success = False
     user = db.retrieveUser('name', username)
     returnMoney = 0
-    info = ""
+    msg = ""
     if user['stocksOwned']:
-        info = str(user['name']) + " sprzedaje: "
+        msg = str(user['name']) + " sprzedaje: "
         for share in user['stocksOwned']:
             stock = db.retrieveStock('symbol',share['symbol'])
             stockPrice = int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
             returnMoney += stockPrice
             db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-            info += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
-        info += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
+            msg += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
+        msg += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
         points.modifyPoints('name',user['name'], int(returnMoney))
-        print(info)
-        return info
-    return "User " + str(user['name']) + " doesn't have any shares."
+        print(msg)
+        success = True
+    msg = "User " + str(user['name']) + " doesn't have any shares."
+    return success, msg
 
 def generateGraph():
     stocksData = db.retrieveAllStocks()

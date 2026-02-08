@@ -663,8 +663,11 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
                     if user and stock:
-                        msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                        success, msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
+                        if success:
+                            returnEmbed = embedgen.generateUserStockPurchase(user, stock, msg)
+                        else:
+                            returnText = msg
                     else:
                         returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
@@ -679,8 +682,11 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
                     if stock:
-                        msg = stocks.sellStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                        success, msg = stocks.sellStocks(user['name'], stockSymbol, amount)
+                        if success:
+                            returnEmbed = embedgen.generateUserStockSale(user, stock, msg)
+                        else:
+                            returnText = msg
                     else:
                         returnText = "Stock " + str(stockSymbol) + " not found."
                 else:
@@ -839,8 +845,11 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnEmbed = embedgen.generateFullStonks(_stocks)
 
         if message == "cashout" or message == "imout":
-            msg = stocks.cashout(user['name'])
-            returnEmbed = embedgen.generateUserStockCashout(user, msg)
+            success, msg = stocks.cashout(user['name'])
+            if success:
+                returnEmbed = embedgen.generateUserStockCashout(user, msg)
+            else:
+                returnText = msg
 
         if message == "portfolio" or message == "flex" or message == "mystocks" or message == "mystonks":
             returnEmbed = embedgen.generateUserPortfolioEmbed(user, userAvatarURL)
@@ -853,5 +862,11 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         if message == "stockupdate" or message == "stockrundown":
             msg = stocks.informOnStocksUpdate()
             returnEmbed = embedgen.generateStocksRundown(msg)
+
+        if message in buyStockKeyword:
+            returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !buy MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+        if message in sellStockKeyword:
+            returnText = returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sell MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
     return returnEmbed, returnText, returnView, returnFile
