@@ -38,6 +38,7 @@ BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-
 PEPE_CLOWN_ICON_URL = "https://cdn3.emoji.gg/emojis/4825_PepeClown.png"
 PURCHASE_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/6645_Stonks.png"
 SELL_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/8423_NotStonks.png"
+BET_ICON_URL = "https://cdn3.emoji.gg/emojis/2666-casino-chip.png"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -610,6 +611,145 @@ def generateUserStockSale(user, stock, msg = ""):
     embed = Embed(title=str(user['name']) + " sprzedaje akcje " + str(stock['name']) + "!", description=str(description), color = color)
     embed.set_thumbnail(url = SELL_STOCK_ICON_URL)
     embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetHelp():
+    color = Colour.dark_teal()
+    embed = Embed(title="Poradnik zakladow na P1H", description="System zakladow pozwala tworzyc wlasne zaklady i obstawiac pizzopunktami!", color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+
+    create_text = '**!zaklad "Tytul" "Opcja 1" "Opcja 2"**\n'
+    create_text += 'Mozesz dodac wiecej opcji:\n'
+    create_text += '!zaklad "Kto wygra mecz?" "Polska" "Niemcy" "Remis"\n'
+    create_text += '_Uwaga: tytul i opcje musza byc w cudzyslowach!_'
+    embed.add_field(name = "1. Tworzenie zakladu", value = create_text, inline = False)
+
+    place_text = '**!obstaw <id> <nr_opcji> <kwota>**\n'
+    place_text += 'Przyklad: !obstaw 0 1 500\n'
+    place_text += '_(postawisz 500 ppkt na opcje nr 1 w zakladzie #0)_\n'
+    place_text += 'Min. zaklad: 10 ppkt. Mozesz dokladac do tej samej opcji.'
+    embed.add_field(name = "2. Obstawianie", value = place_text, inline = False)
+
+    info_text = '**!zaklady** - lista aktywnych zakladow\n'
+    info_text += '**!zakladinfo <id>** - szczegoly zakladu (opcje, pule, kto obstawil)'
+    embed.add_field(name = "3. Przegladanie", value = info_text, inline = False)
+
+    resolve_text = '**!rozstrzygnij <id> <nr_opcji>**\n'
+    resolve_text += 'Przyklad: !rozstrzygnij 0 1\n'
+    resolve_text += '_Tylko tworca zakladu moze go rozstrzygnac!_'
+    embed.add_field(name = "4. Rozstrzyganie (tworca)", value = resolve_text, inline = False)
+
+    cancel_text = '**!anuluj <id>**\n'
+    cancel_text += 'Anuluje zaklad i zwraca punkty wszystkim uczestnikom.\n'
+    cancel_text += '_Tworca lub admin moze anulowac._'
+    embed.add_field(name = "5. Anulowanie", value = cancel_text, inline = False)
+
+    payout_text = 'Wygrani dostaja proporcjonalny udzial calej puli.\n'
+    payout_text += 'Np. pula = 1000, postawiles 200 z 400 na zwycieska opcje\n'
+    payout_text += '-> dostajesz 50% puli = **500 ppkt**'
+    embed.add_field(name = "Jak dzialaja wyplaty?", value = payout_text, inline = False)
+
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetCreated(bet):
+    color = Colour.dark_teal()
+    description = "**" + str(bet['title']) + "**\n\nOpcje:\n"
+    for opt in bet['options']:
+        description += str(opt['key']) + ") " + str(opt['label']) + "\n"
+    description += "\nAby obstawic uzyj: **!obstaw " + str(bet['bet_id']) + " <nr_opcji> <kwota>**"
+    embed = Embed(title="Nowy zaklad #" + str(bet['bet_id']), description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+    embed.add_field(name = "Tworca:", value = str(bet['creator_name']), inline = True)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetInfo(bet):
+    color = Colour.dark_teal()
+    if bet['status'] == "resolved":
+        color = Colour.dark_green()
+    elif bet['status'] == "cancelled":
+        color = Colour.dark_gray()
+
+    description = "**" + str(bet['title']) + "**\n\n"
+    for opt in bet['options']:
+        marker = ""
+        if bet['winner_key'] and int(bet['winner_key']) == int(opt['key']):
+            marker = " <<< ZWYCIEZCA"
+        description += str(opt['key']) + ") **" + str(opt['label']) + "** - pula: " + str(opt['pool']) + " ppkt" + marker + "\n"
+        if opt['bets']:
+            for b in opt['bets']:
+                description += "   - " + str(b['name']) + ": " + str(b['amount']) + " ppkt\n"
+    description += "\nLaczna pula: **" + str(bet['total_pool']) + " ppkt**"
+    description += "\nStatus: **" + str(bet['status']) + "**"
+
+    embed = Embed(title="Zaklad #" + str(bet['bet_id']), description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateActiveBets(bets):
+    color = Colour.dark_teal()
+    description = ""
+    if bets:
+        for bet in bets:
+            options_str = " | ".join([str(o['key']) + ") " + o['label'] for o in bet['options']])
+            description += "**#" + str(bet['bet_id']) + "** - " + str(bet['title']) + "\n"
+            description += "Opcje: " + options_str + "\n"
+            description += "Pula: " + str(bet['total_pool']) + " ppkt | Tworca: " + str(bet['creator_name']) + "\n\n"
+    else:
+        description = "Brak aktywnych zakladow. Stworz nowy komenda:\n**!zaklad \"Tytul\" \"Opcja 1\" \"Opcja 2\"**"
+    embed = Embed(title="Aktywne zaklady na P1H", description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetResolved(bet, winners):
+    color = Colour.dark_green()
+    winning_label = ""
+    for opt in bet['options']:
+        if bet['winner_key'] and int(bet['winner_key']) == int(opt['key']):
+            winning_label = opt['label']
+            break
+    
+    description = "**" + str(bet['title']) + "**\n\n"
+    description += "Zwycieska opcja: **" + winning_label + "**\n\n"
+
+    if winners:
+        description += "Wygrani:\n"
+        for w in winners:
+            description += "- " + str(w['name']) + ": postawil " + str(w['bet_amount']) + " -> wygral **" + str(w['payout']) + " ppkt**\n"
+    else:
+        description += "Nikt nie obstawil zwycieskiej opcji - punkty zostaly zwrocone uczestnikom."
+    
+    embed = Embed(title="Zaklad #" + str(bet['bet_id']) + " rozstrzygniety!", description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetCancelled(bet):
+    color = Colour.dark_gray()
+    description = "**" + str(bet['title']) + "**\n\n"
+    description += "Zaklad zostal anulowany. Wszystkie punkty zostaly zwrocone uczestnikom."
+    embed = Embed(title="Zaklad #" + str(bet['bet_id']) + " anulowany", description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
+    return embed
+
+def generateBetPlaced(bet, username, option_label, amount):
+    color = Colour.dark_teal()
+    description = str(username) + " postawil **" + str(amount) + " ppkt** na opcje **" + str(option_label) + "**!"
+    description += "\nLaczna pula: **" + str(bet['total_pool']) + " ppkt**"
+    embed = Embed(title="Zaklad #" + str(bet['bet_id']) + " - " + str(bet['title']), description=description, color=color)
+    embed.set_author(name = "Pizza One Hit AI", icon_url = BOT_GIF_ADDRESS)
+    embed.set_thumbnail(url = BET_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
 

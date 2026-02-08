@@ -11,6 +11,7 @@ import plugins.ai as ai
 import riot.riotleagueapi as leagueapi
 import riot.riottftapi as tftapi
 import plugins.stocks as stocks
+import plugins.betting as betting
 import asyncio
 from datetime import datetime
 import re
@@ -38,6 +39,13 @@ arrestKeyword = ["arrest", "aresztuj", "dopierdla", "wyrok", "zamknij"]
 stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykres"]
 sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
 buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
+betCreateKeyword = ["zaklad", "bet", "nowybet"]
+betPlaceKeyword = ["obstaw", "placebet", "stawiam"]
+betListKeyword = ["zaklady", "bets", "aktywnebet"]
+betInfoKeyword = ["zakladinfo", "betinfo"]
+betResolveKeyword = ["rozstrzygnij", "resolve"]
+betCancelKeyword = ["anuluj", "cancelbet"]
+betHelpKeyword = ["jaksiezakladac", "bethelp", "zakladyhelp", "jakzakladac", "zakladyporadnik", "betporadnik"]
 
 #view in discord for roullette - it will have 3 buttons that You might click - blue/green/red - badly written atm, as we duplicate code 3 times
 class ruletaView(ui.View):
@@ -685,6 +693,83 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             else:
                 returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sellstock MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
 
+        elif commands[0] in betCreateKeyword:
+            quoted_args = betting.parseQuotedArgs(message)
+            if len(quoted_args) >= 3:
+                title = quoted_args[0]
+                options_list = quoted_args[1:]
+                bet_data, error = betting.createBet(str(author), user['name'], title, options_list)
+                if error:
+                    returnText = error
+                else:
+                    returnEmbed = embedgen.generateBetCreated(bet_data)
+            else:
+                returnText = "Uzyj: !zaklad \"Tytul zakladu\" \"Opcja 1\" \"Opcja 2\" [\"Opcja 3\" ...]"
+
+        elif commands[0] in betPlaceKeyword:
+            if len(commands) == 4:
+                if str(commands[1]).isdigit() and str(commands[2]).isdigit() and str(commands[3]).isdigit():
+                    bet_id = int(commands[1])
+                    option_key = int(commands[2])
+                    amount = int(commands[3])
+                    updated_bet, error = betting.placeBet(str(author), user['name'], bet_id, option_key, amount)
+                    if error:
+                        returnText = error
+                    else:
+                        option_label = ""
+                        for opt in updated_bet['options']:
+                            if int(opt['key']) == option_key:
+                                option_label = opt['label']
+                                break
+                        returnEmbed = embedgen.generateBetPlaced(updated_bet, user['name'], option_label, amount)
+                else:
+                    returnText = "Wszystkie argumenty musza byc liczbami! Uzyj: !obstaw <id_zakladu> <nr_opcji> <kwota>"
+            else:
+                returnText = "Uzyj: !obstaw <id_zakladu> <nr_opcji> <kwota>\nPrzyklad: !obstaw 0 1 500"
+
+        elif commands[0] in betResolveKeyword:
+            if len(commands) == 3:
+                if str(commands[1]).isdigit() and str(commands[2]).isdigit():
+                    bet_id = int(commands[1])
+                    winner_key = int(commands[2])
+                    resolved_bet, winners, error = betting.resolveBet(str(author), bet_id, winner_key)
+                    if error:
+                        returnText = error
+                    else:
+                        returnEmbed = embedgen.generateBetResolved(resolved_bet, winners)
+                else:
+                    returnText = "Argumenty musza byc liczbami! Uzyj: !rozstrzygnij <id_zakladu> <nr_opcji>"
+            else:
+                returnText = "Uzyj: !rozstrzygnij <id_zakladu> <nr_zwycieskiej_opcji>\nPrzyklad: !rozstrzygnij 0 1"
+
+        elif commands[0] in betCancelKeyword:
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    bet_id = int(commands[1])
+                    cancelled_bet, error = betting.cancelBet(str(author), bet_id)
+                    if error:
+                        returnText = error
+                    else:
+                        returnEmbed = embedgen.generateBetCancelled(cancelled_bet)
+                else:
+                    returnText = "ID zakladu musi byc liczba!"
+            else:
+                returnText = "Uzyj: !anuluj <id_zakladu>\nPrzyklad: !anuluj 0"
+
+        elif commands[0] in betInfoKeyword:
+            if len(commands) == 2:
+                if str(commands[1]).isdigit():
+                    bet_id = int(commands[1])
+                    bet = betting.getBetInfo(bet_id)
+                    if bet:
+                        returnEmbed = embedgen.generateBetInfo(bet)
+                    else:
+                        returnText = "Zaklad #" + str(bet_id) + " nie istnieje!"
+                else:
+                    returnText = "ID zakladu musi byc liczba!"
+            else:
+                returnText = "Uzyj: !zakladinfo <id_zakladu>\nPrzyklad: !zakladinfo 0"
+
         elif commands[0] == "portfolio" or commands[0] == "flex":
             user = userFromPattern(commands[1])
             if user:
@@ -848,6 +933,13 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                 returnEmbed = embedgen.generateUserPortfolioEmbed(user, flexAvatar)
             else:
                 returnText = "User " + str(commands[1]) + "not found."
+
+        if message in betListKeyword:
+            active_bets = betting.getActiveBets()
+            returnEmbed = embedgen.generateActiveBets(active_bets)
+
+        if message in betHelpKeyword:
+            returnEmbed = embedgen.generateBetHelp()
 
         if message == "testbankrupcy":
             user = db.retrieveUser('discord_id', str(author))

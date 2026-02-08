@@ -25,6 +25,7 @@ stocksCollection = db['stocks']
 tasksCollection = db['tasks']
 theatreCollection = db['theatres']
 eventsCollection = db['events']
+betsCollection = db['bets']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -359,3 +360,38 @@ def retrieveEventsFromTheatre(theatre, title):
 
 def updateEvent(theatre, title, event):
     return eventsCollection.update_one({"teatr":theatre,"title":title},{"$set": event},upsert=True)
+
+#betting functions
+def getBetCount():
+    return betsCollection.estimated_document_count()
+
+def insertBet(bet_data):
+    return betsCollection.insert_one(bet_data)
+
+def retrieveBet(bet_id):
+    return betsCollection.find_one({"bet_id": int(bet_id)})
+
+def retrieveActiveBets():
+    return betsCollection.find({"status": "open"})
+
+def updateBetStatus(bet_id, status):
+    return betsCollection.update_one(
+        {"bet_id": int(bet_id)},
+        {"$set": {"status": status}}
+    ).matched_count
+
+def updateBetWinner(bet_id, winner_key):
+    return betsCollection.update_one(
+        {"bet_id": int(bet_id)},
+        {"$set": {"winner_key": winner_key}}
+    ).matched_count
+
+def appendBetOption(bet_id, option_key, discord_id, name, amount):
+    new_bet_entry = {"discord_id": discord_id, "name": name, "amount": amount}
+    betsCollection.update_one(
+        {"bet_id": int(bet_id), "options.key": int(option_key)},
+        {
+            "$push": {"options.$.bets": new_bet_entry},
+            "$inc": {"options.$.pool": int(amount), "total_pool": int(amount)}
+        }
+    )
