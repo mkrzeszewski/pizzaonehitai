@@ -38,6 +38,7 @@ BOGDANOFF_ICON_URL = "https://emoji.discadia.com/emojis/43f154fb-da6c-4513-ad6d-
 PEPE_CLOWN_ICON_URL = "https://cdn3.emoji.gg/emojis/4825_PepeClown.png"
 PURCHASE_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/6645_Stonks.png"
 SELL_STOCK_ICON_URL = "https://cdn3.emoji.gg/emojis/8423_NotStonks.png"
+GENTLEMAN_CAT_ICON_URL = "https://cdn3.emoji.gg/emojis/3464-floppabased.png"
 
 GAMBA_RANDOM_ICON_ARRAY = ["https://cdn3.emoji.gg/emojis/5897-peepo-gamba.gif",
                            "https://cdn3.emoji.gg/emojis/3135-pepegamble.gif",
@@ -558,9 +559,9 @@ def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
     color = Colour.dark_red()
     description = str(ai.askAI("Poinformuj, ze firma " + str(stock['name']) + "oglosila bankrupctwo, i zartobliwie opisz dlaczego, uwzgledniajac dlaczego to sie stalo bo cos odjebal CEO o nicku " + str(stock['ceo']) + "."))
     if badInvestors:
-        description += "\nNieudacznicy, ktorzy probowali zainwestowac w te firme: \n"
+        description += "\nNieudacznicy, ktorzy probowali zainwestowac w te firme: "
         for investor in badInvestors:
-            description += " - " + str(investor)
+            description += "\n - " + str(investor)
     description += "\n\n!stonks, !fullstonks, !purchasestock, !sellstock - sprobuj szczescia na gieldzie!"
     embed = Embed(title=str(stock['name']) + " bankrutuje!", description=str(description), color = color)
     if userAvatarURL:
@@ -615,10 +616,10 @@ def generateUserStockSale(user, stock, msg = ""):
 
 def generateTheatreEventList(theatre, event, dates):
     color = Colour.dark_purple()
-    description = ""
+    description = "Nowe daty spektakli na wydarzenie!\n"
     for date in dates:
-        description += "* " + str(date['text']) + " \n"
-    embed = Embed(title="Nowe daty na wydarzenie w - " + str(theatre) + " - " + str(event) + ".", description=str(description), color = color)
-    embed.set_thumbnail(url = PEPE_CLOWN_ICON_URL)
+        description += "\n - " + str(date['text'])
+    embed = Embed(title=str(theatre) + " - " + str(event) + ".", description=str(description), color = color)
+    embed.set_thumbnail(url = GENTLEMAN_CAT_ICON_URL)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
