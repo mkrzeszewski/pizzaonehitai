@@ -657,7 +657,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         elif commands[0] in buyStockKeyword:
             if len(commands) > 2:
-                stockSymbol = str(commands[1])
+                stockSymbol = str(commands[1]).upper()
                 amount = int(commands[2])
                 user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
@@ -677,7 +677,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         elif commands[0] in sellStockKeyword:
             if len(commands) > 2:
-                stockSymbol = str(commands[1])
+                stockSymbol = str(commands[1]).upper()
                 amount = int(commands[2])
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:

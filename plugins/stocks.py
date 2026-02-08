@@ -196,9 +196,9 @@ def purchaseStocks(username, stocksymbol, amount):
                 print(msg)
                 success = True
             else:
-                msg = str(username) + " nie ma funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
+                msg = str(username) + " - nie masz funduszy na zakup tylu akcji!\nTwoje punkty: " + str(userPoints) + "\nKoszt: " + str(int(stock['price'] * amount))
         else: 
-            msg = str(stock['name']) + " nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['availableShares']))
+            msg = str(stock['name']) + " - nie ma tylu udzialow na rynku!\nTwoja proba: " + str(amount) + "\nDostepne udzialy: " + str(int(stock['availableShares']))
         return success, msg
     msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
     return success, msg
