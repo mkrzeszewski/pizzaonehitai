@@ -26,6 +26,9 @@ stockHistoryCollection = db['stock_history']
 tasksCollection = db['tasks']
 theatreCollection = db['theatres']
 eventsCollection = db['events']
+iconsCollection = db['icons']
+bdayPhrasesCollection = db['birthday_phrases']
+aiModesCollection = db['ai_modes']
 
 def addRouletteEntry():
     count = ruletasCollection.estimated_document_count()
@@ -374,3 +377,33 @@ def retrieveEventsFromTheatre(theatre, title):
 
 def updateEvent(theatre, title, event):
     return eventsCollection.update_one({"teatr":theatre,"title":title},{"$set": event},upsert=True)
+##
+def retrieveAllIcons():
+    return iconsCollection.find({})
+
+def addIcon(name, url):
+    return iconsCollection.insert_one({'name': name, 
+                                        'url': url})
+def retrieveIcon(key, value):
+    return iconsCollection.find_one({key: value})
+
+def icon(name):
+    return iconsCollection.find_one({'name': name})
+
+def removeIcon(key, value):
+    return iconsCollection.delete_one({key: value})
+
+def updateIcon(name, url):
+    return iconsCollection.update_one({'name': name},{"$set": {"url": url}}).matched_count
+
+def insertBdayPhrase(phrase):
+    return bdayPhrasesCollection.insert_one({'phrase':phrase})
+
+def getAllBdayPhrases():
+    return bdayPhrasesCollection.find({})
+
+def insertAiMode(mode):
+    return aiModesCollection.insert_one({'mode':mode})
+
+def getAllAiModes():
+    return aiModesCollection.find({})
