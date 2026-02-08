@@ -223,7 +223,8 @@ def sellStocks(username, stocksymbol, amount):
             success = True
         else: 
             msg = str(username) + " - nie masz tylu udzialow.\nTwoja proba: " + str(amount) + "\nUdzialy w Twoim posiadaniu: " + str(userShares)
-    msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
+    else:
+        msg = "User " + str(username) + " or stock " + str(stocksymbol) + " not found."
     return success, msg
 
 def cashout(username):
@@ -238,7 +239,7 @@ def cashout(username):
             stockPrice = int(int(int(stock['price']) * int(share['amount'])) * (1 - TAX_RATE))
             returnMoney += stockPrice
             db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-            msg += "\n - [" + str(share['symbol']) + "] " + str(share['name']) + " - " + str(stockPrice) + "."
+            msg += "\n - [" + str(share['symbol']) + "] - " + str(stockPrice) + "."
         msg += "\nTotal: " + str(returnMoney) + ". (10% tax was applied)"
         points.modifyPoints('name',user['name'], int(returnMoney))
         print("[STOCKS] " + msg)
