@@ -313,7 +313,7 @@ class UtilityEmbedGen(BaseEmbedGen):
         else:
             title_prefix = "📉 Najbiedniejsi"
             field_name = f"__Bottom {amount}:__"
-            thumb = db.icon("POINTS_ICON_URL")
+            thumb = db.icon("POINTS_ICON")
             # For bottom, we calculate the starting rank based on total users
             total_users = len(list(db.retrieveAllUsers()))
             start_rank = total_users
