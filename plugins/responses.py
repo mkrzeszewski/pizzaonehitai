@@ -49,6 +49,7 @@ buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "inves
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
+    reloadCommands()
     returnEmbed = None
     returnView = None
     returnFile = None
@@ -56,7 +57,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     userAvatarURL = ""
     message = userMessage[1:]
     commands = message.split(" ")
-
     user = db.retrieveUser('discord_id', str(author))
     if user == None:
         returnText = "User o ID: " + str(author) + " nie znajduje sie w bazie danych. Uderz do roLab."
