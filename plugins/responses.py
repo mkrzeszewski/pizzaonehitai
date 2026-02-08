@@ -403,30 +403,26 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     returnEmbed = embed_buttons.generate_embed()#embedgen.generateEmbedFromRestaurant(pubfinder.chooseRestaurant(),["rolab", "bartus", "fifi"])
 
         elif commands[0] in aiKeyword:
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                query = message[3:]
-                db.insertAIHistory(str(author), query)
-                text = ""
-                returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+            query = message[3:]
+            db.insertAIHistory(str(author), query)
+            text = ""
+            returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
 
         elif commands[0] in heistKeyword:
             if len(commands) == 2:
                 if db.isHeistAvailable():
                     if str(commands[1]).isdigit():
-                        user = db.retrieveUser('discord_id', str(author))
-                        if user:
-                            curr = int(user['points'])
-                            amount = int(str(commands[1]))
-                            if curr >= amount and amount >= 200:
-                                if (db.isUserPartOfCurrentHeist(user['name'])):
-                                    returnText = "Jestes juz czlonkiem aktualnego napadu!"
-                                else:
-                                    db.appendHeistMember(user['name'], amount)
-                                    points.addPoints(str(author), -1 * amount)
-                                    returnText = "Pomyslnie dolaczyles do napadu!"
+                        curr = int(user['points'])
+                        amount = int(str(commands[1]))
+                        if curr >= amount and amount >= 200:
+                            if (db.isUserPartOfCurrentHeist(user['name'])):
+                                returnText = "Jestes juz czlonkiem aktualnego napadu!"
                             else:
-                                returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
+                                db.appendHeistMember(user['name'], amount)
+                                points.addPoints(str(author), -1 * amount)
+                                returnText = "Pomyslnie dolaczyles do napadu!"
+                        else:
+                            returnText = "Masz za malo pizzopunktow - obecnie posiadasz: " + str(user['points']) + "! Min: 200 PPKT."
                     else:
                         returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
                 else:
@@ -435,17 +431,15 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         elif commands[0] in slotsKeyword:
             if len(commands) == 2:
                 if str(commands[1]).isdigit():
-                    user = db.retrieveUser('discord_id', str(author))
-                    if user:
-                        curr = int(user['points'])
-                        amount = int(str(commands[1]))
-                        if amount > 5000:
-                            returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
+                    curr = int(user['points'])
+                    amount = int(str(commands[1]))
+                    if amount > 5000:
+                        returnText = "Maksymalna wysokosc zakladu w slotsach to : " + str(MAX_SLOT_AMOUNT) + "."
+                    else:
+                        if curr >= amount and amount >= 5:
+                            returnEmbed, returnFile = generateSlots(amount, user)
                         else:
-                            if curr >= amount and amount >= 5:
-                                returnEmbed, returnFile = generateSlots(amount, user)
-                            else:
-                                returnText = "Za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            returnText = "Za malo pizzopunktow (min to 5!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -455,23 +449,21 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
                     amount = 0
                     if str(commands[1]).isdigit():
                         amount = int(str(commands[1]))
-                    user = db.retrieveUser('discord_id', str(author))
-                    if user:
-                        curr = int(user['points'])
-                        if str(commands[1]) == "all":
-                            amount = curr
-                        min = int(curr * 0.1)
-                        if curr >= amount and amount >= int(curr * 0.1) and amount >= 25:
-                            result = random.randint(1,2)
-                            if result == 1:
-                                curr = curr + amount
-                                returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:ez:1343529006162772028>"
-                            else:
-                                curr = curr - amount
-                                returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
-                            db.updateUser('discord_id', str(author), 'points', curr)
+                    curr = int(user['points'])
+                    if str(commands[1]) == "all":
+                        amount = curr
+                    min = int(curr * 0.1)
+                    if curr >= amount and amount >= int(curr * 0.1) and amount >= 25:
+                        result = random.randint(1,2)
+                        if result == 1:
+                            curr = curr + amount
+                            returnText = "Nice! +" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:ez:1343529006162772028>"
                         else:
-                            returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% (lub 25 gdy jestes biedakiem) pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
+                            curr = curr - amount
+                            returnText = "Oops.. -" + str(amount) + " pizzapkt! (obecnie masz : " + str(curr) + ") <:pepecopium:1094185065925333012>"
+                        db.updateUser('discord_id', str(author), 'points', curr)
+                    else:
+                        returnText = "Za malo pizzopunktow (minimalna ilosc na gre to 10% (lub 25 gdy jestes biedakiem) pizzopunktow!) - obecnie posiadasz: " + str(user['points']) + "!"
                 else:
                     returnText = "Musisz obstawic liczbe naturalna (dodatnia!)"
 
@@ -559,7 +551,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         elif commands[0] == "instructai":
             if int(author) == 326259887007072257:
                 if len(commands) > 1:
-                    user = db.retrieveUser('discord_id', str(author))
                     db.insertAIInstruction(message[12:])
                     ai.resetModel()
             else:
@@ -659,7 +650,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if len(commands) > 2:
                 stockSymbol = str(commands[1]).upper()
                 amount = int(commands[2])
-                user = db.retrieveUser('discord_id', str(author))
                 stock = db.retrieveStock('symbol',stockSymbol)
                 if amount > 0:
                     if user and stock:
@@ -710,7 +700,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnText =  db.retrieveUser('discord_id', str(author))['name']
 
         if message == "points":
-            user = db.retrieveUser('discord_id', str(author))
             if user:
                 returnText = user['name'] + " - masz: " + str(user['points']) + " pizzapoints."
 
@@ -730,7 +719,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnEmbed = embedgen.generateArrestedUsersInfo(db.retrieveArrestedUsers())
 
         if message in slotsKeyword:
-            user = db.retrieveUser('discord_id', str(author))
             if user:
                 curr = int(user['points'])
                 amount = 5
@@ -758,21 +746,19 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnText =  weather.getLodzWeather()
 
         if message in begKeyword:
-            user = db.retrieveUser('discord_id', str(author))
-            if user:
-                curr = int(user['points'])
-                if curr < 100:
-                    if db.isBegAvailable():
-                        db.updateUser('discord_id', str(author), 'points', 100)
-                        db.createBegEntry(str(author))
-                        returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 10 min."
-                        #isBegAvailable = False
-                    else:
-                        begPerson = db.getBegPerson()
-                        if begPerson:
-                            returnText = "Cooldown! Sprobuj ponownie pozniej. Ostatnia szansa wykorzystana przez: " + str(begPerson['name']) + "."
+            curr = int(user['points'])
+            if curr < 100:
+                if db.isBegAvailable():
+                    db.updateUser('discord_id', str(author), 'points', 100)
+                    db.createBegEntry(str(author))
+                    returnText = "Ustawiono 100 ppkt dla " + user['name'] + ". Globalny cooldown - 10 min."
+                    #isBegAvailable = False
                 else:
-                    returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
+                    begPerson = db.getBegPerson()
+                    if begPerson:
+                        returnText = "Cooldown! Sprobuj ponownie pozniej. Ostatnia szansa wykorzystana przez: " + str(begPerson['name']) + "."
+            else:
+                returnText = "Masz powyzej 100 ppkt. Opcja dostepna tylko dla najbiedniejszych z biednych."
 
         if message == "top5" or message == "top":
             amount = 5
