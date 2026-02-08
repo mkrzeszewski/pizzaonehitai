@@ -770,8 +770,7 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
                     target_avatar = ""
             else:
                 returnText = f"Użytkownik {args[0]} nie został znaleziony w bazie."
-        else:
-            returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
+        returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
     elif action == "achievements":
         returnEmbed = _utilityEmbedGen.achievements(db.retrieveAchievements())
     elif action == "horoscope":
