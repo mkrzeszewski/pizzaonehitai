@@ -13,6 +13,7 @@ import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
 import plugins.theatres as theatres
+from plugins.embedgen import TheatreEmbedGen
 
 target_stock_time = time(hour=7, minute=0)
 user_cooldowns = {}
@@ -44,6 +45,8 @@ TOKEN = os.environ["DC_TOKEN"]
 intents_temp = discord.Intents.default()
 intents_temp.message_content = True
 bot = discord.Client(intents = intents_temp)
+
+_theatreEmbedGen = TheatreEmbedGen()
 
 async def sendEmbedToChannel(interaction, embed, is_private=False):
     if is_private:
@@ -103,7 +106,7 @@ def runDiscordBot():
         if parsedTheatres:
             for theatre in parsedTheatres:
                 for event in theatre[1]:
-                    await channel.send(embed = embedgen.generateTheatreEventList(theatre[0], event[0], event[1]))
+                    await channel.send(embed = _theatreEmbedGen.theatre_event_list(theatre[0], event[0], event[1]))
 
     @tasks.loop(hours = 4)
     async def manageHeist():

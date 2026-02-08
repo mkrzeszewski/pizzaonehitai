@@ -61,8 +61,7 @@ class BaseEmbedGen:
         embed = Embed(
             title=title,
             description=description,
-            color=embed_color,
-            timestamp=datetime.now()
+            color=embed_color
         )
         embed.set_author(name=self.DEFAULT_AUTHOR, icon_url=self.DEFAULT_AUTHOR_ICON)
         embed.set_footer(text=self.DEFAULT_FOOT_TEXT, icon_url=self.DEFAULT_FOOTER_ICON)
@@ -212,6 +211,34 @@ class UtilityEmbedGen(BaseEmbedGen):
         return embed
     
 ##################################################################
+
+class GambleEmbedGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        self.WIN_COLOR = Colour.dark_green()
+        self.LOSE_COLOR = Colour.dark_red()
+
+##################################################################
+
+class TheatreEmbedGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        self.DEFAULT_COLOR = Colour.purple()
+
+    def theatre_event_list(self, theatre, event, dates):
+        description = "Nowe daty spektakli na wydarzenie!\n"
+        for date in dates:
+            description += f"\n - {date['text']}"
+            
+        embed = self._create_base(
+            title=f"{theatre} - {event}.",
+            description=description,
+            color=self.DEFAULT_COLOR,
+            thumbnail=db.icon("GENTLEMAN_CAT_ICON")
+        )
+        
+        # Note: Footer and Author are already set by _create_base!
+        return embed
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set
@@ -789,12 +816,3 @@ def generateUserStockCashout(user, msg = ""):
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
-def generateTheatreEventList(theatre, event, dates):
-    color = Colour.dark_purple()
-    description = "Nowe daty spektakli na wydarzenie!\n"
-    for date in dates:
-        description += "\n - " + str(date['text'])
-    embed = Embed(title=str(theatre) + " - " + str(event) + ".", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("GENTLEMAN_CAT_ICON"))
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
-    return embed
