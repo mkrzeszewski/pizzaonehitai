@@ -51,10 +51,7 @@ _utilityEmbedGen = UtilityEmbedGen()
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
     reloadCommands()
-    returnEmbed = None
-    returnView = None
-    returnFile = None
-    returnText = ""
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
     userAvatarURL = ""
     message = userMessage[1:]
     commands = message.split(" ")
@@ -98,6 +95,12 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         returnEmbed = embedgen.generateUserArrestedInfo(user)
         return returnEmbed, returnText, returnView, returnFile  
     
+    if route:
+        module = route['module']
+        action = route['action']
+        if module == "stocks":
+            return handleStocksModule(action, args, user, dcbot, userAvatarURL)
+        
     #komendy wielokomendowe
     if len(commands) > 1:
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
@@ -718,72 +721,63 @@ def reloadCommands():
             }
 
 
-async def handleStocksModule(action, args, user, avatarUrl):
-    returnEmbed = None
-    returnView = None
-    returnFile = None
-    returnText = ""
+async def handleStocksModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+    defaultTitle = "Giełda P1H"
+    stockSymbol = args[0].upper() if args else None
     _stocks = list(db.retrieveTopStocks(100))
-    if len(_stocks) == 0:
-        return None, "Currently stock list is empty.", None, None
+    if not _stocks:
+        return _utilityEmbedGen.error_msg(defaultTitle, "Obecnie nie ma akcji na giełdzie."), None, None, None
     
+    # --- ROUTING LOGIC ---
     if action == "view":
         returnEmbed = _stockEmbedGen.overview(_stocks)
-    if action == "sell":
-        return ""
-    if action == "buy":
-        return ""
-    if action == "fullview":
-        return ""
-    if action == "cashout":
-        return ""
-    if action == "portfolio":
-        return ""
-    if action == "rundown":
-        return ""
-    if action == "generate":
-        return ""
-    
+    elif action == "portfolio":
+        target_avatar = avatarUrl
+        target_user = user
+        if args:
+            temp_user = userFromPattern(args[0])
+            if temp_user:
+                target_user = temp_user
+                try:
+                    flex_user = await dcbot.fetch_user(int(target_user['discord_id']))
+                    target_avatar = flex_user.avatar.url if flex_user.avatar else flex_user.default_avatar.url
+                except Exception:
+                    target_avatar = ""
+            else:
+                returnText = f"Użytkownik {args[0]} nie został znaleziony w bazie."
+        returnEmbed = _stockEmbedGen.user_portfolio(user, target_avatar)
+    elif action == "fullview":
+        returnEmbed = _stockEmbedGen.full_stonks(_stocks)
+    elif action == "cashout":
+        success, msg = stocks.cashout(user['name'])
+        if success:
+            returnEmbed = _stockEmbedGen.stock_event(user, None, msg, "cashout")
+    elif action in ["buy", "sell"]:
+        if len(args) < 2:
+            returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Brak symbolu lub ilości.", f"!{action} [SYMBOL] [ILOŚĆ]")
+        else:
+            try:
+                amount = int(args[1])
+                stock = db.retrieveStock('symbol', stockSymbol)
+                
+                if amount <= 0:
+                    returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Ilość musi być większa od 0.", f"!{action} [SYMBOL] [ILOŚĆ]")
+                elif not stock:
+                    returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, f"Spółka {stockSymbol} nie istnieje.")
+                else:
+                    if action == "buy":
+                        success, msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
+                        returnEmbed = _stockEmbedGen.stock_event(user, stock, msg) if success else None
+                        returnText = msg if not success else ""
+                    else:
+                        success, msg = stocks.sellStocks(user['name'], stockSymbol, amount)
+                        returnEmbed = _stockEmbedGen.stock_event(user, stock, msg, "sell") if success else None
+                        returnText = msg if not success else ""
+            
+            except ValueError:
+                returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Ilość musi być liczbą całkowitą!")
+    else:
+        returnText = f"Nieznana akcja: {action}"
+
     return returnEmbed, returnText, returnView, returnFile
-    # if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
-    #         _stocks = list(db.retrieveAllStocks())
-    #         if len(_stocks) > 0:
-    #             returnEmbed = embedgen.generateStocksOverview(_stocks)
-    #         else:
-    #             returnText = "Currently there's no stock value"
-        
-    #     if message == 'generatestocks':
-    #         returnText = securityResponse
-    #         if user['role'] == "owner":# or user['role'] == "admin"::
-    #             returnText = str(stocks.generateStocks())
-
-
-    #     if message in stocksKeyword:
-    #         _stocks = list(db.retrieveTopStocks(100))
-    #         if len(_stocks) > 0:
-    #             returnEmbed = embedgen.generateFullStonks(_stocks)
-
-    #     if message == "cashout" or message == "imout":
-    #         success, msg = stocks.cashout(user['name'])
-    #         if success:
-    #             returnEmbed = embedgen.generateUserStockCashout(user, msg)
-    #         else:
-    #             returnText = msg
-
-    #     if message == "portfolio" or message == "flex" or message == "mystocks" or message == "mystonks":
-    #         returnEmbed = embedgen.generateUserPortfolioEmbed(user, userAvatarURL)
-
-    #     if message == "testbankrupcy":
-    #         _stock = db.retrieveStock('ceo',user['name'])
-    #         if _stock:
-    #             returnEmbed = embedgen.generateBankrupcy(_stock, userAvatarURL)
-        
-    #     if message == "stockupdate" or message == "stockrundown":
-    #         msg = stocks.informOnStocksUpdate()
-    #         returnEmbed = embedgen.generateStocksRundown(msg)
-
-    #     if message in buyStockKeyword:
-    #         returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !buy MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
-
-    #     if message in sellStockKeyword:
-    #         returnText = returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sell MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
