@@ -144,7 +144,7 @@ class StocksGen(BaseEmbedGen):
             investors_list = "\n".join([f" - {i}" for i in bad_investors])
             description += f"\n\n**Nieudacznicy, którzy stracili kasę:**\n{investors_list}"
             
-        return self._create_base(f"{stock['name']} bankrutuje!", description, self.RED, "STINKS_ICON")
+        return self._create_base(f"{stock['name']} bankrutuje!", description, self.RED, db.icon("STINKS_ICON"))
 
     def user_portfolio(self, user, avatar=None):
         description = ""
@@ -158,7 +158,7 @@ class StocksGen(BaseEmbedGen):
         else:
             description = f"Użytkownik {user['name']} nie posiada akcji."
             
-        return self._create_base(f"Portfel - {user['name']}", description, self.GOLD, avatar or "STINKS_ICON")
+        return self._create_base(f"Portfel - {user['name']}", description, self.GOLD, avatar or db.icon("STINKS_ICON"))
 
     def stock_event(self, user, stock, msg, event_type="buy"):
         """Handles Purchase, Sale, and Cashout in one method."""
