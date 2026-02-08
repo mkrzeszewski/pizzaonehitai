@@ -151,9 +151,10 @@ def updatePrices():
                 print("[STOCKS] " + str(stock['name'] + " has filed for bankrupcy."))
                 bankrupts.append([stock, badInvestors])
             else:
-                if newPrice >= 100000:
-                    stockSplit() #we add more shares to market but lower the price
                 db.updateStockPrice(stock['name'], newPrice)
+                if newPrice >= 100000:
+                    stockSplit(stock) #we add more shares to market but lower the price
+                    print("[Stocks] " + str(stock['name']) + " has been dilluded!")
     return bankrupts
 
 def purchaseStocks(username, stocksymbol, amount):
