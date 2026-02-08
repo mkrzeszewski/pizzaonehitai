@@ -99,7 +99,7 @@ class StocksGen(BaseEmbedGen):
         self.BUY_COLOR = Colour.dark_green()
         self.SELL_COLOR = Colour.dark_red()
         self.help_hint = "\n\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
-        
+
     def user_portfolio(self, user, userAvatarURL=0):
         description = ""
         total_amount = 0
@@ -158,7 +158,7 @@ def generateEmbedFromTFTMatch(results,players,matchID, date):
     #main title and embed data 
     embed = Embed(title = str("Nowa partia z P1H w TFT!"), description = None, colour = endColour )
     embed.set_author(name = topTitle, icon_url = embedIcon)
-    embed.set_thumbnail(url = db.icon("TFT_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("TFT_ICON"))
 
     playerList = ""
     iterator = 0
@@ -185,7 +185,7 @@ def generateEmbedFromTFTMatch(results,players,matchID, date):
 
     #footer with match ID + date
     formatted_time = time.strftime('%Y-%m-%d %H:%M', time.gmtime(int(date)))
-    embed.set_footer(text = str(matchID) + "                                                                            " + str(formatted_time), icon_url = db.icon("FOOTER_TFT_ICON")['url'])
+    embed.set_footer(text = str(matchID) + "                                                                            " + str(formatted_time), icon_url = db.icon("FOOTER_TFT_ICON"))
 
     #print(datetime.datetime.fromtimestamp(date))
     return embed
@@ -200,21 +200,21 @@ def generateEmbedFromLeagueMatch(results,players,matchID):
     print(results[:-1])
     
     endGameStatus = "Kolejna przegrana.."
-    endGameIcon = db.icon("LOSE_ICON")['url']
+    endGameIcon = db.icon("LOSE_ICON")
     endColour = Colour.red()
 
     if(results[-2] == "win"):
         endGameStatus = "EZ WIN"
-        endGameIcon = db.icon("WIN_ICON")['url']
+        endGameIcon = db.icon("WIN_ICON")
         endColour = Colour.green()
         
     embed = Embed(title = str(playerList + " zagrali sobie ARAMka!"), description = str(results[-1]), colour = endColour )
     embed.set_author(name = endGameStatus, icon_url = endGameIcon)
-    embed.set_thumbnail(url = db.icon("TFT_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("TFT_ICON"))
     for result in results[:-2]:
         embed.add_field(name = "", value = result, inline = False)
 
-    embed.set_footer(text = str(matchID), icon_url = db.icon("FOOTER_ICON")['url'])
+    embed.set_footer(text = str(matchID), icon_url = db.icon("FOOTER_ICON"))
     return embed
 
 def generateEmbedFromRestaurant(restaurant):
@@ -250,7 +250,7 @@ def generateHelpEmbed():
     listOfCommands += "`!ai <pytanie>` - zadaj pytanie AI!\n"
     listOfCommands += "`!stocks - gielda P1H\n"
     embed.add_field(name = "Komendy:", value = listOfCommands)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateTopPointsEmbed(users, amount):
@@ -261,10 +261,10 @@ def generateTopPointsEmbed(users, amount):
         stringList = stringList + str(increment) + ") " + user['name'] + " - " + str(user['points']) + " ppkt.\n"
 
     embed = Embed(title = "pizzopunkty na DC Pizza One Hit!", colour = Colour.og_blurple())
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("POINTS_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("POINTS_ICON"))
     embed.add_field(name = "__Top " + str(amount) + ":__", value = (stringList), inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateBottomPointsEmbed(users, amount):
@@ -277,10 +277,10 @@ def generateBottomPointsEmbed(users, amount):
         increment = increment + 1
 
     embed = Embed(title = "pizzopunkty na DC Pizza One Hit!", colour = Colour.og_blurple())
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("POINTS_ICON_URL")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("POINTS_ICON_URL"))
     embed.add_field(name = "__Bottom " + str(amount) + ":__", value = (stringList), inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
@@ -290,7 +290,7 @@ def generateRuletaWheel(id = 0, gif_path = "assets/gif/ruleta.gif"):
     embed.set_image(url="attachment://"+ gif_path.split("/")[-1])
 
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed, file
 
 def generateRuletaResults(players, winner, id = 0):
@@ -312,7 +312,7 @@ def generateRuletaResults(players, winner, id = 0):
             sign = "+"
         listOfPlayers = listOfPlayers + str(player[0]) + ": "+ str(sign) + str(player[2]) + "ppkt.\n"
     embed.add_field(name = "Bilans: ", value = listOfPlayers)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateRuletaChoices(id = 0):
@@ -320,21 +320,21 @@ def generateRuletaChoices(id = 0):
     embed = Embed(title="Ruleta #" + str(id), description="Czas na gre do: " + str(formatted_time), color=Colour.darker_grey())
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Koszt - 50 PPKT", value = "!niebieski = x2!\n!czerwony = x2! \n !zielony = x25!")
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateRuletaPlayers(players, id = 0):
     embed = Embed(title="Ruleta #" + str(id), description="", color=Colour.darker_grey())
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Oto zawodnicy:", value = players)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateAIResponse(input, response):
     embed = Embed(title="Twoje pytanie: ", description=str(input), color=Colour.darker_grey())
     embed.add_field(name = "Odpowiedz: ", value = response)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateBirthdayEmbed(user, facts, wrozba):
@@ -347,7 +347,7 @@ def generateBirthdayEmbed(user, facts, wrozba):
             body = body + str(fact) + "\n"
     embed.add_field(name = "Ciekawostki: ", value = body, inline = False)
     embed.add_field(name = "Wrozba: ", value = wrozba, inline = False)
-    embed.set_footer(text = "Do twojego konta zostalo przypisane 5000 pizzopkt!", icon_url = db.icon("PARTY_FACE")['url'])
+    embed.set_footer(text = "Do twojego konta zostalo przypisane 5000 pizzopkt!", icon_url = db.icon("PARTY_FACE"))
     return embed
 
 def generateWinnerEmbed(user, userAvatarURL):
@@ -355,8 +355,8 @@ def generateWinnerEmbed(user, userAvatarURL):
     embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow w sposob " + str(aiMode) + "."), color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Do twojego konta przypisalismy 500 ppkt + 15% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateLoserEmbed(user, userAvatarURL):
@@ -365,8 +365,8 @@ def generateLoserEmbed(user, userAvatarURL):
     embed = Embed(title="Przykro nam, " + user['name'] + "!", description=ai.askAI("Poinformuj uzytkownika: \""+ user['name'] + "\" ze przegral w dziennej loterii pizzopunktow (tj zostaly mu pobrane z konta punkty) w sposob " + str(aiMode) + "."), color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Z twojego konta zostalo odebrane 15% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def uploadDoBartola(gif_path):
@@ -409,13 +409,13 @@ def generateSlotsAnimation(id = 0, gif_path = "assets/gif/slots.gif", amount = 0
 
     embed.set_author(name = "Pizza One Hit AI", icon_url = GAMBA_RANDOM_ICON_ARRAY[random.randint(0,len(GAMBA_RANDOM_ICON_ARRAY) - 1)])
     embed.add_field(name = "Bilans gry:", value= user['name'] + infoString)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed, file
 
 def generateUnknownUser(discord_id):
     embed = Embed(title="Nieznany uzytkownik" + str(discord_id), description="Uzytkownik o podanym ID nie istnieje w bazie!", color=Colour.red)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateHeistInvite(level, heist_name, message, time, id = 0):
@@ -424,13 +424,13 @@ def generateHeistInvite(level, heist_name, message, time, id = 0):
     if level == "hard":
         color = Colour.dark_red()
     embed = Embed(title="Nowy napad grupowy!", description="Czas na dolaczenie: " + str(time) + ".", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
 
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
     embed.add_field(name = heist_name, value=message, inline = False)
 
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Twoj wklad ma wplyw na wysokosc potencjalnej nagrody!", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateHeistIntro(level, heist_name, message, id = 0):
@@ -438,11 +438,11 @@ def generateHeistIntro(level, heist_name, message, id = 0):
     if level == "hard":
         color = Colour.dark_red()
     embed = Embed(title=heist_name, description=message, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
 
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
     embed.add_field(name = "", value = "Trwaja przygotowania do napadu! Za jakis czas dowiecie sie, jak sprawdziliscie sie w swoich rolach!", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateHeistBody(level, heist_name, message, id = 0):
@@ -450,10 +450,10 @@ def generateHeistBody(level, heist_name, message, id = 0):
     if level == "hard":
         color = Colour.dark_red()
     embed = Embed(title=heist_name, description=message, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
 
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateHeistEnding(level, heist_name, message, id = 0):
@@ -461,10 +461,10 @@ def generateHeistEnding(level, heist_name, message, id = 0):
     if level == "hard":
         color = Colour.dark_red()
     embed = Embed(title=heist_name, description=message, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
 
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateHeistInfo(level, heist_name, time, members):
@@ -472,26 +472,26 @@ def generateHeistInfo(level, heist_name, time, members):
     if level == "hard":
         color = Colour.dark_red()
     embed = Embed(title="Obecnie zbieramy ekipe na :", description=heist_name, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
     description = ""
     for user in members:
         description += "* " + user[0] + "\n"
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
     if description != "":
         embed.add_field(name = "Obecna ekipa sklada sie z:", value=description, inline = False)
     else:
         embed.add_field(name = "Obecnie nie ma chetnych na ten napad. Mozesz byc pierwszy!", value=description, inline = False)
 
     embed.add_field(name = "Aby dolaczyc napisz **!joinheist <KWOTA>**", value = "Czas na dolaczenie do: " + str(time) + ".", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
   
 def generateHeistCanceled(heist_name):
     color = Colour.dark_orange()
     embed = Embed(title="Napad zostaje anulowany z powodu braku wystarczajacych uczestnikow! (min 2):", description=heist_name, color = color)
-    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("CRIMINAL_ICON"))
     embed.add_field(name = "Sprobujcie szczescia w nastepnym napadzie..", value="Punkty zostaly zwrocone.", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generatePrisonRelease(users):
@@ -500,31 +500,31 @@ def generatePrisonRelease(users):
     for user in users:
         description += "* " + user['name'] + "\n"
     embed = Embed(title="Czlonkowie Pizza One Hit opuszczaja wiezienie!", description=description, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("PEPE_PRISON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("PEPE_PRISON"))
     embed.add_field(name = "Mozecie ponownie korzystac z komend na DC!", value="", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateUserArrestedInfo(user):
     color = Colour.dark_gray()
     embed = Embed(title="Niestety, jestes aresztowany!", description="Nie mozesz korzystac z funkcjonalnosci bota.. Zostaniesz wypuszczony o 7 rano.", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("PEPE_PRISON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("PEPE_PRISON"))
     pointsInfo = "Obecnie posiadasz "
     if user:
         pointsInfo += str(user['points']) + " ppkt.\nUzyj komendy **!wykup** aby wyjsc z wiezienia."
     embed.add_field(name = "Mozesz sie wykupic za 50% wartosci swoich punktow! (minimum 300)", value=pointsInfo, inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateFreedUser(user, cost):
     color = Colour.dark_green()
     embed = Embed(title="Witamy na wolnosci, " + user['name'] + "!", description="Po uiszczeniu oplaty w wysokosci "+str(cost)+" twoj prawnik Cie wyciagnal!", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("PEPE_LAWYER")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("PEPE_LAWYER"))
     embed.add_field(name = "Mozesz ponownie korzystac z komend na DC!", value="", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateArrestedUsersInfo(users):
@@ -533,22 +533,22 @@ def generateArrestedUsersInfo(users):
     for user in users:
         description += "* " + user['name'] + "\n"
     embed = Embed(title="Oto obecni zaaresztowani zloczyncy:", description=description, color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("PEPE_PRISON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("PEPE_PRISON"))
     embed.add_field(name = "", value="Wyslijcie im paczki na swieta..", inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateRewards(rewards):
     color = Colour.dark_green()
     embed = Embed(title="Nagrody na serwerze Pizza One Hit", description="Aby wykupic nagrode, napisz do roLab na PRIV.", color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
     description = ""
     for reward in rewards:
         description += "* " + str(reward['text']) + " - " + str(reward['cost']) + "\n"
-    embed.set_thumbnail(url = db.icon("PEPE_COIN")['url'])
+    embed.set_thumbnail(url = db.icon("PEPE_COIN"))
     embed.add_field(name = "Oto dostepne nagrody:", value=description, inline = False)
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateAchievements(achievements):
@@ -560,9 +560,9 @@ def generateAchievements(achievements):
             who = "[TU MOZESZ BYC TY!]"
         description += "* " + str(achievement['achievement']) + " - " + str(who) + "\n" + str(achievement['description']) + "\n\n"
     embed = Embed(title="Osiagniecia na serwerze Pizza One Hit", description=str(description), color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("PEPE_PUCHAR")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("PEPE_PUCHAR"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateStocksOverview(stocks):
@@ -587,9 +587,9 @@ def generateStocksOverview(stocks):
 
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title="📈 Giełda Pizza One Hit", description=description, color=color)
-    embed.set_author(name="Pizza One Hit AI", icon_url=db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url=db.icon("STONKS_ICON")['url'])
-    embed.set_footer(text="Sztuczna inteligencja na twoim discordzie!", icon_url=db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name="Pizza One Hit AI", icon_url=db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url=db.icon("STONKS_ICON"))
+    embed.set_footer(text="Sztuczna inteligencja na twoim discordzie!", icon_url=db.icon("PIZZA_ICON"))
     return embed
 
 def generateStocksRundown(msg):
@@ -597,9 +597,9 @@ def generateStocksRundown(msg):
     description = msg
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title="Co tam slychac na gieldzie?", description=str(description), color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("BOGDANOFF_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("BOGDANOFF_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateFullStonks(stocks):
@@ -630,9 +630,9 @@ def generateFullStonks(stocks):
     description += "```"
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title="WallStreet - Pizza One Hit", description=str(description), color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_thumbnail(url = db.icon("STONKS_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_thumbnail(url = db.icon("STONKS_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateBottomStocks(stocks):
@@ -642,16 +642,16 @@ def generateBottomStocks(stocks):
         description += "* [" + str(stock['symbol']) + "] " + str(stock['name']) + ":\nAvailable shares: [" + str(stock['availableShares']) + "]\nCurrent price: [" + str(stock['price']) + "]\n\n"
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title="Gielda Pizza One Hit - bottom 5", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("BOGDANOFF_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("BOGDANOFF_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def testMarkdown():
     color = Colour.dark_green()
     description = "```py\ntest\n```"
     embed = Embed(title="Test backticks.", description=str(description), color = color)
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
@@ -666,9 +666,9 @@ def generateBankrupcy(stock, userAvatarURL = 0, badInvestors = None):
     if userAvatarURL:
         embed.set_thumbnail(url = userAvatarURL)
     else:
-        embed.set_thumbnail(url = db.icon("STINKS_ICON")['url'])
-    embed.set_thumbnail(url = db.icon("STINKS_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+        embed.set_thumbnail(url = db.icon("STINKS_ICON"))
+    embed.set_thumbnail(url = db.icon("STINKS_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateUserPortfolioEmbed(user, userAvatarURL = 0):
@@ -688,9 +688,9 @@ def generateUserPortfolioEmbed(user, userAvatarURL = 0):
     if userAvatarURL:
         embed.set_thumbnail(url = userAvatarURL)
     else:
-        embed.set_thumbnail(url = db.icon("STINKS_ICON")['url'])
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+        embed.set_thumbnail(url = db.icon("STINKS_ICON"))
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateUserStockPurchase(user, stock, msg = ""):
@@ -698,9 +698,9 @@ def generateUserStockPurchase(user, stock, msg = ""):
     description = msg
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title=str(user['name']) + " kupuje akcje " + str(stock['name']) + "!", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("PURCHASE_STOCK_ICON")['url'])
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("PURCHASE_STOCK_ICON"))
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateUserStockSale(user, stock, msg = ""):
@@ -708,9 +708,9 @@ def generateUserStockSale(user, stock, msg = ""):
     description = msg
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title=str(user['name']) + " sprzedaje akcje " + str(stock['name']) + "!", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("SELL_STOCK_ICON")['url'])
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("SELL_STOCK_ICON"))
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateUserStockCashout(user, msg = ""):
@@ -718,9 +718,9 @@ def generateUserStockCashout(user, msg = ""):
     description = msg
     description += "\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
     embed = Embed(title=str(user['name']) + " ma dosc! Sprzedaje wszystkie swoje akcje!", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("SELL_STOCK_ICON")['url'])
-    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("SELL_STOCK_ICON"))
+    embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed
 
 def generateTheatreEventList(theatre, event, dates):
@@ -729,6 +729,6 @@ def generateTheatreEventList(theatre, event, dates):
     for date in dates:
         description += "\n - " + str(date['text'])
     embed = Embed(title=str(theatre) + " - " + str(event) + ".", description=str(description), color = color)
-    embed.set_thumbnail(url = db.icon("GENTLEMAN_CAT_ICON")['url'])
-    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON")['url'])
+    embed.set_thumbnail(url = db.icon("GENTLEMAN_CAT_ICON"))
+    embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = db.icon("PIZZA_ICON"))
     return embed

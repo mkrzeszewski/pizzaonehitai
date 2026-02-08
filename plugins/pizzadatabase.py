@@ -390,7 +390,7 @@ def retrieveIcon(key, value):
 def icon(name):
     icon = iconsCollection.find_one({'name': name})
     if icon:
-        return icon
+        return str(icon['url'])
     else:
         return "https://cdn3.emoji.gg/emojis/48134-bmodancing.gif"
 
