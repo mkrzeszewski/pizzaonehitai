@@ -105,7 +105,7 @@ class StocksGen(BaseEmbedGen):
         if val >= 1000: return f"{val/1000:.2f}k"
         return str(val)
 
-    def overview(self, stocks):
+    def full_stonks(self, stocks):
         sorted_stocks = sorted(stocks, key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), reverse=True)
         description = "🚀 **Oto obecnie dostępne akcje na giełdzie P1H:**\n"
         
@@ -118,7 +118,7 @@ class StocksGen(BaseEmbedGen):
     def rundown(self, msg):
         return self._create_base("Co tam słychać na giełdzie?", msg, self.GREEN, db.icon("BOGDANOFF_ICON"))
 
-    def full_stonks(self, stocks):
+    def overview(self, stocks):
         sorted_stocks = sorted(stocks, key=lambda s: int(s['price']) * int(s.get('totalShares', 1)), reverse=True)
         table = f"{'SYM':<5} | {'PRICE':<6} | {'AVAILABLE':<10} | {'MCAP':<8}\n"
         table += "—" * 40 + "\n"
