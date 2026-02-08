@@ -768,12 +768,16 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
                 else:
                     if action == "buy":
                         success, msg = stocks.purchaseStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = _stockEmbedGen.stock_event(user, stock, msg) if success else None
-                        returnText = msg if not success else ""
+                        if success:
+                            returnEmbed = _stockEmbedGen.stock_event(user, stock, msg, "buy")
+                        else:
+                            returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, msg)
                     else:
                         success, msg = stocks.sellStocks(user['name'], stockSymbol, amount)
-                        returnEmbed = _stockEmbedGen.stock_event(user, stock, msg, "sell") if success else None
-                        returnText = msg if not success else ""
+                        if success:
+                            returnEmbed = _stockEmbedGen.stock_event(user, stock, msg, "sell")
+                        else:
+                            returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, msg)
             
             except ValueError:
                 returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Ilość musi być liczbą całkowitą!")

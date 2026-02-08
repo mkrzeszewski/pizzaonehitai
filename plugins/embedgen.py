@@ -184,7 +184,7 @@ class UtilityEmbedGen(BaseEmbedGen):
         if usage:
             description += f"\n\n**Poprawne użycie:**\n`{usage}`"
             
-        return self._create_base(title, description, color=self.ERROR_COLOR)
+        return self._create_base(title, description, color=self.ERROR_COLOR, thumbnail="https://cdn.7tv.app/emote/01G4ZTECKR0002P97QQ94BDSP4/4x.avif")
     
     def main_help(self):
         title = "Tutorial używania bota:"
