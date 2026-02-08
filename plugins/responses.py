@@ -3,7 +3,7 @@ import plugins.weather as weather
 import plugins.horoscope as horoskop
 import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
-from plugins.embedgen import StocksGen, UtilityEmbedGen, BaseEmbedGen
+from plugins.embedgen import StocksGen, UtilityEmbedGen, BaseEmbedGen, HoroscopeEmbedGen, HeistEmbedGen, GambleEmbedGen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
 import plugins.gifgenerator as gif
@@ -44,9 +44,13 @@ stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykr
 sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
 buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
 
+#embed classes section
 _defaultEmbedGen = BaseEmbedGen()
 _stockEmbedGen = StocksGen()
 _utilityEmbedGen = UtilityEmbedGen()
+_horoscopeEmbedGen = HoroscopeEmbedGen()
+_heistEmbedGen = HeistEmbedGen()
+_gambleEmbedGen = GambleEmbedGen()
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
@@ -100,6 +104,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
         action = route['action']
         if module == "stocks":
             return await handleStocksModule(action, args, user, dcbot, userAvatarURL)
+        elif module == "utility":
+            return await handleUtilityModule(action, args, user, dcbot, userAvatarURL)
             
     #komendy wielokomendowe
     if len(commands) > 1:
@@ -508,7 +514,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
         if message in horoskopKeyword:
             name = db.retrieveUser('discord_id', str(author))['name']
-            sign, text = horoskop.getHoroscopeForUser('discord_id', str(author))
+            sign, text = horoskop.getHoroscopeForUser(user)
             returnEmbed = embedgen.generateEmbedFromHoroscope(text, sign, name)
 
         if message in restaurantKeywords:
@@ -707,6 +713,18 @@ def userFromPattern(pattern):
         return user
     return None
 
+async def targetUser(dcbot, target):
+    temp_user = userFromPattern(target)
+    target_user = None
+    target_avatar = None
+    if temp_user:
+        target_user = temp_user
+        try:
+            flex_user = await dcbot.fetch_user(int(target_user['discord_id']))
+            target_avatar = flex_user.avatar.url if flex_user.avatar else flex_user.default_avatar.url
+        except Exception:
+            target_avatar = ""
+    return target_user, target_avatar
 
 def reloadCommands():
     global ROUTING_TABLE
@@ -720,6 +738,48 @@ def reloadCommands():
                 "action": doc['action']
             }
 
+async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+    target_user = user
+    target_avatar = avatarUrl
+
+    if action == "help":
+        returnEmbed = _utilityEmbedGen.main_help()
+    elif action == "quote":
+        returnText = "Funkcja cytatu poki co nie dziala."
+    elif action == "whoami":
+        returnEmbed = _defaultEmbedGen.neutral_msg("Dane o Tobie:", ai.askAI("Przesyłam Ci dane o użytkowniku, powiedz mu coś o nim i zarzuć jakąś ciekawostką." + str(user)))
+    elif action == "roll":
+        if args:
+            if len(args) == 1:
+                returnText = "Losujemy: 1 - " + args[0] + " -> " + str(random.randint(1, int(args[0])))
+            elif len(args) == 2:
+                returnText = "Losujemy liczbe pomiedzy " + args[1] + " - " + args[2] + " -> " + str(random.randint(int(args[0]), int(args[1])))
+        return ""
+    elif action == "points":
+        if args:
+            target_user, target_avatar = targetUser(dcbot, args[0])
+            if target_user:
+                returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
+        else:
+            returnEmbed = _utilityEmbedGen.user_points(target_user, target_avatar)
+    elif action == "achievements":
+        returnEmbed = _utilityEmbedGen.achievements(db.retrieveAchievements())
+    elif action == "horoscope":
+        if args:
+            temp_user = userFromPattern(args[0])
+            if temp_user:
+                target_user = temp_user
+        sign, text = horoskop.getHoroscopeForUser(target_user)
+        returnEmbed = _horoscopeEmbedGen.horoscope(text, sign)
+    elif action == "whoisarrested":
+        returnEmbed = embedgen.generateArrestedUsersInfo(db.retrieveArrestedUsers())
+    elif action == "restaurant":
+        returnText = "Funkcja knajpy poki co nie dziala."
+    elif action == "weather":
+        returnEmbed = _defaultEmbedGen.neutral_msg("Pogoda: ", weather.getLodzWeather())
+
+    return returnEmbed, returnText, returnView, returnFile
 
 async def handleStocksModule(action, args, user, dcbot, avatarUrl):
     returnEmbed, returnView, returnFile, returnText = None, None, None, ""

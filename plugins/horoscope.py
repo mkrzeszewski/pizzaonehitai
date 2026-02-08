@@ -33,8 +33,8 @@ def getHoroscopeName(month_day: str) -> str:
     return "Invalid date."
 
 
-def getHoroscopeForUser(key, value):
-    sign = getHoroscopeName(db.retrieveUser(key,value)['birthday'])
+def getHoroscopeForUser(user):
+    sign = getHoroscopeName(user['birthday'])
     response = requests.get(HOROSKOP_URL + sign)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")

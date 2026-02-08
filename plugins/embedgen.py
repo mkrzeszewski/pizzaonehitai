@@ -61,7 +61,8 @@ class BaseEmbedGen:
         embed = Embed(
             title=title,
             description=description,
-            color=embed_color
+            color=embed_color,
+            description = full_description
         )
         embed.set_author(name=self.DEFAULT_AUTHOR, icon_url=self.DEFAULT_AUTHOR_ICON)
         embed.set_footer(text=self.DEFAULT_FOOT_TEXT, icon_url=self.DEFAULT_FOOTER_ICON)
@@ -75,20 +76,31 @@ class BaseEmbedGen:
     
 ##################################################################
 
-class GambleGen(BaseEmbedGen):
+class GambleEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        # Casino specific commands
-        self.help_hint = "\n\n💡 `!slots`, `!ruletka`, `!daily`, `!bal`"
-        self.color = Colour.purple()
+        self.help_hint = "\n\n💡 `!slots`, `!gamble`"
+        self.color = Colour.light_grey()
 
-class HoroscopeGen(BaseEmbedGen):
+class HoroscopeEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
         # Simple back button for horoscopes
-        self.help_hint = "\n\n🔮 Sprawdź inny znak: `!horoskop <nazwa>`"
-        self.color = Colour.blue()
+        self.help_hint = "\nhttps://horoskop.wp.pl/horoskop/horoskop-dzienny/\n\n🔮 Sprawdź swoj horoskop na dzis (lub kogoś) `!horoskop`, `!horoskop @<USER>`"
+        self.color = Colour.pink()
 
+    def horoscope(self, msg, sign):
+        return self._create_base("Horoskop na dzis dla " + str(sign), msg, self.color, db.icon("BOGDANOFF_ICON"), thumbnail = SIGN_ICON_ARRAY[sign])
+    
+class HeistEmbedGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        # Simple back button for horoscopes
+        self.help_hint = "\nhttps://horoskop.wp.pl/horoskop/horoskop-dzienny/\n\n🔮 Sprawdź swoj horoskop na dzis (lub kogoś) `!horoskop`, `!horoskop @<USER>`"
+        self.color = Colour.pink()
+
+    def horoscope(self, msg, sign):
+        return self._create_base("Horoskop na dzis dla " + str(sign), msg, self.color, db.icon("BOGDANOFF_ICON"), thumbnail = SIGN_ICON_ARRAY[sign])
 ##################################################################
 
 class StocksGen(BaseEmbedGen):
@@ -183,6 +195,8 @@ class UtilityEmbedGen(BaseEmbedGen):
         super().__init__()
         self.ERROR_COLOR = Colour.red()
         self.INFO_COLOR = Colour.blue()
+        self.REWARD_COLOR = Colour.gold()
+        self.SUCCESS_COLOR = Colour.dark_green()
 
     def error_msg(self, action_name, error_text, usage=None):
         title = f"❌ Błąd: {action_name}"
@@ -215,6 +229,80 @@ class UtilityEmbedGen(BaseEmbedGen):
         )
         embed.add_field(name="Komendy:", value=commands, inline=False)
         return embed
+    
+    def achievements(self, achievements_list):
+        title = "🏆 Osiągnięcia na serwerze Pizza One Hit"
+        description = "Oto lista legendarnych czynów dokonanych na naszym serwerze!"
+        embed = self._create_base(
+            title=title,
+            description=description,
+            color=self.REWARD_COLOR,
+            thumbnail=db.icon("PEPE_PUCHAR")
+        )
+        for ach in achievements_list:
+            who = ach['user'] if ach['user'] != "" else "👑 [TU MOŻESZ BYĆ TY!]"
+            field_name = f"✨ {ach['achievement']} — {who}"
+            field_value = f"*{ach['description']}*"
+            embed.add_field(name=field_name, value=field_value, inline=False)
+        return embed
+    
+    def user_points(self, user, avatarURL=""):
+        points = int(user['points'])
+        title = f"Portfel użytkownika {user['name']}"
+        
+        # 1. Dynamic Ranking Logic
+        if points < 1000:
+            rank = "📉 Totalny Biedak"
+            color = self.NEUTRAL_COLOR
+        elif points < 5000:
+            rank = "😐 Przechodzień"
+            color = self.INFO_COLOR
+        elif points < 10000:
+            rank = "🎮 Niedzielny Gracz"
+            color = self.INFO_COLOR
+        elif points < 20000:
+            rank = "💼 Przedsiębiorca"
+            color = self.INFO_COLOR
+        elif points < 40000:
+            rank = "📈 Inwestor"
+            color = self.SUCCESS_COLOR
+        elif points < 50000:
+            rank = "💰 Szycha"
+            color = self.SUCCESS_COLOR
+        elif points < 100000:
+            rank = "💎 Specjalista"
+            color = self.REWARD_COLOR
+        elif points < 1000000:
+            rank = "🎩 Elita P1H"
+            color = self.REWARD_COLOR
+        elif points < 10000000:
+            rank = "🏦 Legenda Giełdy"
+            color = 0xFFD700 # Gold
+        else:
+            rank = "👑 Bóg Pieniędzy"
+            color = 0x00FFFF # Cyan/Godly
+
+        formatted_points = f"{points:,}"
+        description = (
+            f"**Ranga:** {rank}\n"
+            f"💰 **Saldo:** `{formatted_points}` pkt\n"
+            f"───────────────────"
+        )
+
+        # 3. Create the Embed
+        embed = self._create_base(
+            title=title,
+            description=description,
+            color=color,
+            thumbnail=avatarURL if avatarURL else db.icon("DEFAULT_POINTS_ICON")
+        )
+        
+        # If they are super rich, add a special flair field
+        if points >= 1000000:
+            embed.add_field(name="Status", value="✨ Ten użytkownik jest nietykalny!", inline=False)
+            
+        return embed
+
     
 ##################################################################
 
