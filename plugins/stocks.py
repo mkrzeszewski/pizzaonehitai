@@ -9,16 +9,19 @@ import io
 
 TAX_RATE = 0.10
 
+BASE_PRICE = 1000
+MAX_CHANGE_PER_UPDATE = 0.25  # max ±25% per single update
+
 def generateTrend():
     roll = random.random() * 100 
     trend = 0
-    if roll <= 1:    trend = random.uniform(-0.50, -0.40) # 1% - THE BLACK SWAN (Total devastation)
-    elif roll <= 5:  trend = random.uniform(-0.30, -0.15) # 4% - BUMMER WEEK (Hard dip)
-    elif roll <= 20: trend = random.uniform(-0.12, -0.05) # 15% - BEARISH (Consistent sell-off)
-    elif roll <= 80: trend = random.uniform(-0.02, 0.03) # 60% - STABLE (The "Normal" Day) 
-    elif roll <= 95: trend = random.uniform(0.05, 0.12) # 15% - BULLISH (Good news!)   
-    elif roll <= 99: trend = random.uniform(0.20, 0.35) # 4% - TO THE MOON (Huge hype)  
-    else:            trend = random.uniform(0.45, 0.60) # 1% - THE BIG SQUEEZE (God-tier gains)
+    if roll <= 1:    trend = random.uniform(-0.35, -0.25) # 1% - THE BLACK SWAN (Total devastation)
+    elif roll <= 5:  trend = random.uniform(-0.20, -0.10) # 4% - BUMMER WEEK (Hard dip)
+    elif roll <= 20: trend = random.uniform(-0.08, -0.03) # 15% - BEARISH (Consistent sell-off)
+    elif roll <= 80: trend = random.uniform(-0.02, 0.02)  # 60% - STABLE (The "Normal" Day) 
+    elif roll <= 95: trend = random.uniform(0.03, 0.08)   # 15% - BULLISH (Good news!)   
+    elif roll <= 99: trend = random.uniform(0.10, 0.20)   # 4% - TO THE MOON (Huge hype)  
+    else:            trend = random.uniform(0.25, 0.35)   # 1% - THE BIG SQUEEZE (God-tier gains)
 
     return round(trend, 3)
 
@@ -66,9 +69,25 @@ def updatePrices():
     if allStocks:
         for stock in allStocks:
             trend = float(stock['trend'])
-            noiseMultiplier = random.uniform(0.85, 1.15)
+            noiseMultiplier = random.uniform(0.90, 1.10)
             trend = trend * noiseMultiplier
-            newPrice = int(trend * float(int(stock['price']))) + int(stock['price'])
+
+            # mean reversion - the further from base price, the stronger the pull back
+            currentPrice = float(int(stock['price']))
+            priceRatio = currentPrice / BASE_PRICE
+            if priceRatio > 1.5 and trend > 0:
+                # stock is expensive - dampen positive trends
+                dampening = max(0.1, 1.0 - (priceRatio - 1.5) * 0.5)
+                trend = trend * dampening
+            elif priceRatio < 0.5 and trend < 0:
+                # stock is cheap - dampen negative trends
+                dampening = max(0.1, 1.0 - (0.5 - priceRatio) * 0.5)
+                trend = trend * dampening
+
+            # cap max change per update
+            trend = max(-MAX_CHANGE_PER_UPDATE, min(MAX_CHANGE_PER_UPDATE, trend))
+
+            newPrice = int(trend * currentPrice) + int(stock['price'])
             if newPrice < 50:
                 users = db.retrieveAllUsers()
                 badInvestors = []
