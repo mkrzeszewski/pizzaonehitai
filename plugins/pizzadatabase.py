@@ -388,7 +388,11 @@ def retrieveIcon(key, value):
     return iconsCollection.find_one({key: value})
 
 def icon(name):
-    return iconsCollection.find_one({'name': name})
+    icon = iconsCollection.find_one({'name': name})
+    if icon:
+        return icon
+    else:
+        return "https://cdn3.emoji.gg/emojis/48134-bmodancing.gif"
 
 def removeIcon(key, value):
     return iconsCollection.delete_one({key: value})
