@@ -158,6 +158,12 @@ def runDiscordBot():
     async def generateStocks():
         if datetime.now().weekday() == 0: #monday 10 am
             stocks.generateStocks()
+            channel = bot.get_channel(GAMBA_CHANNEL_ID)
+            _stocks = list(db.retrieveAllStocks())
+            if _stocks:
+                await channel.send(embed = responses._stockEmbedGen.full_stonks(_stocks))
+            else:
+                print("[STOCKS] - cos poszlo nie tak przy generowaniu")
 
     #prison
     @freePeopleFromPrison.before_loop
