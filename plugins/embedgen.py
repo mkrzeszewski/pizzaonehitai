@@ -558,7 +558,7 @@ def generateFullStonks(stocks):
     
     for stock in sorted_stocks:
         sym = stock['symbol']
-        prc = f"{stock['price']}PP"
+        prc = f"{stock['price']}"
         shr = f"{stock['availableShares']}"
         mcap_val = int(stock['price']) * int(stock.get('totalShares', 1))
         if mcap_val >= 1000000:
