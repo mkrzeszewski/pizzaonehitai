@@ -91,13 +91,10 @@ class HoroscopeGen(BaseEmbedGen):
         self.color = Colour.blue()
 
 ##################################################################
-    
-from discord import Embed, Colour
 
 class StocksGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        # Every embed from this class will use this specific hint
         self.help_hint = "\n\n💡 `!stonks`, `!fullstonks`, `!buy`, `!sell`"
         self.GREEN = Colour.dark_green()
         self.RED = Colour.dark_red()
@@ -176,7 +173,45 @@ class StocksGen(BaseEmbedGen):
 
 ##################################################################
 
+class UtilityEmbedGen(BaseEmbedGen):
+    def __init__(self):
+        super().__init__()
+        self.ERROR_COLOR = Colour.red()
+        self.INFO_COLOR = Colour.blue()
 
+    def error_msg(self, action_name, error_text, usage=None):
+        title = f"❌ Błąd: {action_name}"
+        description = f"**Problem:** {error_text}"
+        if usage:
+            description += f"\n\n**Poprawne użycie:**\n`{usage}`"
+            
+        return self._create_base(title, description, color=self.ERROR_COLOR)
+    
+    def main_help(self):
+        title = "Tutorial używania bota:"
+        description = "Oto lista dostępnych komend, które pomogą Ci przetrwać na serwerze."
+        
+        embed = self._create_base(
+            title=title, 
+            description=description, 
+            color=self.INFO_COLOR,
+            thumbnail="https://cdn.7tv.app/emote/01G4ZTECKR0002P97QQ94BDSP4/4x.avif"
+        )
+        
+        commands = (
+            "`!help` - to okno.\n"
+            "`!analyzetft <id>` - analiza meczu TFT.\n"
+            "`!analyzelol <id>` - analiza meczu LOL'a.\n"
+            "`!points` - aktualna liczba punktów.\n"
+            "`!top X` - top X bogaczy.\n"
+            "`!horoskop` - horoskop na dziś!\n"
+            "`!ai <pytanie>` - zadaj pytanie AI!\n"
+            "`!stocks` - giełda P1H\n"
+        )
+        embed.add_field(name="Komendy:", value=commands, inline=False)
+        return embed
+    
+##################################################################
 
 def generateEmbedFromTFTMatch(results,players,matchID, date):
     #title of embed - ranked/normal - set

@@ -3,7 +3,7 @@ import plugins.weather as weather
 import plugins.horoscope as horoskop
 import plugins.pizzadatabase as db
 import plugins.embedgen as embedgen
-from plugins.embedgen import StocksGen
+from plugins.embedgen import StocksGen, UtilityEmbedGen, BaseEmbedGen
 import plugins.pubfinder as pubfinder
 import plugins.points as points
 import plugins.gifgenerator as gif
@@ -17,15 +17,14 @@ from datetime import datetime
 import re
 from discord import Embed, Colour, ui, ButtonStyle, Interaction, NotFound, File, Member, User
 
-ROUTING_TABLE = {}
-
-
+#to be moved to slots.py?
 MAX_SLOT_AMOUNT = 5000
 
 #when user is tagged in dc, i.e. @roLab this is the re to check for that ID
 TAG_PATTERN = re.compile(r'<@!?(\d+)>')
 
-
+#for keyword mapping
+ROUTING_TABLE = {}
 securityResponse = "<:police:1343736194546274394> Nie masz prawa do uzywania tej komendy. Incydent bezpieczenstwa zostal zgloszony."
 restaurantKeywords = ["restauracja", "bar", "znajdzbar", "gdziejemy", "jemy"]
 helpKeyword = ["help", "?", "??", "pomoc", "tutorial", "kurwapomocy", "test"]
@@ -45,7 +44,9 @@ stocksKeyword = ["stocks", "stonks", "invest", "gielda", "rynek", "stoki", "wykr
 sellStockKeyword = ["sellstock", "sell", "sprzedaj", "sellstocks", "out"]
 buyStockKeyword = ["buystock", "purchasestock", "buy", "kup", "inwestuj", "invest"]
 
-
+_defaultEmbedGen = BaseEmbedGen()
+_stockEmbedGen = StocksGen()
+_utilityEmbedGen = UtilityEmbedGen()
 
 #this is main body of this module - it performs manual if check depending on my widzimisie
 async def handleResponse(userMessage, author, dcbot = None) -> str:
@@ -513,26 +514,12 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             returnEmbed = embed_buttons.generate_embed()
 
         if message in helpKeyword:
-            returnEmbed = embedgen.generateHelpEmbed()
+            returnEmbed = _utilityEmbedGen.main_help()
 
         if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
             _stocks = list(db.retrieveAllStocks())
             if len(_stocks) > 0:
                 returnEmbed = embedgen.generateStocksOverview(_stocks)
-            else:
-                returnText = "Currently there's no stock value"
-
-        if message == "topstocks":
-            _stocks = list(db.retrieveAllStocks())
-            if len(_stocks) > 0:
-                returnEmbed = embedgen.generateStocksOverview(_stocks)
-            else:
-                returnText = "Currently there's no stock value"
-
-        if message == "bottomstocks":
-            _stocks = list(db.retrieveAllStocks())
-            if len(_stocks) > 0:
-                returnEmbed = embedgen.generateBottomStocks(_stocks)
             else:
                 returnText = "Currently there's no stock value"
         
@@ -546,9 +533,6 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             if user['role'] == "owner":# or user['role'] == "admin"::
                 stocks.simulateTrends()
                 returnText = "Przeprowadzono generacje trendow dla stockow."
-
-        if message == "testmarkdown":
-            returnEmbed = embedgen.testMarkdown()
 
         if message in stocksKeyword:
             _stocks = list(db.retrieveTopStocks(100))
@@ -732,3 +716,74 @@ def reloadCommands():
                 "module": doc['module'], 
                 "action": doc['action']
             }
+
+
+async def handleStocksModule(action, args, user, avatarUrl):
+    returnEmbed = None
+    returnView = None
+    returnFile = None
+    returnText = ""
+    _stocks = list(db.retrieveTopStocks(100))
+    if len(_stocks) == 0:
+        return None, "Currently stock list is empty.", None, None
+    
+    if action == "view":
+        returnEmbed = _stockEmbedGen.overview(_stocks)
+    if action == "sell":
+        return ""
+    if action == "buy":
+        return ""
+    if action == "fullview":
+        return ""
+    if action == "cashout":
+        return ""
+    if action == "portfolio":
+        return ""
+    if action == "rundown":
+        return ""
+    if action == "generate":
+        return ""
+    
+    return returnEmbed, returnText, returnView, returnFile
+    # if message == "fullstonks" or message == "fullstocks" or message == "stocksoverview":
+    #         _stocks = list(db.retrieveAllStocks())
+    #         if len(_stocks) > 0:
+    #             returnEmbed = embedgen.generateStocksOverview(_stocks)
+    #         else:
+    #             returnText = "Currently there's no stock value"
+        
+    #     if message == 'generatestocks':
+    #         returnText = securityResponse
+    #         if user['role'] == "owner":# or user['role'] == "admin"::
+    #             returnText = str(stocks.generateStocks())
+
+
+    #     if message in stocksKeyword:
+    #         _stocks = list(db.retrieveTopStocks(100))
+    #         if len(_stocks) > 0:
+    #             returnEmbed = embedgen.generateFullStonks(_stocks)
+
+    #     if message == "cashout" or message == "imout":
+    #         success, msg = stocks.cashout(user['name'])
+    #         if success:
+    #             returnEmbed = embedgen.generateUserStockCashout(user, msg)
+    #         else:
+    #             returnText = msg
+
+    #     if message == "portfolio" or message == "flex" or message == "mystocks" or message == "mystonks":
+    #         returnEmbed = embedgen.generateUserPortfolioEmbed(user, userAvatarURL)
+
+    #     if message == "testbankrupcy":
+    #         _stock = db.retrieveStock('ceo',user['name'])
+    #         if _stock:
+    #             returnEmbed = embedgen.generateBankrupcy(_stock, userAvatarURL)
+        
+    #     if message == "stockupdate" or message == "stockrundown":
+    #         msg = stocks.informOnStocksUpdate()
+    #         returnEmbed = embedgen.generateStocksRundown(msg)
+
+    #     if message in buyStockKeyword:
+    #         returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !buy MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks"
+
+    #     if message in sellStockKeyword:
+    #         returnText = returnText = "Prosze podac symbol oraz ilosc akcji ktore chcesz kupic! Np. !sell MMM 5.\nW celu zweryfikowania jakie akcje sa na rynku - !stonks\nPamietaj, ze przy sprzedazy pobierane jest 10% podatku!"
