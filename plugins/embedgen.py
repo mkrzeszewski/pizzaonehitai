@@ -187,13 +187,14 @@ def generateHelpEmbed():
     embed = Embed(colour = Colour.yellow())
     embed.set_author(name = "Tutorial uzywania bota:", icon_url = "https://cdn.7tv.app/emote/01GR7R0H9G000FEKDNHQTECH62/2x.avif")
     embed.set_thumbnail(url = "https://cdn.7tv.app/emote/01G4ZTECKR0002P97QQ94BDSP4/4x.avif")
-    listOfCommands = "!help - to okno.\n"
-    listOfCommands += "!analyzetft <match_id> - analiza meczu TFT.\n"
-    listOfCommands += "!analyzelol <match_id> - analiza meczu LOL'a.\n"
-    listOfCommands += "!points - wyswietla aktualna liczbe punktow.\n"
-    listOfCommands += "!top X - wyswietla top X posiadaczy punktow.\n"
-    listOfCommands += "!horoskop - zwraca horoskop na dzis!\n"
-    listOfCommands += "!ai <pytanie> - zadaj pytanie AI!\n"
+    listOfCommands = "`!help` - to okno.\n"
+    listOfCommands += "`!analyzetft <match_id>` - analiza meczu TFT.\n"
+    listOfCommands += "`!analyzelol <match_id>` - analiza meczu LOL'a.\n"
+    listOfCommands += "`!points` - wyswietla aktualna liczbe punktow.\n"
+    listOfCommands += "`!top X` - wyswietla top X posiadaczy punktow.\n"
+    listOfCommands += "`!horoskop` - zwraca horoskop na dzis!\n"
+    listOfCommands += "`!ai <pytanie>` - zadaj pytanie AI!\n"
+    listOfCommands += "`!stocks - gielda P1H\n"
     embed.add_field(name = "Komendy:", value = listOfCommands)
     embed.set_footer(text = "Sztuczna inteligencja na twoim discordzie!", icon_url = PIZZA_ICON_URL)
     return embed
