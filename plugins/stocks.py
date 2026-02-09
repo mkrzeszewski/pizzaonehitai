@@ -83,8 +83,8 @@ def removeAllStocks():
 
 #simulate trends
 def simulateTrends():
-    allStocks = db.retrieveAllStocks()
-    if allStocks:
+    allStocks = list(db.retrieveAllStocks())
+    if len(allStocks) > 0:
         for stock in allStocks:
             db.updateStockTrend(stock['name'],generateTrend(int(stock['price'])))
 
@@ -142,9 +142,9 @@ def stockConsolidation(stock):
 
 #update according to price
 def updatePrices():
-    allStocks = db.retrieveAllStocks()
+    allStocks = list(db.retrieveAllStocks())
     bankrupts = []
-    if allStocks:
+    if len(allStocks) > 0:
         for stock in allStocks:
             trend = float(stock['trend'])
             noiseMultiplier = random.uniform(0.85, 1.15)
@@ -221,7 +221,6 @@ def removeStock(stock):
                 if share['symbol'] == stock['symbol']:
                     badInvestors.append(user['name'])
                     db.removeStocksFromUser(user['name'],share['symbol'], share['amount'])
-                    break
     db.insertStockHistory(stock)
     db.removeStock(stock['name'])
     return badInvestors
