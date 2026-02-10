@@ -335,7 +335,7 @@ def retrieveStockHistory():
     return stockHistoryCollection.find()
 
 def insertStockHistory(stock):
-    return stocksCollection.insert_one({'name': stock['name'], 
+    return stockHistoryCollection.insert_one({'name': stock['name'], 
                                         'ceo': stock['ceo'],
                                         'symbol' : stock['symbol'],
                                         'priceHistory':  stock['priceHistory']})
