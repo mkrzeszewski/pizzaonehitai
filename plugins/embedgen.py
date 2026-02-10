@@ -619,7 +619,7 @@ def generateBirthdayEmbed(user, facts, wrozba):
 
 def generateWinnerEmbed(user, userAvatarURL):
     aiMode = random.choice(list(db.getAllAiModes()))
-    embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow w sposob " + str(aiMode) + "."), color=Colour.dark_green())
+    embed = Embed(title="Gratulacje, " + user['name'] + "!", description=ai.askAI("Pogratuluj uzytkownikowi: \""+ user['name'] + "\" wygranej w dziennej loterii pizzopunktow. Mów w nastepujacy  w sposob " + str(aiMode) + "."), color=Colour.dark_green())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Do twojego konta przypisalismy 500 ppkt + 15% twojej dotychczasowej ilosci pizzopunktow!", value="Woohoo!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
@@ -629,7 +629,7 @@ def generateWinnerEmbed(user, userAvatarURL):
 def generateLoserEmbed(user, userAvatarURL):
     aiMode = random.choice(list(db.getAllAiModes()))
     #embed = Embed(title="Ojojoj, " + user['name'] + "...", description="Jestes dzisiejszym przegrywem..", color=Colour.dark_red())
-    embed = Embed(title="Przykro nam, " + user['name'] + "!", description=ai.askAI("Poinformuj uzytkownika: \""+ user['name'] + "\" ze przegral w dziennej loterii pizzopunktow (tj zostaly mu pobrane z konta punkty) w sposob " + str(aiMode) + "."), color=Colour.dark_red())
+    embed = Embed(title="Przykro nam, " + user['name'] + "!", description=ai.askAI("Poinformuj uzytkownika: \""+ user['name'] + "\" ze przegral w dziennej loterii pizzopunktow (tj zostaly mu pobrane z konta punkty). Mów w nastepujacy sposob " + str(aiMode) + "."), color=Colour.dark_red())
     embed.set_thumbnail(url = userAvatarURL)
     embed.add_field(name = "Z twojego konta zostalo odebrane 15% ppkt.", value="Sprobuj sie odbic na hazard-lounge!", inline = False)
     embed.set_author(name = "Pizza One Hit AI", icon_url = db.icon("BOT_GIF_ADDRESS"))
