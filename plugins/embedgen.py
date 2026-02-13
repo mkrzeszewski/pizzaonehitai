@@ -606,7 +606,7 @@ def generateAIResponse(input, response):
 
 def generateBirthdayEmbed(user, facts, wrozba):
     bdayPhrases = list(db.getAllBdayPhrases())
-    embed = Embed(title="Dzis sa twoje urodziny, " + user['name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + bdayPhrases[random.randint(0,len(bdayPhrases) - 1)], color=Colour.pink())
+    embed = Embed(title="Dzis sa twoje urodziny, " + user['name'] + "!", description = PEPE_BIRTHDAY_EMOTE + " " + str(bdayPhrases[random.randint(0,len(bdayPhrases) - 1)]), color=Colour.pink())
     embed.set_author(name = "Pizza One Hit AI", icon_url = BIRTHDAY_RANDOM_ICON_ARRAY[random.randint(0,len(BIRTHDAY_RANDOM_ICON_ARRAY) - 1)])
     body = ""
     if facts:
