@@ -820,6 +820,9 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         if int(user['points']) >= 100:
             returnText = f"❌ Masz {user['points']} pkt. To za dużo na zasiłek, ty chciwy sępie!"
             return None, returnText, None, None
+        elif user['stocksOwned']:
+            returnText = f"❌ Jesteś właścicielem akcji! Zapomoga jest dla najbiedniejszych, a nie inwestorów! Wstydź się!"
+            return None, returnText, None, None
         if db.isBegAvailable():
             db.updateUser('discord_id', str(user['discord_id']), 'points', 100)
             db.createBegEntry(str(user['discord_id']))
