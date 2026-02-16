@@ -243,7 +243,7 @@ class HeistEmbedGen(BaseEmbedGen):
         embed.add_field(name=heist_name, value=intro_msg, inline=False)
         embed.add_field(
             name="Jak dołączyć?", 
-            value="Napisz `!heist join <KWOTA>`\nWkład zwiększa Twoją dolę z łupu!", 
+            value="Napisz `!join <KWOTA>`\nWkład zwiększa Twoją dolę z łupu!", 
             inline=False
         )
         return embed
