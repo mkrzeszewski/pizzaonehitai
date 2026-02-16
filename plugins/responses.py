@@ -682,7 +682,8 @@ def generateSlots(amount, user):
     #in case of skulls
     if multiplier < 0:
         earnings = earnings - amount
-    return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
+    return _gambleEmbedGen.generate_slots_animation(id, output_path, earnings, user)
+    #return embedgen.generateSlotsAnimation(id, output_path, earnings, user)
 
 def getWeather():
     return weather.getLodzWeather()

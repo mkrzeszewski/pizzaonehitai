@@ -142,6 +142,41 @@ class GambleEmbedGen(BaseEmbedGen):
             thumbnail=db.icon("TRANSFER_ICON")
         )
         return embed
+    def generate_slots_animation(self, id = 0, gif_path = "assets/gif/slots.gif", amount = 0, user = None):
+        # 1. Logika wygranej/przegranej
+        is_win = amount > 0
+        abs_amount = abs(amount)
+        icon = self.WIN_ICON
+        if is_win:
+            title_prefix = "🎰 WYGRANA"
+            description = f"🔥 Szczęśliwy traf, **{user['name']}**!"
+            color = self.SUCCESS_COLOR
+            status_text = f"zyskałeś `{abs_amount:,}` ppkt!"
+        else:
+            title_prefix = "🎰 PRZEGRANA"
+            description = f"💀 Pech, **{user['name']}**..."
+            color = self.ERROR_COLOR
+            status_text = f"straciłeś `{abs_amount:,}` ppkt.."
+            icon = self.LOSE_ICON
+
+        embed = self._create_base(
+            title=f"{title_prefix} (ID: #{id})",
+            description=description,
+            color=color,
+            thumbnail=icon
+        )
+
+        filename = gif_path.split("/")[-1]
+        file = File(gif_path, filename=filename)
+        embed.set_image(url=f"attachment://{filename}")
+        
+        # Główny bilans w polu
+        embed.add_field(
+            name="📊 Wynik losowania:", 
+            value=f"Użytkownik **{user['name']}** {status_text}", 
+            inline=False
+        )
+        return embed, file
 ##################################################################
 
 class HoroscopeEmbedGen(BaseEmbedGen):
