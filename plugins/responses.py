@@ -75,8 +75,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     args = userMessage.split()[1:]               # ["@roLab", "500"]
     
     route = ROUTING_TABLE.get(trigger)
-    if not route:
-        return None, f"Nie znam komendy: {trigger}", None, None
+    
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) < 300:
             returnText = "Masz za malo pizzopunktow! Minimalna ilosc do zaplaty to 300! Obecnie masz " + str(user['points']) + "!"
@@ -95,6 +94,9 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     elif not user['arrested'] and commands[0] in escapeKeyword:
         returnText = "Nie jestes obecnie aresztowany."
     
+    if not route:
+        return None, f"Nie znam komendy: {trigger}", None, None
+
     if route:
         module = route['module']
         action = route['action']
