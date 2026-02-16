@@ -114,20 +114,31 @@ def runDiscordBot():
                 for event in theatre[1]:
                     await channel.send(embed = _theatreEmbedGen.theatre_event_list(theatre[0], event[0], event[1]))
 
-    @tasks.loop(hours = 4)
+    @tasks.loop(hours=4)
     async def manageHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
         if not db.isHeistOngoing():
             heist.generateHeist()
             currHeist = db.retrieveHeistInfo()
-            await channel.send(embed = embedgen.generateHeistInvite(currHeist['level'], currHeist['heist_name'], heist.generateHeistIntro(currHeist['heist_name']), currHeist['when_starts'], currHeist['level']))
+            intro_text = heist.generateHeistIntro(currHeist['heist_name'])
+            embed = responses._heistEmbedGen.invite(
+                level=currHeist['level'], 
+                heist_name=currHeist['heist_name'], 
+                intro_msg=intro_text, 
+                time_limit=currHeist['when_starts']
+            )
+            await channel.send(embed=embed)
         else:
             currHeist = db.retrieveHeistInfo()
-            await channel.send(embed = embedgen.generateHeistInfo(currHeist['level'], currHeist['heist_name'],currHeist['when_starts'],currHeist['members']))
-        currHeist = db.retrieveHeistInfo()
-        
-        #starts upon the time in DB
-        await waitUntil(datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time())
+            embed = responses._heistEmbedGen.info(
+                level=currHeist['level'], 
+                heist_name=currHeist['heist_name'], 
+                time_limit=currHeist['when_starts'], 
+                members=currHeist['members']
+            )
+            await channel.send(embed=embed)
+        start_time_dt = datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time()
+        await waitUntil(start_time_dt)
         await triggerHeist(channel)
 
     @tasks.loop(hours = 24.0)
