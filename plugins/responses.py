@@ -818,7 +818,7 @@ async def handleHeistModule(action, args, user, dcbot, avatarUrl):
 async def handleAIModule(action, args, user, dcbot, avatarUrl):
     returnEmbed, returnView, returnFile, returnText = None, None, None, ""
     if action == "resetai":
-        if user.get('role') != "owner":
+        if user.get('role') == "owner":
             ai.resetModel()
             returnText =  "👌AI zostal przywrócony do stanu pierwotnego."
         else:
@@ -828,7 +828,6 @@ async def handleAIModule(action, args, user, dcbot, avatarUrl):
         db.insertAIHistory(str(user['name']), query)
         returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
     return returnEmbed, returnText, returnView, returnFile
-
 
 async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
     returnEmbed, returnView, returnFile, returnText = None, None, None, ""
