@@ -13,7 +13,7 @@ import plugins.heist as heist
 import plugins.pizzadatabase as db
 import plugins.stocks as stocks
 import plugins.theatres as theatres
-from plugins.embedgen import TheatreEmbedGen
+from plugins.embedgen import TheatreEmbedGen, HeistEmbedGen
 
 target_stock_time = time(hour=7, minute=0)
 user_cooldowns = {}
@@ -56,14 +56,20 @@ async def sendEmbedToChannel(interaction, embed, is_private=False):
 
 async def triggerHeist(channel):
     currHeist = db.retrieveHeistInfo()
+    # Symulacja zwraca akty
     started, acts = heist.heistSimulation(currHeist['heist_name'], int(currHeist['potential_loot']), int(currHeist['success_chance']))
+    
     if started:
         for act in acts[:-1]:
             await asyncio.sleep(300)
-            await channel.send(embed = embedgen.generateHeistBody(currHeist['level'], currHeist['heist_name'], act)) 
-        heist.finalizeHeist(acts[-1].strip().lstrip('```json\n').rstrip('```'))
+            # Używamy nowej metody z klasy heistGen
+            await channel.send(embed=responses._heistEmbedGen.simulation_step(currHeist['level'], currHeist['heist_name'], act))
+        
+        # Finalizacja (parsowanie JSON z ostatniego aktu)
+        result_json = acts[-1].strip().lstrip('```json\n').rstrip('```')
+        heist.finalizeHeist(result_json)
     else:
-        await channel.send(embed = embedgen.generateHeistCanceled(currHeist['heist_name']))
+        await channel.send(embed=responses._heistEmbedGen.canceled(currHeist['heist_name']))
         heist.finalizeHeist(None)
         
 async def sendMessage(message, user_message, is_private):

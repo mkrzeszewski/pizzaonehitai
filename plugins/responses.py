@@ -78,8 +78,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
     args = userMessage.split()[1:]               # ["@roLab", "500"]
     
     route = ROUTING_TABLE.get(trigger)
-    #if not route:
-    #    return None, f"Nie znam komendy: {trigger}", None, None
+    if not route:
+        return None, f"Nie znam komendy: {trigger}", None, None
     
     if user['arrested'] and commands[0] in escapeKeyword:
         if int(user['points']) < 300:
@@ -108,7 +108,15 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             return await handleUtilityModule(action, args, user, dcbot, userAvatarURL)
         elif module == "economy":
             return await handleGambleModule(action, args, user, dcbot, userAvatarURL)
+        elif module == "ai":
+            return await handleAIModule(action, args, user, dcbot, userAvatarURL)
+        elif module == "heist":
+            return await handleHeistModule(action, args, user, dcbot, userAvatarURL)
+        elif module == "admin":
+            return await handleAdminModule(action, args, user, dcbot, userAvatarURL)
             
+
+    ######################################### wszystko ponizej - do kosza
     #komendy wielokomendowe
     if len(commands) > 1:
         #analyze league of legends match - need proper ID, example: EUN1_3498132354
@@ -577,7 +585,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
 
     return returnEmbed, returnText, returnView, returnFile
 
-
+######################################### wszystko wyzej - do kosza
 
 ###################Utility
 
@@ -740,6 +748,90 @@ def reloadCommands():
                 "module": doc['module'], 
                 "action": doc['action']
             }
+
+async def handleAdminModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+    if user.get('role') != "owner":
+        return None, securityResponse, None, None
+
+    if not args:
+        return None, f"Musisz podać użytkownika! Przykład: `!{action} @roLab`", None, None
+    
+    target_pattern = args[0]
+    target_user_db = userFromPattern(target_pattern)
+
+    if not target_user_db:
+        return None, f"❌ Nie znaleziono użytkownika: `{target_pattern}`.", None, None
+    if action == "arrest":
+        if db.arrestUser('discord_id', str(target_user_db['discord_id'])):
+            returnEmbed = _utilityEmbedGen.arrest_result(target_user_db, user['name'])
+        else:
+            returnText = f"❌ Błąd podczas aresztowania {target_user_db['name']}."
+    elif action == "free_user":
+        if db.freeUser('discord_id', str(target_user_db['discord_id'])):
+            returnEmbed = _utilityEmbedGen.free_result(target_user_db, user['name'])
+        else:
+            returnText = f"❌ Błąd podczas uwalniania {target_user_db['name']}."
+
+    return returnEmbed, returnText, returnView, returnFile
+
+async def handleHeistModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+
+    if action == "join":
+        if not db.isHeistAvailable():
+            return None, "🛑 Obecnie nie ma żadnego aktywnego planu napadu.", None, None
+
+        if not args or not str(args[0]).isdigit():
+            return None, "❌ Podaj kwotę! Użycie: `!heist join 500`", None, None
+        
+        amount = int(args[0])
+        curr_points = int(user.get('points', 0))
+
+        if amount < 200:
+            return None, "❌ Minimalny wkład w napad to `200` pkt.", None, None
+
+        if curr_points < amount:
+            return None, f"❌ Nie masz tyle punktów! (Masz: `{curr_points:,}`)", None, None
+
+        # 3. Sprawdzenie czy już jest w ekipie
+        if db.isUserPartOfCurrentHeist(user['name']):
+            return None, "👀 Już jesteś w ekipie na ten skok!", None, None
+
+        # 4. Akcja
+        db.appendHeistMember(user['name'], amount)
+        points.addPoints(str(user['discord_id']), -amount)
+        
+        returnEmbed = _heistEmbedGen.join_success(user, amount)
+
+    elif action == "heistinfo":
+        currHeist = db.retrieveHeistInfo()
+        if currHeist:
+            returnEmbed = _heistEmbedGen.heist_info(
+                currHeist['level'], 
+                currHeist['heist_name'], 
+                currHeist['when_starts'], 
+                currHeist['members']
+            )
+        else:
+            returnText = "🕵️‍♂️ Wywiad donosi, że na razie nie ma żadnego banku do obrobienia."
+
+    return returnEmbed, returnText, returnView, returnFile
+
+async def handleAIModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+    if action == "resetai":
+        if user.get('role') != "owner":
+            ai.resetModel()
+            returnText =  "👌AI zostal przywrócony do stanu pierwotnego."
+        else:
+            return None, securityResponse, None, None
+    elif action == "chat":
+        query = " ".join(args)
+        db.insertAIHistory(str(user['name']), query)
+        returnEmbed = embedgen.generateAIResponse(query, ai.chatWithAI(query))
+    return returnEmbed, returnText, returnView, returnFile
+
 
 async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
     returnEmbed, returnView, returnFile, returnText = None, None, None, ""

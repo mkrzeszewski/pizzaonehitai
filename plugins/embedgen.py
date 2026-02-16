@@ -93,14 +93,24 @@ class GambleEmbedGen(BaseEmbedGen):
             
             # Pula tekstów dla zwycięzcy
             win_phrases = [
-                f"Nieprawdopodobne! **{user['name']}** rozbił bank!",
+                f"Nieprawdopodobne! **{user['name']}** właśnie rozbił bank i godność krupiera!",
                 f"Szczęście sprzyja lepszym. Dobra robota, **{user['name']}**!",
-                f"Właśnie tak się to robi! Portfel puchnie.",
+                f"Właśnie tak się to robi! Twój portfel puchnie szybciej niż ego admina.",
                 f"Kasyno Pizza One Hit płacze i płaci. Gratulacje!",
-                f"EZ! **{user['name']}** wchodzi w tryb rekin biznesu."
+                f"EZ! **{user['name']}** wchodzi w tryb rekin biznesu. Ktoś wezwij Forbesa!",
+                f"Urząd Skarbowy już zaciera ręce, ale na razie - brawo **{user['name']}**!",
+                f"Z takim fuksem powinieneś zacząć grać na giełdzie...",
+                f"Matematyka właśnie przegrała z Twoim fartem. Nie przyzwyczajaj się!",
+                f"**{user['name']}** właśnie wygrał tyle, ile potrzeba.",
+                f"Twoja passą wygranych można by zasilić małe miasto. Albo chociaż ten serwer.",
+                f"To nie jest wygrana, to jest czysta dominacja nad algorytmem!",
+                f"Gamer move! **{user['name']}** oszukał przeznaczenie.",
+                f"Saldo rośnie, a z nim szacunek na tym discordzie.",
+                f"Oficjalnie: **{user['name']}** jest nowym sponsorem dzisiejszej imprezy!",
+                f"Wygrałeś. Teraz możesz patrzeć na resztę z góry (dopóki nie przegrasz)."
             ]
             msg_header = random.choice(win_phrases)
-            msg = f"{msg_header}\n💰 Zyskałeś: `+{amount:,}` ppkt"
+            msg = f"{msg_header}\n💰 Zyskałeś: `{amount:,}` ppkt"
             
         else:
             title = "📉 PORAŻKA..."
@@ -108,14 +118,24 @@ class GambleEmbedGen(BaseEmbedGen):
             thumb = self.LOSE_ICON
 
             lose_phrases = [
-                f"Ups... **{user['name']}** właśnie sfinansował obiady administracji.",
-                f"Dom zawsze wygrywa. Może następnym razem?",
-                f"Przykry widok. **{user['name']}** traci wszystko przez jedną decyzję.",
-                f"Spokojnie, to tylko cyferki... których już nie masz.",
-                f"Widziałem to w zwolnionym tempie. Zabolało."
+                f"Ups... **{user['name']}** właśnie sfinansował obiady dla całej administracji.",
+                f"House always wins. Może następnym razem spróbujesz nie przegrać?",
+                f"Przykry widok. **{user['name']}** traci wszystko przez jedną, bardzo głupią decyzję.",
+                f"Spokojnie, to tylko cyferki... których już nie masz na koncie.",
+                f"Widziałem to w zwolnionym tempie. Nawet boty odwróciły wzrok z litości.",
+                f"Twoje punkty właśnie udały się na zasłużoną emeryturę. Bez Ciebie.",
+                f"Czy to był planowany dar na rzecz biednego bota? Jeśli tak, dziękuję!",
+                f"**{user['name']}** - mistrz przekazywania majątku w obce ręce.",
+                f"Twoje saldo właśnie zaliczyło 'unplanned disassembly'.",
+                f"Słyszysz to? To dźwięk Twoich punktów uciekających do kogoś mądrzejszego.",
+                f"Zaraz wezwiemy jednostkę ratunkową dla Twojego portfela. Chociaż już za późno.",
+                f"Nie płacz, że się skończyło. Ciesz się, że przez sekundę byłeś 'bogaty'.",
+                f"Statystycznie rzecz biorąc, ktoś musiał przegrać. Padło na największego pechowca.",
+                f"Właśnie zostałeś twarzą nowej kampanii: 'Hazard - nie każdemu wychodzi'.",
+                f"Może spróbuj zbierania jagód? Bo hazard Ci ewidentnie nie idzie, **{user['name']}**."
             ]
             msg_header = random.choice(lose_phrases)
-            msg = f"{msg_header}\n💸 Straciłeś: `-{amount:,}` ppkt"
+            msg = f"{msg_header}\n💸 Straciłeś: `{amount:,}` ppkt"
 
         embed = self._create_base(
             title=title,
@@ -126,18 +146,28 @@ class GambleEmbedGen(BaseEmbedGen):
         return embed
     
     def transfer_result(self, sender, receiver, amount):
-        phrases = [
-            f"💰 **{sender['name']}** sypnął groszem dla **{receiver['name']}**!",
-            f"💸 Przelew dotarł! **{receiver['name']}** jest teraz bogatszy o `{amount:,}` pkt.",
-            f"🤝 Czysty biznes. **{sender['name']}** przekazał środki dla **{receiver['name']}**.",
-            f"🎁 **{receiver['name']}** dostał prezent od **{sender['name']}**! Co za hojność.",
-            f"🏧 Transakcja zakończona sukcesem. **{sender['name']}** -> **{receiver['name']}**."
+        transfer_phrases = [
+            f"💰 **{sender['name']}** sypnął groszem dla **{receiver['name']}**! Pańskie oko konia tuczy.",
+            f"💸 Przelew dotarł! **{receiver['name']}** jest teraz bogatszy o `{amount:,}` pkt. Nie wydaj wszystkiego na głupoty!",
+            f"🤝 Czysty biznes. **{sender['name']}** przekazał środki dla **{receiver['name']}**. Fiskus już o tym wie.",
+            f"🎁 **{receiver['name']}** dostał prezent od **{sender['name']}**! Co za hojność, prawie jak w Wigilię.",
+            f"🏧 Transakcja zakończona sukcesem. **{sender['name']}** -> **{receiver['name']}**. Pieniądze nie śmierdzą!",
+            f"🕵️ Cicha łapówka przekazana. **{sender['name']}** właśnie kupił sobie lojalność **{receiver['name']}**.",
+            f"🍕 **{sender['name']}** funduje pizzę (albo punkty na nią) dla **{receiver['name']}**!",
+            f"💳 Autoryzacja pomyślna. **{receiver['name']}** właśnie wygrał na loterii zwanej hojnością **{sender['name']}**.",
+            f"📦 Paczka z gotówką dostarczona. **{sender['name']}** oddaje hołd swojemu nowemu panu: **{receiver['name']}**.",
+            f"🤑 Uwaga, bogacz wjeżdża na rejon! **{sender['name']}** rzuca `{amount:,}` pkt w tłum, a zgarnia to **{receiver['name']}**.",
+            f"📉 Redystrybucja dóbr zakończona. **{sender['name']}** staje się biedniejszy, żeby **{receiver['name']}** mógł żyć jak król.",
+            f"🕊️ Charytatywny gest roku: **{sender['name']}** wspiera fundację pomocy upośledzonym hazardzistom im. **{receiver['name']}**.",
+            f"🏦 Bank Centralny Pizza One Hit potwierdza: **{sender['name']}** wysłał `{amount:,}` pkt do **{receiver['name']}**.",
+            f"🤫 Szybki przelew pod stołem. Nikt nic nie widział, nikt nic nie słyszał, ale **{receiver['name']}** ma więcej siana.",
+            f"🎭 Scena jak z filmu: **{sender['name']}** zostawia walizkę z punktami na ławce. Podnosi ją **{receiver['name']}**."
         ]
-        description = random.choice(phrases)
+        description = random.choice(transfer_phrases)
         
         embed = self._create_base(
             title="💸 Przelew Punktów",
-            description=f"{description}\n\n**Kwota:** `{amount:,}` pkt",
+            description=f"{description}\n\n**Kwota:** `{amount:,}` ppkt",
             color=self.color,
             thumbnail=db.icon("TRANSFER_ICON")
         )
@@ -160,7 +190,7 @@ class GambleEmbedGen(BaseEmbedGen):
             icon = self.LOSE_ICON
 
         embed = self._create_base(
-            title=f"{title_prefix} (ID: #{id})",
+            title=f"{title_prefix} (SLOT ID: #{id})",
             description=description,
             color=color,
             thumbnail=icon
@@ -192,12 +222,77 @@ class HoroscopeEmbedGen(BaseEmbedGen):
 class HeistEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        # Simple back button for horoscopes
-        self.help_hint = "\nhttps://horoskop.wp.pl/horoskop/horoskop-dzienny/\n\n🔮 Sprawdź swoj horoskop na dzis (lub kogoś) `!horoskop`, `!horoskop @<USER>`"
-        self.color = Colour.pink()
+        self.help_hint = "\n\n💡 `!join`, `!heistinfo`"
+        self.ICON_CRIMINAL = db.icon("CRIMINAL_ICON")
+        self.ICON_PRISON = db.icon("PEPE_PRISON")
+        self.ICON_BOT = db.icon("BOT_GIF_ADDRESS")
+        self.COLOR_NORMAL = Colour.dark_orange()
+        self.COLOR_HARD = Colour.dark_red()
 
-    def horoscope(self, msg, sign):
-        return self._create_base("Horoskop na dzis dla " + str(sign), msg, self.color, db.icon("BOGDANOFF_ICON"), thumbnail = SIGN_ICON_ARRAY[sign])
+    def _get_heist_color(self, level):
+        return self.COLOR_HARD if str(level).lower() == "hard" else self.COLOR_NORMAL
+
+    def invite(self, level, heist_name, intro_msg, time_limit):
+        embed = self._create_base(
+            title="🚨 NOWY NAPAD GRUPOWY!",
+            description=f"Czas na dołączenie: **{time_limit}**",
+            color=self._get_heist_color(level),
+            thumbnail=self.ICON_CRIMINAL
+        )
+        embed.set_author(name="Pizza One Hit AI", icon_url=self.ICON_BOT)
+        embed.add_field(name=heist_name, value=intro_msg, inline=False)
+        embed.add_field(
+            name="Jak dołączyć?", 
+            value="Napisz `!heist join <KWOTA>`\nWkład zwiększa Twoją dolę z łupu!", 
+            inline=False
+        )
+        return embed
+
+    def simulation_step(self, level, heist_name, message):
+        embed = self._create_base(
+            title=f"🎬 {heist_name}",
+            description=message,
+            color=self._get_heist_color(level),
+            thumbnail=self.ICON_CRIMINAL
+        )
+        return embed
+
+    def info(self, level, heist_name, time_limit, members):
+        embed = self._create_base(
+            title="🏦 Przygotowania do skoku",
+            description=f"Cel: **{heist_name}**",
+            color=self._get_heist_color(level),
+            thumbnail=self.ICON_CRIMINAL
+        )
+        
+        if members:
+            m_list = ""
+            for m in members:
+                name = m[0] if isinstance(m, (list, tuple)) else m['name']
+                m_list += f"• {name}\n"
+            embed.add_field(name="👥 Obecna ekipa:", value=m_list, inline=False)
+        else:
+            embed.add_field(name="👥 Skład:", value="Brak chętnych. Bądź pierwszy!", inline=False)
+
+        embed.add_field(name="⏳ Do startu pozostało:", value=str(time_limit), inline=False)
+        return embed
+
+    def canceled(self, heist_name):
+        return self._create_base(
+            title="🚫 NAPAD ANULOWANY",
+            description=f"Zbyt mało chętnych na skok: **{heist_name}**",
+            color=Colour.light_grey(),
+            thumbnail=self.ICON_CRIMINAL
+        ).add_field(name="Info", value="Punkty zostały zwrócone uczestnikom.")
+
+    def prison_release(self, users):
+        user_list = "\n".join([f"• {u['name']}" for u in users])
+        return self._create_base(
+            title="🔓 WOLNOŚĆ!",
+            description=f"Członkowie Pizza One Hit opuszczają więzienie:\n\n{user_list}",
+            color=self.COLOR_NORMAL,
+            thumbnail=self.ICON_PRISON
+        ).add_field(name="Status", value="Wszystkie funkcje konta zostały przywrócone.")
 ##################################################################
 
 class StocksGen(BaseEmbedGen):
@@ -482,7 +577,22 @@ class UtilityEmbedGen(BaseEmbedGen):
             color=self.ERROR_COLOR, # Używamy czerwonego/pomarańczowego, bo to drastyczna zmiana
             thumbnail=db.icon("ADMIN_CASH")
         )
+    
+    def arrest_result(self, target_user, admin_name):
+        return self._create_base(
+            title="🔒 Aresztowanie",
+            description=f"Użytkownik **{target_user['name']}** został zakuty w kajdanki przez **{admin_name}**.\n\n*„Nie miniesz pola start, nie otrzymasz 200 pkt.”*",
+            color=self.ERROR_COLOR,
+            thumbnail=db.icon("PEPE_JAIL")
+        )
 
+    def free_result(self, target_user, admin_name):
+        return self._create_base(
+            title="🔓 Uwolnienie",
+            description=f"**{target_user['name']}** odzyskał wolność dzięki łasce **{admin_name}**.\n\n*„Idź i nie grzesz więcej.”*",
+            color=self.SUCCESS_COLOR,
+            thumbnail=db.icon("DOGE_LAWYER")
+        )
 ##################################################################
 
 class TheatreEmbedGen(BaseEmbedGen):
