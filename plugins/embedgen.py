@@ -240,30 +240,41 @@ class HeistEmbedGen(BaseEmbedGen):
         ).set_footer(text="Przygotuj się na akcję!")
 
     def heist_info(self, level, heist_name, time_limit, members):
+        from datetime import datetime, date, timedelta
+        
         embed = self._create_base(
             title="🏦 Status przygotowań",
             description=f"Cel: **{heist_name}**",
             color=self._get_heist_color(level),
             thumbnail=self.ICON_CRIMINAL
         )
+        
         if members:
             m_list = ""
             for m in members:
                 name = m[0] if isinstance(m, (list, tuple)) else m.get('name', 'Nieznany')
-                m_list += f" - {name}\n"
+                m_list += f"• {name}\n"
             embed.add_field(name="👥 Ekipa:", value=m_list, inline=False)
         else:
             embed.add_field(name="👥 Skład:", value="Brak chętnych. Bądź pierwszy!", inline=False)
 
-        # --- DYNAMICZNE LICZENIE CZASU ---
         display_time = str(time_limit)
         try:
+            now = datetime.now()
             h_time = datetime.strptime(str(time_limit), "%H:%M:%S").time()
             full_dt = datetime.combine(date.today(), h_time)
+
+            if full_dt < now:
+                full_dt += timedelta(days=1)
+            
             timestamp = int(full_dt.timestamp())
             display_time = f"<t:{timestamp}:R> (`{time_limit}`)"
-        except Exception:
+        except Exception as e:
+            print(f"Błąd konwersji czasu: {e}")
             pass
+
+        embed.add_field(name="⏳ Start napadu:", value=display_time, inline=False)
+        return embed
 
         embed.add_field(name="⏳ Start napadu:", value=display_time, inline=False)
         return embed
