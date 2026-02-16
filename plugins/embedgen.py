@@ -2,7 +2,7 @@ import random
 from discord import Embed, Colour, File
 import time
 from os import environ
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import requests
 import plugins.points as points
 import plugins.pizzadatabase as db
@@ -246,17 +246,26 @@ class HeistEmbedGen(BaseEmbedGen):
             color=self._get_heist_color(level),
             thumbnail=self.ICON_CRIMINAL
         )
-        
         if members:
             m_list = ""
             for m in members:
                 name = m[0] if isinstance(m, (list, tuple)) else m.get('name', 'Nieznany')
-                m_list += f"• {name}\n"
+                m_list += f" - {name}\n"
             embed.add_field(name="👥 Ekipa:", value=m_list, inline=False)
         else:
-            embed.add_field(name="👥 Skład:", value="Brak chętnych.", inline=False)
+            embed.add_field(name="👥 Skład:", value="Brak chętnych. Bądź pierwszy!", inline=False)
 
-        embed.add_field(name="⏳ Start za:", value=str(time_limit), inline=False)
+        # --- DYNAMICZNE LICZENIE CZASU ---
+        display_time = str(time_limit)
+        try:
+            h_time = datetime.strptime(str(time_limit), "%H:%M:%S").time()
+            full_dt = datetime.combine(date.today(), h_time)
+            timestamp = int(full_dt.timestamp())
+            display_time = f"<t:{timestamp}:R> (`{time_limit}`)"
+        except Exception:
+            pass
+
+        embed.add_field(name="⏳ Start napadu:", value=display_time, inline=False)
         return embed
 
     def invite(self, level, heist_name, intro_msg, time_limit):
