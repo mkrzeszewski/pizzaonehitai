@@ -78,8 +78,71 @@ class BaseEmbedGen:
 class GambleEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        self.help_hint = "\n\n💡 `!slots`, `!gamble`"
+        self.help_hint = "\n\n💡 `!slots`, `!gamble`, `!transfer`"
         self.color = Colour.light_grey()
+        self.SUCCESS_COLOR = Colour.dark_green()
+        self.ERROR_COLOR = Colour.dark_red()
+        self.WIN_ICON = db.icon("PEPE_EZ")
+        self.LOSE_ICON = db.icon("PEPE_COPIUM")
+
+    def gamble_result(self, user, amount, result_type, new_balance):
+        if result_type == "win":
+            title = "📈 WYGRANA!"
+            color = self.SUCCESS_COLOR
+            thumb = self.WIN_ICON
+            
+            # Pula tekstów dla zwycięzcy
+            win_phrases = [
+                f"Nieprawdopodobne! **{user['name']}** rozbił bank!",
+                f"Szczęście sprzyja lepszym. Dobra robota, **{user['name']}**!",
+                f"Właśnie tak się to robi! Portfel puchnie.",
+                f"Kasyno Pizza One Hit płacze i płaci. Gratulacje!",
+                f"EZ! **{user['name']}** wchodzi w tryb rekin biznesu."
+            ]
+            msg_header = random.choice(win_phrases)
+            msg = f"{msg_header}\n💰 Zyskałeś: `+{amount:,}` ppkt"
+            
+        else:
+            title = "📉 PORAŻKA..."
+            color = self.ERROR_COLOR
+            thumb = self.LOSE_ICON
+
+            lose_phrases = [
+                f"Ups... **{user['name']}** właśnie sfinansował obiady administracji.",
+                f"Dom zawsze wygrywa. Może następnym razem?",
+                f"Przykry widok. **{user['name']}** traci wszystko przez jedną decyzję.",
+                f"Spokojnie, to tylko cyferki... których już nie masz.",
+                f"Widziałem to w zwolnionym tempie. Zabolało."
+            ]
+            msg_header = random.choice(lose_phrases)
+            msg = f"{msg_header}\n💸 Straciłeś: `-{amount:,}` ppkt"
+
+        embed = self._create_base(
+            title=title,
+            description=f"{msg}\n\n**Twój obecny stan konta:** `{new_balance:,}` ppkt",
+            color=color,
+            thumbnail=thumb
+        )
+        return embed
+    
+    def transfer_result(self, sender, receiver, amount):
+        phrases = [
+            f"💰 **{sender['name']}** sypnął groszem dla **{receiver['name']}**!",
+            f"💸 Przelew dotarł! **{receiver['name']}** jest teraz bogatszy o `{amount:,}` pkt.",
+            f"🤝 Czysty biznes. **{sender['name']}** przekazał środki dla **{receiver['name']}**.",
+            f"🎁 **{receiver['name']}** dostał prezent od **{sender['name']}**! Co za hojność.",
+            f"🏧 Transakcja zakończona sukcesem. **{sender['name']}** -> **{receiver['name']}**."
+        ]
+        description = random.choice(phrases)
+        
+        embed = self._create_base(
+            title="💸 Przelew Punktów",
+            description=f"{description}\n\n**Kwota:** `{amount:,}` pkt",
+            color=self.color,
+            thumbnail=db.icon("TRANSFER_ICON")
+        )
+        return embed
+##################################################################
 
 class HoroscopeEmbedGen(BaseEmbedGen):
     def __init__(self):
@@ -384,13 +447,6 @@ class UtilityEmbedGen(BaseEmbedGen):
             color=self.ERROR_COLOR, # Używamy czerwonego/pomarańczowego, bo to drastyczna zmiana
             thumbnail=db.icon("ADMIN_CASH")
         )
-##################################################################
-
-class GambleEmbedGen(BaseEmbedGen):
-    def __init__(self):
-        super().__init__()
-        self.WIN_COLOR = Colour.dark_green()
-        self.LOSE_COLOR = Colour.dark_red()
 
 ##################################################################
 

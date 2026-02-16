@@ -106,6 +106,8 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             return await handleStocksModule(action, args, user, dcbot, userAvatarURL)
         elif module == "utility":
             return await handleUtilityModule(action, args, user, dcbot, userAvatarURL)
+        elif module == "gamble":
+            return await handleGambleModule(action, args, user, dcbot, userAvatarURL)
             
     #komendy wielokomendowe
     if len(commands) > 1:
@@ -874,6 +876,102 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         returnText = "Funkcja knajpy poki co nie dziala."
     elif action == "weather":
         returnEmbed = _defaultEmbedGen.neutral_msg("Pogoda: ", weather.getLodzWeather())
+
+    return returnEmbed, returnText, returnView, returnFile
+
+async def handleGambleModule(action, args, user, dcbot, avatarUrl):
+    returnEmbed, returnView, returnFile, returnText = None, None, None, ""
+    defaultTitle = "Ekonomia P1H"
+    if action == "slots":
+        MAX_SLOT_AMOUNT = 5000
+        if not args:
+            return None, "Podaj kwotę! Przykład: `!slots 500`", None, None
+
+        amount_raw = args[0]
+        if not amount_raw.isdigit():
+            return None, "❌ Kwota musi być liczbą dodatnią!", None, None
+        
+        amount = int(amount_raw)
+        curr_points = int(user.get('points', 0))
+
+        # 2. Walidacja limitów i portfela
+        if amount > MAX_SLOT_AMOUNT:
+            return None, f"🚫 Maksymalny zakład w slotsach to `{MAX_SLOT_AMOUNT:,}` pkt.", None, None
+        
+        if amount < 5:
+            return None, "🚫 Minimalny zakład to `5` pkt.", None, None
+
+        if curr_points < amount:
+            return None, f"❌ Nie masz tyle punktów! Twoje saldo: `{curr_points:,}` pkt.", None, None
+
+        # 3. Wywołanie Twojej dedykowanej funkcji generującej
+        # Zakładam, że generateSlots zajmuje się losowaniem, aktualizacją bazy i tworzeniem grafiki
+        returnEmbed, returnFile = generateSlots(amount, user)
+
+    elif action == "transfer":
+        if len(args) < 2:
+            return None, "Niepoprawnie użyta komenda. Użyj np: `!tip @roLab 20`", None, None
+
+        target_raw = args[0]
+        amount_raw = args[1]
+
+        if not amount_raw.isdigit():
+            return None, "❌ ERROR: Kwota musi być liczbą całkowitą!", None, None
+        
+        amount = int(amount_raw)
+        user_points = int(user.get('points', 0))
+        if amount <= 0:
+            return None, "❌ Musisz przelać więcej niż 0!", None, None
+            
+        if amount > user_points:
+            return None, f"❌ Możesz dać tylko tyle ile masz! (Masz: `{user_points:,}` pkt)", None, None
+
+        dest_user = userFromPattern(target_raw)
+        if not dest_user:
+            return None, f"❌ Nie znam tego użytkownika: `{target_raw}`.", None, None
+
+        if str(dest_user['discord_id']) == str(user['discord_id']):
+            return None, "❌ Nie możesz przelać punktów samemu sobie! To nie inflacja.", None, None
+
+        points.transferPoints(str(user['discord_id']), dest_user['discord_id'], amount)
+        returnEmbed = _gambleEmbedGen.transfer_result(user, dest_user, amount)
+
+    elif action == "rewards":
+        return None, None, None, ""
+    elif action == "gamble":
+        if not args:
+            return None, None, None, "Musisz podać kwotę lub `all`! Przykład: `!gamble 100`"
+
+        curr_points = int(user.get('points', 0))
+        input_val = str(args[0]).lower()
+
+        if input_val == "all":
+            amount = curr_points
+        elif input_val.isdigit():
+            amount = int(input_val)
+        else:
+            return None, None, None, "Musisz obstawić liczbę naturalną lub `all`!"
+        
+        min_bet = max(int(curr_points * 0.1), 25)
+
+        if amount > curr_points:
+            returnText = f"Nie masz tyle punktów! Posiadasz tylko `{curr_points:,}`."
+        elif amount < min_bet and curr_points >= 25:
+             returnText = f"Za mała stawka! Minimalny zakład dla Ciebie to `{min_bet:,}` pkt (10% portfela lub min. 25)."
+        elif amount <= 0:
+            returnText = "Chcesz grać o nic? Obstaw coś konkretnego!"
+        
+        else:
+            result = random.randint(1, 2)
+            
+            if result == 1: # WYGRANA
+                new_balance = curr_points + amount
+                db.updateUser('discord_id', str(user['discord_id']), 'points', new_balance)
+                returnEmbed = _gambleEmbedGen.gamble_result(user, amount, "win", new_balance)
+            else: # PRZEGRANA
+                new_balance = curr_points - amount
+                db.updateUser('discord_id', str(user['discord_id']), 'points', new_balance)
+                returnEmbed = _gambleEmbedGen.gamble_result(user, amount, "loss", new_balance)
 
     return returnEmbed, returnText, returnView, returnFile
 
