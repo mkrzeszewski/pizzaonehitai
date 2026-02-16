@@ -371,7 +371,7 @@ def retrieveEvents(key, value):
     return eventsCollection.find({key: value})
 
 def retrieveEventFromTheatre(theatre, title):
-    return eventsCollection.find_one({"theatre": theatre, "title": title}, {"_id": 0, "name":1})
+    return eventsCollection.find_one({"teatr": theatre, "title": title}, {"_id": 0, "name":1})
 
 def retrieveEventsFromTheatre(theatre, title):
     return list(eventsCollection.find({"title":title,"teatr":theatre}))

@@ -46,7 +46,6 @@ def checkNewEvents():
             i.filter_events()
 
             for w in wydarzenia_on_site:
-                dateArray = []
                 if len(w["dates"]) == 0:
                     continue
 
@@ -60,7 +59,7 @@ def checkNewEvents():
                     new_dates = i.compare_dates(wydarzenie_in_db[0])
 
                 if len(new_dates) > 0:
-                    db.updateEvent(w['title'], w['teatr'], w)
+                    db.updateEvent(w['teatr'], w['title'], w)
                     
                     msg = f"Nowe terminy na **{w["title"]}** w {w["teatr"]}:\n"
                     eventArray.append([w["title"], new_dates])
