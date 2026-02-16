@@ -106,7 +106,7 @@ async def handleResponse(userMessage, author, dcbot = None) -> str:
             return await handleStocksModule(action, args, user, dcbot, userAvatarURL)
         elif module == "utility":
             return await handleUtilityModule(action, args, user, dcbot, userAvatarURL)
-        elif module == "gamble":
+        elif module == "economy":
             return await handleGambleModule(action, args, user, dcbot, userAvatarURL)
             
     #komendy wielokomendowe
