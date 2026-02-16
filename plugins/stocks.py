@@ -168,8 +168,14 @@ def purchaseStocks(username, stocksymbol, amount):
     success = False
     msg = ""
     user = db.retrieveUser('name', username)
+    
+
     stock = db.retrieveStock('symbol', stocksymbol)
     if user and stock:
+        ownedStocks = [s['symbol'] for s in user.get('stocksOwned', [])]
+        if stocksymbol not in ownedStocks and len(ownedStocks) >= 3:
+            return False, f"❌ **{username}**, masz już akcje 3 różnych spółek. Sprzedaj coś, zanim kupisz `{stocksymbol}`!"
+        
         userPoints = int(user['points'])
         if int(stock['availableShares']) >= amount:
             if userPoints >= int(stock['price'] * amount):
