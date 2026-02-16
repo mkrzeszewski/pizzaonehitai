@@ -222,7 +222,6 @@ class HoroscopeEmbedGen(BaseEmbedGen):
 class HeistEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        #self.help_hint = "\n\n💡 `!join`, `!heistinfo`"
         self.ICON_CRIMINAL = db.icon("CRIMINAL_ICON")
         self.ICON_PRISON = db.icon("PEPE_PRISON")
         self.ICON_BOT = db.icon("BOT_GIF_ADDRESS")
@@ -232,35 +231,18 @@ class HeistEmbedGen(BaseEmbedGen):
     def _get_heist_color(self, level):
         return self.COLOR_HARD if str(level).lower() == "hard" else self.COLOR_NORMAL
 
-    def invite(self, level, heist_name, intro_msg, time_limit):
-        embed = self._create_base(
-            title="🚨 NOWY NAPAD GRUPOWY!",
-            description=f"Czas na dołączenie: **{time_limit}**",
-            color=self._get_heist_color(level),
+    def join_success(self, user, amount):
+        return self._create_base(
+            title="🔫 Nowy Rekrut!",
+            description=f"**{user['name']}** dołączył do ekipy i wyłożył `{amount:,}` pkt.",
+            color=self.COLOR_NORMAL,
             thumbnail=self.ICON_CRIMINAL
-        )
-        embed.set_author(name="Pizza One Hit AI", icon_url=self.ICON_BOT)
-        embed.add_field(name=heist_name, value=intro_msg, inline=False)
-        embed.add_field(
-            name="Jak dołączyć?", 
-            value="Napisz `!join <KWOTA>`\nWkład zwiększa Twoją dolę z łupu!", 
-            inline=False
-        )
-        return embed
+        ).set_footer(text="Przygotuj się na akcję!")
 
-    def simulation_step(self, level, heist_name, message):
+    def heist_info(self, level, name, time_limit, members):
         embed = self._create_base(
-            title=f"🎬 {heist_name}",
-            description=message,
-            color=self._get_heist_color(level),
-            thumbnail=self.ICON_CRIMINAL
-        )
-        return embed
-
-    def info(self, level, heist_name, time_limit, members):
-        embed = self._create_base(
-            title="🏦 Przygotowania do skoku",
-            description=f"Cel: **{heist_name}**",
+            title="🏦 Status przygotowań",
+            description=f"Cel: **{name}**",
             color=self._get_heist_color(level),
             thumbnail=self.ICON_CRIMINAL
         )
@@ -268,31 +250,28 @@ class HeistEmbedGen(BaseEmbedGen):
         if members:
             m_list = ""
             for m in members:
-                name = m[0] if isinstance(m, (list, tuple)) else m['name']
+                name = m[0] if isinstance(m, (list, tuple)) else m.get('name', 'Nieznany')
                 m_list += f"• {name}\n"
-            embed.add_field(name="👥 Obecna ekipa:", value=m_list, inline=False)
+            embed.add_field(name="👥 Ekipa:", value=m_list, inline=False)
         else:
-            embed.add_field(name="👥 Skład:", value="Brak chętnych. Bądź pierwszy!", inline=False)
+            embed.add_field(name="👥 Skład:", value="Brak chętnych.", inline=False)
 
-        embed.add_field(name="⏳ Do startu pozostało:", value=str(time_limit), inline=False)
+        embed.add_field(name="⏳ Start za:", value=str(time_limit), inline=False)
         return embed
 
-    def canceled(self, heist_name):
-        return self._create_base(
-            title="🚫 NAPAD ANULOWANY",
-            description=f"Zbyt mało chętnych na skok: **{heist_name}**",
-            color=Colour.light_grey(),
+    def invite(self, level, heist_name, intro_msg, time_limit):
+        embed = self._create_base(
+            title="🚨 NOWY NAPAD!",
+            description=f"Start: **{time_limit}**",
+            color=self._get_heist_color(level),
             thumbnail=self.ICON_CRIMINAL
-        ).add_field(name="Info", value="Punkty zostały zwrócone uczestnikom.")
+        )
+        embed.set_author(name="Pizza One Hit AI", icon_url=self.ICON_BOT)
+        embed.add_field(name=heist_name, value=intro_msg, inline=False)
+        embed.add_field(name="Komenda:", value="`!heist join <KWOTA>`", inline=False)
+        return embed
+    
 
-    def prison_release(self, users):
-        user_list = "\n".join([f"• {u['name']}" for u in users])
-        return self._create_base(
-            title="🔓 WOLNOŚĆ!",
-            description=f"Członkowie Pizza One Hit opuszczają więzienie:\n\n{user_list}",
-            color=self.COLOR_NORMAL,
-            thumbnail=self.ICON_PRISON
-        ).add_field(name="Status", value="Wszystkie funkcje konta zostały przywrócone.")
 ##################################################################
 
 class StocksGen(BaseEmbedGen):

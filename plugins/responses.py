@@ -794,11 +794,9 @@ async def handleHeistModule(action, args, user, dcbot, avatarUrl):
         if curr_points < amount:
             return None, f"❌ Nie masz tyle punktów! (Masz: `{curr_points:,}`)", None, None
 
-        # 3. Sprawdzenie czy już jest w ekipie
         if db.isUserPartOfCurrentHeist(user['name']):
             return None, "👀 Już jesteś w ekipie na ten skok!", None, None
 
-        # 4. Akcja
         db.appendHeistMember(user['name'], amount)
         points.addPoints(str(user['discord_id']), -amount)
         

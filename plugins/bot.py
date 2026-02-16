@@ -117,6 +117,9 @@ def runDiscordBot():
     @tasks.loop(hours=4)
     async def manageHeist():
         channel = bot.get_channel(DEFAULT_HEIST_CHANNEL)
+        if not channel:
+            print("[ERROR] Nie znaleziono kanału dla napadów!")
+            return
         if not db.isHeistOngoing():
             heist.generateHeist()
             currHeist = db.retrieveHeistInfo()
@@ -137,9 +140,16 @@ def runDiscordBot():
                 members=currHeist['members']
             )
             await channel.send(embed=embed)
-        start_time_dt = datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time()
-        await waitUntil(start_time_dt)
-        await triggerHeist(channel)
+        currHeist = db.retrieveHeistInfo()
+        
+        try:
+            start_time_dt = datetime.strptime(currHeist['when_starts'], "%H:%M:%S").time()
+            
+            print(f"[HEIST] Oczekiwanie na start napadu '{currHeist['heist_name']}' o godzinie {start_time_dt}")
+            await waitUntil(start_time_dt)
+            await triggerHeist(channel)
+        except ValueError as e:
+            print(f"[ERROR] Błędny format czasu w bazie danych: {currHeist['when_starts']}. Błąd: {e}")
 
     @tasks.loop(hours = 24.0)
     async def freePeopleFromPrison():
