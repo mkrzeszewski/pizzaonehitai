@@ -800,7 +800,7 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         task = db.retrieveTask('name', task_name)
         if not task:
             return None, f"🔍 Nie znaleziono zadania o nazwie: `{task_name}`.", None, None
-        if action == "enable":
+        if action == "enabletask":
             db.enableTask(task_name)
             returnText = f"✅ Zadanie `{task_name}` zostało **włączone**."
         else:
