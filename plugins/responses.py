@@ -790,7 +790,7 @@ async def handleUtilityModule(action, args, user, dcbot, avatarUrl):
         
         points.addPoints(dest_user['discord_id'], amount)
         returnEmbed = _utilityEmbedGen.admin_add_points(dest_user, amount, user['name'])
-    elif action in ["enable", "disable"]:
+    elif action in ["enabletask", "disabletask"]:
         if user.get('role') != "owner":
             return None, securityResponse, None, None
         if not args:
