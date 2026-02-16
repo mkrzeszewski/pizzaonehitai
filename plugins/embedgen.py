@@ -222,7 +222,7 @@ class HoroscopeEmbedGen(BaseEmbedGen):
 class HeistEmbedGen(BaseEmbedGen):
     def __init__(self):
         super().__init__()
-        self.help_hint = "\n\n💡 `!join`, `!heistinfo`"
+        #self.help_hint = "\n\n💡 `!join`, `!heistinfo`"
         self.ICON_CRIMINAL = db.icon("CRIMINAL_ICON")
         self.ICON_PRISON = db.icon("PEPE_PRISON")
         self.ICON_BOT = db.icon("BOT_GIF_ADDRESS")
