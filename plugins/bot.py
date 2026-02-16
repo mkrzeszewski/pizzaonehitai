@@ -133,7 +133,7 @@ def runDiscordBot():
             await channel.send(embed=embed)
         else:
             currHeist = db.retrieveHeistInfo()
-            embed = responses._heistEmbedGen.info(
+            embed = responses._heistEmbedGen.heist_info(
                 level=currHeist['level'], 
                 heist_name=currHeist['heist_name'], 
                 time_limit=currHeist['when_starts'], 
