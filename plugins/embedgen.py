@@ -239,10 +239,10 @@ class HeistEmbedGen(BaseEmbedGen):
             thumbnail=self.ICON_CRIMINAL
         ).set_footer(text="Przygotuj się na akcję!")
 
-    def heist_info(self, level, name, time_limit, members):
+    def heist_info(self, level, heist_name, time_limit, members):
         embed = self._create_base(
             title="🏦 Status przygotowań",
-            description=f"Cel: **{name}**",
+            description=f"Cel: **{heist_name}**",
             color=self._get_heist_color(level),
             thumbnail=self.ICON_CRIMINAL
         )
