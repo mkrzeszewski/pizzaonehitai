@@ -276,9 +276,6 @@ class HeistEmbedGen(BaseEmbedGen):
         embed.add_field(name="⏳ Start napadu:", value=display_time, inline=False)
         return embed
 
-        embed.add_field(name="⏳ Start napadu:", value=display_time, inline=False)
-        return embed
-
     def invite(self, level, heist_name, intro_msg, time_limit):
         embed = self._create_base(
             title="🚨 NOWY NAPAD!",
