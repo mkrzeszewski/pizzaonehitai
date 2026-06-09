@@ -14,17 +14,17 @@ for record in initialInstructions:
     instructionString += record['instruction'] + "\n"
 if instructionString.strip():
     model = genai.GenerativeModel(
-        "models/gemini-2.0-flash", system_instruction = instructionString
+        "models/gemini-2.5-flash", system_instruction = instructionString
     )
 else:
-    model = genai.GenerativeModel("models/gemini-2.0-flash")
+    model = genai.GenerativeModel("models/gemini-2.5-flash")
 chat = model.start_chat()
 
 #ai for heist generation in heist.py
 with open("config/heist-instructions.json", "r", encoding="utf-8") as file:
     heistInstruction = json.load(file)
 heistModel = genai.GenerativeModel(
-    "models/gemini-2.0-flash", system_instruction = heistInstruction
+    "models/gemini-2.5-flash", system_instruction = heistInstruction
 )
 heistChat = heistModel.start_chat()
 
@@ -32,7 +32,7 @@ heistChat = heistModel.start_chat()
 with open("config/stocks-instructions.json", "r", encoding="utf-8") as file:
     stockInstruction = json.load(file)
 stockModel = genai.GenerativeModel(
-    "models/gemini-2.0-flash", system_instruction = stockInstruction
+    "models/gemini-2.5-flash", system_instruction = stockInstruction
 )
 stockChat = stockModel.start_chat()
 
@@ -44,7 +44,7 @@ def askAI(message):
 
 def resetModel():
     global model, chat
-    model = genai.GenerativeModel("models/gemini-2.0-flash", system_instruction = instructionString)
+    model = genai.GenerativeModel("models/gemini-2.5-flash", system_instruction = instructionString)
     chat = model.start_chat()
 
 def generateHeist(message):
