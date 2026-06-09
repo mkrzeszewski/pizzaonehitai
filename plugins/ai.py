@@ -51,4 +51,5 @@ def generateHeist(message):
     return heistModel.generate_content(message).text
 
 def generateStocks(message):
+    print(message)
     return stockModel.generate_content(message).text
