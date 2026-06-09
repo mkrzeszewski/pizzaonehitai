@@ -1100,6 +1100,12 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
             returnEmbed = _stockEmbedGen.stock_event(user, None, msg, "cashout")
         else:
             returnEmbed = _utilityEmbedGen.error_msg(defaultTitle,msg)
+    elif action == "generate":
+        if user.get('role') != "owner":
+            return None, securityResponse, None, None
+        else:
+            stocks.generateStocks()
+            returnText = f"Zrekroewano gielde."
     elif action in ["buy", "sell"]:
         if len(args) < 2:
             returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Brak symbolu lub ilości.", f"!{action} [SYMBOL] [ILOŚĆ]")
