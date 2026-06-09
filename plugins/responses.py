@@ -1068,6 +1068,16 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
     returnEmbed, returnView, returnFile, returnText = None, None, None, ""
     defaultTitle = "Giełda P1H"
     stockSymbol = args[0].upper() if args else None
+    
+
+    #in case of manual recreation
+    if action == "generate":
+        if user.get('role') != "owner":
+            return None, securityResponse, None, None
+        else:
+            stocks.generateStocks()
+            returnText = f"Zrekroewano gielde."
+
     _stocks = list(db.retrieveTopStocks(100))
     if not _stocks:
         return _utilityEmbedGen.error_msg(defaultTitle, "Obecnie nie ma akcji na giełdzie."), None, None, None
@@ -1100,12 +1110,6 @@ async def handleStocksModule(action, args, user, dcbot, avatarUrl):
             returnEmbed = _stockEmbedGen.stock_event(user, None, msg, "cashout")
         else:
             returnEmbed = _utilityEmbedGen.error_msg(defaultTitle,msg)
-    elif action == "generate":
-        if user.get('role') != "owner":
-            return None, securityResponse, None, None
-        else:
-            stocks.generateStocks()
-            returnText = f"Zrekroewano gielde."
     elif action in ["buy", "sell"]:
         if len(args) < 2:
             returnEmbed = _utilityEmbedGen.error_msg(defaultTitle, "Brak symbolu lub ilości.", f"!{action} [SYMBOL] [ILOŚĆ]")
